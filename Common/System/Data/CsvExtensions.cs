@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace System.Data
 {
     /// <summary>
     /// csv扩展
     /// </summary>
-    public static class CsvExtension
+    public static class CsvExtensions
     {
         /// <summary>
         /// 转换为Csv

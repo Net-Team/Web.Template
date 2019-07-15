@@ -1,8 +1,7 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
-namespace System
+namespace System.Reflection
 {
     /// <summary>
     /// 表示式委托

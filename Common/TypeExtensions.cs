@@ -1,12 +1,37 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace System
 {
     /// <summary>
     /// 类型扩展
     /// </summary>
-    static class TypeExtensionss
+    public static class TypeExtensionss
     {
+        /// <summary>
+        /// 类型的默认值缓存
+        /// </summary>
+        private static readonly ConcurrentCache<Type, object> typeDefaultValueCache = new ConcurrentCache<Type, object>();
+
+
+        /// <summary>
+        /// 返回类型的默认值
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object DefaultValue(this Type type)
+        {
+            if (type == null)
+            {
+                return null;
+            }
+
+            return typeDefaultValueCache.GetOrAdd(type, t =>
+            {
+                var value = Expression.Convert(Expression.Default(t), typeof(object));
+                return Expression.Lambda<Func<object>>(value).Compile().Invoke();
+            });
+        }
 
 #if !NETSTANDARD1_3
         /// <summary>

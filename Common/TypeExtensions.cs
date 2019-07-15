@@ -6,7 +6,7 @@ namespace System
     /// <summary>
     /// 类型扩展
     /// </summary>
-    public static class TypeExtensionss
+    public static class TypeExtensions
     {
         /// <summary>
         /// 类型的默认值缓存

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application;
+using IdentityModel;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,6 +33,17 @@ namespace Web.Host
             services.RegisterDependencyInterfaces(typeof(ApplicationService).Assembly);
 
             services.AddControllers();
+
+            //添加认证配置
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "http://account.taichuan.com"; // 认证站点地址
+                    options.RequireHttpsMetadata = false;
+                    options.ApiName = "Web.Template";
+                    options.RoleClaimType = JwtClaimTypes.Role;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

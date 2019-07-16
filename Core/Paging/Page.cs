@@ -13,7 +13,7 @@ namespace Core.Paging
         /// <summary>
         /// 当前页面数据
         /// </summary>
-        private IEnumerable<T> datas { get; set; }
+        private readonly IEnumerable<T> datas;
 
         /// <summary>
         /// 页面索引

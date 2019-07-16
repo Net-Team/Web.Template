@@ -94,7 +94,7 @@ namespace System.Linq
                 throw new ArgumentNullException("orderByString");
             }
 
-            Func<string[], bool> descFun = (item) => item.Length > 1 && item[1].Equals("desc", StringComparison.OrdinalIgnoreCase);
+            bool descFun(string[] item) => item.Length > 1 && item[1].Equals("desc", StringComparison.OrdinalIgnoreCase);
 
             var parameters = orderByString
                 .Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -126,14 +126,7 @@ namespace System.Linq
         /// <returns></returns>
         public static IOrderedQueryable<T> OrderBy<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> orderKeySelector, bool ascending)
         {
-            if (ascending)
-            {
-                return source.OrderBy(orderKeySelector);
-            }
-            else
-            {
-                return source.OrderByDescending(orderKeySelector);
-            }
+            return ascending ? source.OrderBy(orderKeySelector) : source.OrderByDescending(orderKeySelector);
         }
 
         /// <summary>
@@ -148,14 +141,7 @@ namespace System.Linq
         /// <returns></returns>
         public static IOrderedQueryable<T> ThenBy<T, TKey>(this IOrderedQueryable<T> source, Expression<Func<T, TKey>> orderKeySelector, bool ascending)
         {
-            if (ascending)
-            {
-                return source.ThenBy(orderKeySelector);
-            }
-            else
-            {
-                return source.ThenByDescending(orderKeySelector);
-            }
+            return ascending ? source.ThenBy(orderKeySelector) : source.ThenByDescending(orderKeySelector);
         }
     }
 }

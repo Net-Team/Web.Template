@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Dependency
+﻿namespace Core.Dependency
 {
+    /// <summary>
+    /// 定义Transient模式的对象注入接口
+    /// </summary>
     public interface ITransientDependency
     {
     }

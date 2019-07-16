@@ -18,7 +18,7 @@ namespace Web.Core.Startups
         /// </summary>
         /// <param name="services"></param>
         /// <param name="assembly"></param>
-        public static void RegisterDependencyInterfaces(this IServiceCollection services, Assembly assembly)
+        public static void RegisterDependencyServices(this IServiceCollection services, Assembly assembly)
         {
             var types = assembly.GetTypes().Where(item => item.IsClass && item.IsAbstract == false).ToArray();
             var singletons = types.Where(item => item.IsInheritFrom<ISingletonDependency>());

@@ -21,6 +21,7 @@ namespace Web.Host
             return Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseUrls("https://*:7000");
                     webBuilder.UseStartup<Startup>();
                 });
         }

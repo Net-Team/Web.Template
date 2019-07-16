@@ -37,7 +37,13 @@ namespace Domain
             var idQuery = source.OrderBy(orderBy).Skip(pageIndex * pageSize).Take(pageSize).Select(idSelector);
             var datas = await source.Join(idQuery, idSelector, item => item, (item, id) => item).OrderBy(orderBy).ToArrayAsync();
 
-            return new Page<T>(datas) { PageIndex = pageIndex, PageSize = pageSize, TotalCount = total };
+            return new Page<T>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = total,
+                DataArray = datas
+            };
         }
 
         /// <summary>
@@ -57,8 +63,14 @@ namespace Domain
             var maxPageIndex = (int)Math.Floor((double)total / pageSize) + inc;
             pageIndex = Math.Max(0, Math.Min(pageIndex, maxPageIndex));
 
-            var datas = await source.OrderBy(orderBy).Skip(pageIndex * pageSize).Take(pageSize).AsNoTracking().ToListAsync();
-            return new Page<T>(datas) { PageIndex = pageIndex, PageSize = pageSize, TotalCount = total };
+            var datas = await source.OrderBy(orderBy).Skip(pageIndex * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
+            return new Page<T>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = total,
+                DataArray = datas
+            };
         }
     }
 }

@@ -5,23 +5,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Application;
+using Application.Baidu;
 
 namespace Web.Host.Controllers
 {
-    [Authorize]
+
     [Route("api/[controller]")]
-    [ApiController] 
+    [ApiController]
     public class ValuesController : ControllerBase
-    { 
+    {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public  async Task <IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
         {
-            return new string[] { "value1", "value2" };
+            var sum = baidu.Sum(1, 3);
+            var html = await baiduApi.GetAsync();
+            return new string[] { sum.ToString() };
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<string> Get(int id)
         {
             return "value";

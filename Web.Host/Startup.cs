@@ -32,9 +32,12 @@ namespace Web.Host
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SqlDbContext>();
-            services.RegisterDependencyServices(typeof(ApplicationService).Assembly);
+
+            services.AddHttpApis(typeof(ApplicationService).Assembly);
+            services.AddDependencyServices(typeof(ApplicationService).Assembly);
 
             services.AddControllers();
+
 
 
             //ÃÌº”»œ÷§≈‰÷√

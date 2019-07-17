@@ -6,20 +6,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Application;
-using Application.Baidu;
+using Application.Baidus;
 using Web.Core.Controllers;
 
 namespace Web.Host.Controllers
 {
-
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ValuesController : CoreController
+    [Route("api/[controller]")]   
+    public class ValuesController : ApiController
     {
         // GET api/values
         [HttpGet]
-        public  async Task <IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
+        public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
         {
+            var where = this.GetQueryPredicate<Baidu>();
             var sum = baidu.Sum(1, 3);
             var html = await baiduApi.GetAsync();
             return new string[] { sum.ToString() };
@@ -30,7 +29,6 @@ namespace Web.Host.Controllers
         [Authorize]
         public ActionResult<string> Get(int id)
         {
-            this.Request.Query
             return "value";
         }
 

@@ -1,7 +1,7 @@
 ﻿using WebApiClient;
 using WebApiClient.Attributes;
 
-namespace Application.Baidu
+namespace Application.Baidus
 {
     public interface IBaiduApi : IHttpApi
     {

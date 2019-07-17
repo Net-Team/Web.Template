@@ -7,9 +7,11 @@ using System.Linq.Expressions;
 namespace Web.Core.Controllers
 {
     /// <summary>
-    /// 表示基础核心控制器
+    /// 表示Api控制器
+    /// 提供查询条件表达式的获取
     /// </summary>
-    public abstract class CoreController : ControllerBase
+    [ApiController]
+    public abstract class ApiController : ControllerBase
     {
         /// <summary>
         /// 从请求Query获取查询表达式
@@ -32,6 +34,7 @@ namespace Web.Core.Controllers
             var items = this.GetConditionItems<T>();
             return new Condition<T>(items);
         }
+
         /// <summary>
         /// 从Query获取条件项
         /// </summary>

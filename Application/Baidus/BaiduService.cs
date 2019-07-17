@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Application.Baidu
+namespace Application.Baidus
 {
     public class BaiduService : TransientApplicationService
     {

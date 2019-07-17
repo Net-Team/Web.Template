@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Application;
 using Application.Baidu;
+using Web.Core.Controllers;
 
 namespace Web.Host.Controllers
 {
 
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesController : CoreController
     {
         // GET api/values
         [HttpGet]
@@ -29,6 +30,7 @@ namespace Web.Host.Controllers
         [Authorize]
         public ActionResult<string> Get(int id)
         {
+            this.Request.Query
             return "value";
         }
 

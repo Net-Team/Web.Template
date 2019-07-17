@@ -18,6 +18,7 @@ namespace Domain
         /// 性能最好
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
+        /// <typeparam name="TId">Id类型</typeparam>
         /// <param name="source">数据源</param>    
         /// <param name="orderBy">排序字符串</param>
         /// <param name="pageIndex">分页索引</param>

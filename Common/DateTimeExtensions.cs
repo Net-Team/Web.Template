@@ -78,13 +78,23 @@ namespace System
         }
 
         /// <summary>
-        /// 转为日期格式
+        /// 转为日期格式 yyyy-MM-dd
         /// </summary>
         /// <param name="dateTime">时间</param>
         /// <returns></returns>
         public static string ToDateString(this DateTime dateTime)
         {
             return dateTime.ToString("yyyy-MM-dd");
+        }
+
+        /// <summary>
+        /// 转为日期格式 yyyy-MM-dd HH:mm:ss
+        /// </summary>
+        /// <param name="dateTime">时间</param>
+        /// <returns></returns>
+        public static string ToDateTimeString(this DateTime dateTime)
+        {
+            return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         /// <summary>
@@ -119,6 +129,26 @@ namespace System
             {
                 yield return min.AddDays(i);
             }
+        }
+
+        /// <summary>  
+        /// 获取时间毫秒戳 Timestamp
+        /// </summary>  
+        /// <param name="dt"></param>  
+        /// <returns></returns>  
+        public static long ToTimeStamp(this DateTime dt)
+        {
+            return new DateTimeOffset(dt).ToUniversalTime().ToUnixTimeMilliseconds();
+        }
+
+        /// <summary>  
+        /// 获取时间秒戳 Timestamp
+        /// </summary>  
+        /// <param name="dt"></param>  
+        /// <returns></returns>  
+        public static long ToTimeStampBySeconds(this DateTime dt)
+        {
+            return new DateTimeOffset(dt).ToUniversalTime().ToUnixTimeSeconds();
         }
     }
 }

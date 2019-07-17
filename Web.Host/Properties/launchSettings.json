@@ -15,7 +15,8 @@
       "launchUrl": "api/values",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "nativeDebugging": false
     },
     "Web.Host": {
       "commandName": "Project",
@@ -24,6 +25,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
+      "nativeDebugging": true,
       "applicationUrl": "https://localhost:7000"
     },
     "Docker": {

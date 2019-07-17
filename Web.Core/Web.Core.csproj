@@ -2,14 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CodeAnalysisRuleSet>Web.Core.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet>Web.Core.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,10 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Filters\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WebApiClient.Extensions.HttpClientFactory" Version="2.0.3" />
   </ItemGroup>
 
 </Project>

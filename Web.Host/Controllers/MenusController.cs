@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Collections.Generic;
 using Web.Core.Controllers;
+using Web.Core.Filters;
 
 namespace Web.Host.Controllers
 {

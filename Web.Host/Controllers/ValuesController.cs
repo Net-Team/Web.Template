@@ -1,10 +1,10 @@
 ﻿using Application.Baidus;
-using Core.Menus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Web.Core.Controllers;
+using Web.Core.Filters;
 
 namespace Web.Host.Controllers
 {
@@ -15,7 +15,7 @@ namespace Web.Host.Controllers
         [HttpGet]
         [MenuItem("测试", GroupName = "系统")]
         public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
-        {
+        { 
             var where = this.GetQueryPredicate<Baidu>();
             var sum = baidu.Sum(1, 3);
             var html = await baiduApi.GetAsync();

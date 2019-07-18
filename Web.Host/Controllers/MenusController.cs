@@ -25,7 +25,7 @@ namespace Web.Host.Controllers
         /// <returns></returns>
         [HttpGet]
         [ApiExplorerSettings()]
-        public async Task<MenuItem[]> Get(
+        public async Task<MenuGroup[]> Get(
             [FromServices]MenuService menuService,
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)
         {
@@ -33,22 +33,30 @@ namespace Web.Host.Controllers
             var userMenus = await menuService.GetMenusAsync(userId);
             var allMenuItems = GetMenuItems(apiExplorer);
 
-            var q = from a in allMenuItems
-                    join u in userMenus
-                    on a.RelativePath equals u.RelativePath
-                    into g
-                    from item in g.DefaultIfEmpty()
-                    select new MenuItem
-                    {
-                        Name = a.Name,
-                        GroupName = a.GroupName,
-                        HttpMethod = a.HttpMethod,
-                        Class = a.Class,
-                        RelativePath = a.RelativePath,
-                        Enable = item?.Enable == true
-                    };
+            var menuItems = from a in allMenuItems
+                            join u in userMenus
+                            on a.RelativePath equals u.RelativePath
+                            into g
+                            from item in g.DefaultIfEmpty()
+                            select new MenuItem
+                            {
+                                Name = a.Name,
+                                GroupName = a.GroupName,
+                                HttpMethod = a.HttpMethod,
+                                Class = a.Class,
+                                RelativePath = a.RelativePath,
+                                Enable = item?.Enable == true
+                            };
 
-            return q.ToArray();
+            var groups = menuItems
+                .GroupBy(item => item.GroupName)
+                .Select(g => new MenuGroup
+                {
+                    Group = g.Key,
+                    Items = g.ToArray()
+                });
+
+            return groups.ToArray();
         }
 
         /// <summary>

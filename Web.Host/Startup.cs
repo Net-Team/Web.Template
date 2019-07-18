@@ -53,7 +53,7 @@ namespace Web.Host
             // swaggerÎÄµµ
             services.AddSwaggerGen(c =>
             {
-                c.SchemaFilter<RequireValueTypePropertiesSchemaFilter>(true);
+                c.SchemaFilter<RequiredSchemaFilter>(true);
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
         }

@@ -11,7 +11,7 @@ namespace Web.Host.Startups
     /// <summary>
     /// 表示swagger的值类型自动Required标记过滤器
     /// </summary>
-    public class RequireValueTypePropertiesSchemaFilter : ISchemaFilter
+    public class RequiredSchemaFilter : ISchemaFilter
     {
         private readonly CamelCasePropertyNamesContractResolver camelCaseContractResolver;
 
@@ -19,7 +19,7 @@ namespace Web.Host.Startups
         /// swagger的值类型自动Required标记过滤器
         /// </summary>
         /// <param name="camelCasePropertyNames"></param>
-        public RequireValueTypePropertiesSchemaFilter(bool camelCasePropertyNames)
+        public RequiredSchemaFilter(bool camelCasePropertyNames)
         {
             this.camelCaseContractResolver = camelCasePropertyNames ? new CamelCasePropertyNamesContractResolver() : null;
         }

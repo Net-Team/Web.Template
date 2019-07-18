@@ -24,5 +24,10 @@
         /// 获取或设置相对Uri
         /// </summary>
         public string RelativePath { get; set; }
+
+        /// <summary>
+        /// 获取或设置是否可用
+        /// </summary>
+        public bool Enable { get; set; }
     }
 }

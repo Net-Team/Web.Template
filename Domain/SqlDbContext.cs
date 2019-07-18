@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 
 namespace Domain
@@ -9,6 +11,11 @@ namespace Domain
     public class SqlDbContext : DbContext
     {
         /// <summary>
+        /// 菜单
+        /// </summary>
+        public DbSet<Menu> Menu { get; set; }
+
+        /// <summary>
         /// 数据库上下文
         /// </summary>
         /// <param name="options"></param>
@@ -17,9 +24,12 @@ namespace Domain
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public override void Dispose()
         {
-            base.OnModelCreating(modelBuilder);
+            base.Dispose();
         }
     }
 }

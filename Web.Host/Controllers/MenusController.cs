@@ -43,6 +43,7 @@ namespace Web.Host.Controllers
                         Name = a.Name,
                         GroupName = a.GroupName,
                         HttpMethod = a.HttpMethod,
+                        Class = a.Class,
                         RelativePath = a.RelativePath,
                         Enable = item?.Enable == true
                     };
@@ -55,28 +56,27 @@ namespace Web.Host.Controllers
         /// </summary>
         /// <param name="apiExplorer"></param>
         /// <returns></returns>
-        private static IList<MenuItem> GetMenuItems(IApiDescriptionGroupCollectionProvider apiExplorer)
+        private static MenuItem[] GetMenuItems(IApiDescriptionGroupCollectionProvider apiExplorer)
         {
-            var menus = new List<MenuItem>();
-            foreach (var item in apiExplorer.ApiDescriptionGroups.Items)
-            {
-                foreach (var api in item.Items)
+            var apis = apiExplorer.ApiDescriptionGroups.Items.SelectMany(item => item.Items);
+            var menus = apis
+                .Select(api => new
                 {
-                    var attribute = GetMenuItemAttribute(api);
-                    if (attribute != null)
-                    {
-                        var menuItem = new MenuItem
-                        {
-                            Name = attribute.Name,
-                            GroupName = attribute.GroupName,
-                            HttpMethod = api.HttpMethod,
-                            RelativePath = api.RelativePath,
-                            Enable = false
-                        };
-                        menus.Add(menuItem);
-                    }
-                }
-            }
+                    api,
+                    attr = GetMenuItemAttribute(api)
+                })
+                .Where(item => item.attr != null)
+                .OrderBy(item => (int)item.attr.Group)
+                .ThenBy(item => item.attr.Order)
+                .Select(item => new MenuItem
+                {
+                    Name = item.attr.Name,
+                    GroupName = item.attr.Group.ToString(),
+                    Class = item.attr.Class,
+                    HttpMethod = item.api.HttpMethod,
+                    RelativePath = item.api.RelativePath,
+                    Enable = false
+                }).ToArray();
 
             return menus;
         }

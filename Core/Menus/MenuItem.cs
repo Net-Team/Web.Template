@@ -6,14 +6,19 @@
     public class MenuItem
     {
         /// <summary>
+        /// 获取或设置分组名称
+        /// </summary>
+        public string GroupName { get; set; }
+
+        /// <summary>
         /// 或取或设置名称
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// 获取或设置分组名称
+        /// 获取或设置类名
         /// </summary>
-        public string GroupName { get; set; }
+        public string Class { get; set; }
 
         /// <summary>
         /// 获取或设置讲求方式 

@@ -13,6 +13,27 @@ using System.Threading.Tasks;
 namespace Web.Core.Filters
 {
     /// <summary>
+    /// 表示菜单项分组
+    /// </summary>
+    public enum Group
+    {
+        /// <summary>
+        /// 基础数据
+        /// </summary>
+        基础数据,
+
+        /// <summary>
+        /// 系统管理
+        /// </summary>
+        系统管理,
+
+        /// <summary>
+        /// 日志管理
+        /// </summary>
+        日志管理
+    }
+
+    /// <summary>
     /// 表示菜单项特性
     /// 并提供菜单访问的验证
     /// </summary>
@@ -25,17 +46,31 @@ namespace Web.Core.Filters
         public string Name { get; }
 
         /// <summary>
-        /// 获取或设置所在分组名称
+        /// 获取或设置排序
+        /// 从小到大排序
         /// </summary>
-        public string GroupName { get; set; }
+        public int Order { get; set; }
+
+        /// <summary>
+        /// 获取或设置类名
+        /// 用于辅助前端设置ico等
+        /// </summary>
+        public string Class { get; set; }
+
+        /// <summary>
+        /// 获取所在分组
+        /// </summary>
+        public Group Group { get; }
 
         /// <summary>
         /// 菜单项特性
         /// </summary>
         /// <param name="name">菜单项名称</param>
-        public MenuItemAttribute(string name)
+        /// <param name="group">所在分组</param>
+        public MenuItemAttribute(string name, Group group)
         {
             this.Name = name;
+            this.Group = group;
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace Web.Host.Controllers
     {
         // GET api/values
         [HttpGet]
-        [MenuItem("菜单1", GroupName = "系统")]
+        [MenuItem("接口安全", Group.基础数据)]
         public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
         {
             var where = this.GetQueryPredicate<Baidu>();
@@ -24,7 +24,7 @@ namespace Web.Host.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [MenuItem("菜单2", GroupName = "系统")]
+        [MenuItem("开锁日志", Group.日志管理, Order = 1, Class = "open")]
         public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
         {
             return "value";
@@ -32,6 +32,7 @@ namespace Web.Host.Controllers
 
         // POST api/values
         [HttpPost]
+        [MenuItem("报警日志", Group.日志管理, Order = 0)]
         public void Post([FromBody] Baidu value)
         {
         }

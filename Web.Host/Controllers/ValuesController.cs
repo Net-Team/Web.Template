@@ -13,9 +13,9 @@ namespace Web.Host.Controllers
     {
         // GET api/values
         [HttpGet]
-        [MenuItem("测试", GroupName = "系统")]
+        [MenuItem("菜单1", GroupName = "系统")]
         public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
-        {             
+        {
             var where = this.GetQueryPredicate<Baidu>();
             var sum = baidu.Sum(1, 3);
             var html = await baiduApi.GetAsync();
@@ -24,6 +24,7 @@ namespace Web.Host.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [MenuItem("菜单2", GroupName = "系统")]
         public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
         {
             return "value";

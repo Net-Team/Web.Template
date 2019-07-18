@@ -22,30 +22,49 @@ using Web.Host.Startups;
 
 namespace Web.Host
 {
+    /// <summary>
+    /// 启动页
+    /// </summary>
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
+        /// <summary>
+        /// 获取配置
+        /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// 获取环境
+        /// </summary>
+        public IWebHostEnvironment Environment { get; }
+
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="environment"></param>
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            Configuration = configuration;
+            Environment = environment;
+        }
+
+
+        /// <summary>
+        /// 添加服务
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            // 添加缓存和数据库
             services.AddMemoryCache();
             services.AddDbContext<SqlDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetValue<string>("ConnectionStrings:SqlDbContext"));
             });
 
+            // 添加httpApi与applicationService服务
             services.AddHttpApis(typeof(ApplicationService).Assembly);
             services.AddDependencyServices(typeof(ApplicationService).Assembly);
-
-            services.AddControllers();
-
-
 
             // 添加认证配置
             services
@@ -55,15 +74,29 @@ namespace Web.Host
                     Configuration.GetSection("IdentityServer").Bind(options);
                 });
 
-            // swagger文档
+            // 添加swagger文档
             services.AddSwaggerGen(c =>
             {
                 c.SchemaFilter<RequiredSchemaFilter>(true);
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
+
+            // 添加控制
+            if (Environment.IsDevelopment())
+            {
+                services.AddControllers().AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
+            }
+            else
+            {
+                services.AddControllers();
+            }
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// 配置中间件
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

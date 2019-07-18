@@ -1,0 +1,28 @@
+﻿namespace Core.Menus
+{
+    /// <summary>
+    /// 表示菜单信息
+    /// </summary>
+    public class MenuItem
+    {
+        /// <summary>
+        /// 或取或设置名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 获取或设置分组名称
+        /// </summary>
+        public string GroupName { get; set; }
+
+        /// <summary>
+        /// 获取或设置讲求方式 
+        /// </summary>
+        public string HttpMethod { get; set; }
+
+        /// <summary>
+        /// 获取或设置相对Uri
+        /// </summary>
+        public string RelativePath { get; set; }
+    }
+}

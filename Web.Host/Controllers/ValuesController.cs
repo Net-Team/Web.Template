@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Application.Baidus;
+using Core.Menus;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Application;
-using Application.Baidus;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Web.Core.Controllers;
 
 namespace Web.Host.Controllers
 {
-    [Route("api/[controller]")]   
+    [Route("api/[controller]")]
     public class ValuesController : ApiController
     {
         // GET api/values
         [HttpGet]
+        [MenuItem("测试", GroupName = "系统")]
         public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
         {
             var where = this.GetQueryPredicate<Baidu>();
@@ -26,8 +24,7 @@ namespace Web.Host.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [Authorize]
-        public ActionResult<string> Get(int id)
+        public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
         {
             return "value";
         }

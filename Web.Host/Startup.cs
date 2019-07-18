@@ -14,8 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 using Web.Core.Startups;
+using Web.Host.Startups;
 
 namespace Web.Host
 {
@@ -40,13 +42,20 @@ namespace Web.Host
 
 
 
-            //添加认证配置
+            // 添加认证配置
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(options =>
                 {
                     Configuration.GetSection("IdentityServer").Bind(options);
                 });
+
+            // swagger文档
+            services.AddSwaggerGen(c =>
+            {
+                c.SchemaFilter<RequireValueTypePropertiesSchemaFilter>(true);
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +76,12 @@ namespace Web.Host
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "swagger doc");
+            });
 
             app.UseEndpoints(endpoints =>
             {

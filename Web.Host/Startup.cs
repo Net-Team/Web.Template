@@ -92,7 +92,7 @@ namespace Web.Host
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Host.xml"));
             });
 
-            // 添加控制
+            // 添加控制器
             if (Environment.IsDevelopment())
             {
                 services.AddControllers().AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
@@ -101,6 +101,9 @@ namespace Web.Host
             {
                 services.AddControllers();
             }
+
+            // 添加心跳检测支持
+            services.AddHealthChecks();
         }
 
         /// <summary>
@@ -138,6 +141,7 @@ namespace Web.Host
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/healthy");
             });
         }
     }

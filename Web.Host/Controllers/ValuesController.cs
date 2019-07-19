@@ -22,7 +22,12 @@ namespace Web.Host.Controllers
             return new string[] { sum.ToString() };
         }
 
-        // GET api/values/5
+        /// <summary>
+        /// 开锁日志
+        /// </summary>
+        /// <param name="id">开锁id</param>
+        /// <param name="apiDescription"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         [MenuItem("开锁日志", Group.日志管理, Order = 1, Class = "open")]
         public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)

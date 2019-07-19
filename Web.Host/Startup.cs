@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application;
@@ -83,6 +84,12 @@ namespace Web.Host
             {
                 c.SchemaFilter<RequiredSchemaFilter>(true);
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Core.xml"));
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Host.xml"));
             });
 
             // Ìí¼Ó¿ØÖÆ

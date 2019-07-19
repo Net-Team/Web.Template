@@ -1,5 +1,6 @@
 ﻿using Consul;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
@@ -14,16 +15,19 @@ namespace Web.Core.ServiceRegistration
     {
         private readonly ConsulInfo consul;
         private readonly ServiceInfo service;
+        private readonly ILogger<ConsulHostService> logger;
 
         /// <summary>
         /// Consul注册服务
         /// </summary>
-        /// <param name="serviceInfo"></param>
-        /// <param name="consulInfo"></param>
-        public ConsulHostService(IOptions<ServiceInfo> serviceInfo, IOptions<ConsulInfo> consulInfo)
+        /// <param name="service"></param>
+        /// <param name="consul"></param>
+        /// <param name="logger"></param>
+        public ConsulHostService(IOptions<ServiceInfo> service, IOptions<ConsulInfo> consul, ILogger<ConsulHostService> logger)
         {
-            this.service = serviceInfo.Value;
-            this.consul = consulInfo.Value;
+            this.service = service.Value;
+            this.consul = consul.Value;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -38,13 +42,12 @@ namespace Web.Core.ServiceRegistration
                 return;
             }
 
-            var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
             var httpCheck = new AgentServiceCheck()
             {
-                DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(5d),// 服务启动多久后注册
-                Interval = TimeSpan.FromSeconds(10d),// 健康检查时间间隔，或者称为心跳间隔
-                HTTP = $"http://{service.IPAddress}:{service.Port}/health",// 健康检查地址
-                Timeout = TimeSpan.FromSeconds(5)
+                DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(5d),
+                Interval = TimeSpan.FromSeconds(10d),
+                HTTP = $"http://{service.IPAddress}:{service.Port}/health",
+                Timeout = TimeSpan.FromSeconds(5d)
             };
 
             var registration = new AgentServiceRegistration()
@@ -54,10 +57,18 @@ namespace Web.Core.ServiceRegistration
                 Name = service.Name,
                 Address = service.IPAddress,
                 Port = service.Port,
-                Tags = new[] { $"urlprefix-/{service.Name}" } //添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
+                Tags = new[] { $"urlprefix-/{service.Name}" } // 添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
             };
 
-            await consulClient.Agent.ServiceRegister(registration);
+            try
+            {
+                using var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
+                await consulClient.Agent.ServiceRegister(registration);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "服务注册异常");
+            }
         }
 
         /// <summary>
@@ -70,11 +81,18 @@ namespace Web.Core.ServiceRegistration
             if (this.service.ServiceRouteEnable == false)
             {
                 return;
-            }
+            }           
 
-            var id = $"{service.Name}_{service.Port}";
-            var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
-            await consulClient.Agent.ServiceDeregister(id);
+            try
+            {
+                var id = $"{service.Name}_{service.Port}";
+                using var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
+                await consulClient.Agent.ServiceDeregister(id);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "服务解除注册异常");
+            }
         }
     }
 }

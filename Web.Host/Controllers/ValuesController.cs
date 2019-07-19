@@ -7,8 +7,7 @@ using Web.Core.Controllers;
 using Web.Core.FilterAttributes;
 
 namespace Web.Host.Controllers
-{
-    [Route("api/[controller]")]
+{   
     public class ValuesController : ApiController
     {
         // GET api/values

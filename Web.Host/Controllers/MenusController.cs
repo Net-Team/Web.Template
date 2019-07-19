@@ -14,22 +14,19 @@ namespace Web.Host.Controllers
 {
     /// <summary>
     /// 菜单控制器
-    /// </summary>
-    [Route("api/[controller]")]
+    /// </summary>   
     public class MenusController : ApiController
     {
         /// <summary>
         /// 获取所有菜单
         /// </summary>
         /// <param name="menuService"></param>
-        /// <param name="serviceInfo"></param>
         /// <param name="apiExplorer"></param>
         /// <returns></returns>
         [HttpGet]
         [ApiExplorerSettings()]
         public async Task<MenuGroup[]> Get(
             [FromServices]MenuService menuService,
-            [FromServices]IOptions<ServiceInfo> serviceInfo,
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)
         {
             var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -47,7 +44,7 @@ namespace Web.Host.Controllers
                                 GroupName = a.GroupName,
                                 HttpMethod = a.HttpMethod,
                                 Class = a.Class,
-                                RelativePath = serviceInfo.Value.ServiceRoute(a.RelativePath),
+                                RelativePath = a.RelativePath,
                                 Enable = item?.Enable == true
                             };
 

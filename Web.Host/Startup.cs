@@ -8,7 +8,9 @@ using Domain;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -137,6 +139,7 @@ namespace Web.Host
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "swagger doc");
                 });
             }
+
 
             app.UseEndpoints(endpoints =>
             {

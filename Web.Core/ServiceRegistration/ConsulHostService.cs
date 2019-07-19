@@ -37,7 +37,7 @@ namespace Web.Core.ServiceRegistration
         /// <returns></returns>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            if (this.service.ServiceRouteEnable == false)
+            if (this.consul.Enable == false)
             {
                 return;
             }
@@ -53,17 +53,18 @@ namespace Web.Core.ServiceRegistration
             var registration = new AgentServiceRegistration()
             {
                 Checks = new[] { httpCheck },
-                ID = $"{service.Name}_{service.Port}",
-                Name = service.Name,
+                ID = $"{ consul.ServiceName}_{service.Port}",
+                Name = consul.ServiceName,
                 Address = service.IPAddress,
                 Port = service.Port,
-                Tags = new[] { $"urlprefix-/{service.Name}" } // 添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
+                Tags = new[] { $"urlprefix-{consul.Route}" } // 添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
             };
 
             try
             {
                 using var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
                 await consulClient.Agent.ServiceRegister(registration);
+                this.logger.LogInformation($"服务注册{consul.IPAddress}成功");
             }
             catch (Exception ex)
             {
@@ -78,14 +79,14 @@ namespace Web.Core.ServiceRegistration
         /// <returns></returns>
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (this.service.ServiceRouteEnable == false)
+            if (this.consul.Enable == false)
             {
                 return;
-            }           
+            }
 
             try
             {
-                var id = $"{service.Name}_{service.Port}";
+                var id = $"{ consul.ServiceName}_{service.Port}";
                 using var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
                 await consulClient.Agent.ServiceDeregister(id);
             }

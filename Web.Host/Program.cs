@@ -30,7 +30,7 @@ namespace Web.Host
             return Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls("http://*:7000");
+                    webBuilder.UseUrls("http://*:5178");
                     webBuilder.UseStartup<Startup>();
                 });
         }

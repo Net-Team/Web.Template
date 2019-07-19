@@ -11,6 +11,7 @@ namespace Web.Core.Controllers
     /// 提供查询条件表达式的获取
     /// </summary>
     [ApiController]
+    [Route("api/[controller]")]
     public abstract class ApiController : ControllerBase
     {
         /// <summary>

@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Swagger;
 using Web.Core.Configs;
 using Web.Core.HostServices;
@@ -70,6 +71,16 @@ namespace Web.Host
             services.AddDbContext<SqlDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetValue<string>("ConnectionStrings:SqlDbContext"));
+            });
+
+            // 添加Redis连接与db
+            services.AddSingleton<IConnectionMultiplexer>(p =>
+            {
+                var config = Configuration.GetValue<string>("ConnectionStrings:Redis");
+                return ConnectionMultiplexer.Connect(config);
+            }).AddTransient(p =>
+            {
+                return p.GetService<IConnectionMultiplexer>().GetDatabase();
             });
 
             // 添加httpApi与applicationService服务

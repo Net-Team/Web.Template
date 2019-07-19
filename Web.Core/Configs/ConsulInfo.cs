@@ -1,4 +1,6 @@
-﻿namespace Web.Core.ServiceRegistration
+﻿using System;
+
+namespace Web.Core.Configs
 {
     /// <summary>
     /// Consul信息
@@ -6,19 +8,9 @@
     public class ConsulInfo
     {
         /// <summary>
-        /// 服务名称
+        /// Consul的Uri
         /// </summary>
-        public string ServiceName { get; set; }
-
-        /// <summary>
-        /// Consulip
-        /// </summary>
-        public string IPAddress { get; set; }
-
-        /// <summary>
-        /// Consul端口
-        /// </summary>
-        public int Port { get; set; }
+        public Uri Uri { get; set; }
 
         /// <summary>
         /// 路由

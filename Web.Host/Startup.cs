@@ -20,7 +20,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
-using Web.Core.ServiceRegistration;
+using Web.Core.Configs;
+using Web.Core.HostServices;
 using Web.Core.Startups;
 using Web.Host.Startups;
 
@@ -107,7 +108,7 @@ namespace Web.Host
 
             // 添加心跳检测支持
             services.AddHealthChecks();
-            services.AddHostedService<ConsulHostService>();
+            services.AddHostedService<ConsulRegistryService>();
         }
 
         /// <summary>
@@ -140,11 +141,10 @@ namespace Web.Host
                 });
             }
 
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health");
+                endpoints.MapHealthChecks(Configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.HealthRoute)}"));
             });
         }
     }

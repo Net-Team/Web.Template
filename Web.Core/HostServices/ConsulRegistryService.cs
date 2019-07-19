@@ -5,17 +5,18 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Web.Core.Configs;
 
-namespace Web.Core.ServiceRegistration
+namespace Web.Core.HostServices
 {
     /// <summary>
     /// Consul注册服务
     /// </summary>
-    public class ConsulHostService : IHostedService
+    public class ConsulRegistryService : IHostedService
     {
         private readonly ConsulInfo consul;
         private readonly ServiceInfo service;
-        private readonly ILogger<ConsulHostService> logger;
+        private readonly ILogger<ConsulRegistryService> logger;
 
         /// <summary>
         /// Consul注册服务
@@ -23,7 +24,7 @@ namespace Web.Core.ServiceRegistration
         /// <param name="service"></param>
         /// <param name="consul"></param>
         /// <param name="logger"></param>
-        public ConsulHostService(IOptions<ServiceInfo> service, IOptions<ConsulInfo> consul, ILogger<ConsulHostService> logger)
+        public ConsulRegistryService(IOptions<ServiceInfo> service, IOptions<ConsulInfo> consul, ILogger<ConsulRegistryService> logger)
         {
             this.service = service.Value;
             this.consul = consul.Value;
@@ -46,29 +47,29 @@ namespace Web.Core.ServiceRegistration
             {
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(5d),
                 Interval = TimeSpan.FromSeconds(10d),
-                HTTP = $"http://{service.IPAddress}:{service.Port}/health",
+                HTTP = new Uri(service.Uri, service.HealthRoute).ToString(),
                 Timeout = TimeSpan.FromSeconds(5d)
             };
 
             var registration = new AgentServiceRegistration()
             {
                 Checks = new[] { httpCheck },
-                ID = $"{ consul.ServiceName}_{service.Port}",
-                Name = consul.ServiceName,
-                Address = service.IPAddress,
-                Port = service.Port,
-                Tags = new[] { $"urlprefix-{consul.Route}" } // 添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
+                ID = service.GetServiceId(),
+                Name = service.Name,
+                Address = service.Uri.Host,
+                Port = service.Uri.Port,
+                Tags = new[] { consul.Route }
             };
 
             try
             {
-                using var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
+                using var consulClient = new ConsulClient(x => x.Address = consul.Uri);
                 await consulClient.Agent.ServiceRegister(registration);
-                this.logger.LogInformation($"服务注册{consul.IPAddress}成功");
+                this.logger.LogInformation($"服务注册{consul.Uri}成功");
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "服务注册异常");
+                this.logger.LogError(ex, $"服务注册{consul.Uri}异常");
             }
         }
 
@@ -86,13 +87,13 @@ namespace Web.Core.ServiceRegistration
 
             try
             {
-                var id = $"{ consul.ServiceName}_{service.Port}";
-                using var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consul.IPAddress}:{consul.Port}"));
+                var id = this.service.GetServiceId();
+                using var consulClient = new ConsulClient(x => x.Address = consul.Uri);
                 await consulClient.Agent.ServiceDeregister(id);
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "服务解除注册异常");
+                this.logger.LogError(ex, $"服务解除{consul.Uri}异常");
             }
         }
     }

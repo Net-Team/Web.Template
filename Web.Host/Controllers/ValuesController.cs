@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Web.Core.Controllers;
-using Web.Core.Filters;
+using Web.Core.FilterAttributes;
 
 namespace Web.Host.Controllers
 {

@@ -10,29 +10,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Web.Core.Filters
+namespace Web.Core.FilterAttributes
 {
-    /// <summary>
-    /// 表示菜单项分组
-    /// </summary>
-    public enum Group
-    {
-        /// <summary>
-        /// 基础数据
-        /// </summary>
-        基础数据,
-
-        /// <summary>
-        /// 系统管理
-        /// </summary>
-        系统管理,
-
-        /// <summary>
-        /// 日志管理
-        /// </summary>
-        日志管理
-    }
-
     /// <summary>
     /// 表示菜单项特性
     /// 并提供菜单访问的验证

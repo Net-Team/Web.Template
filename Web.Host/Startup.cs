@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Web.Core.Startups;
+using Web.Host.Models;
 using Web.Host.Startups;
 
 namespace Web.Host
@@ -55,6 +56,9 @@ namespace Web.Host
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            // 配置绑定
+            services.Configure<ServiceInfo>(Configuration.GetSection(nameof(ServiceInfo)));
+
             // 添加缓存和数据库
             services.AddMemoryCache();
             services.AddDbContext<SqlDbContext>(options =>

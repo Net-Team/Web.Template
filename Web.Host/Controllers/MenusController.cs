@@ -2,12 +2,13 @@
 using Core.Menus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Web.Core.Controllers;
-using Web.Core.Filters;
+using Web.Core.FilterAttributes;
+using Web.Host.Models;
 
 namespace Web.Host.Controllers
 {
@@ -21,12 +22,14 @@ namespace Web.Host.Controllers
         /// 获取所有菜单
         /// </summary>
         /// <param name="menuService"></param>
+        /// <param name="serviceInfo"></param>
         /// <param name="apiExplorer"></param>
         /// <returns></returns>
         [HttpGet]
         [ApiExplorerSettings()]
         public async Task<MenuGroup[]> Get(
             [FromServices]MenuService menuService,
+            [FromServices]IOptions<ServiceInfo> serviceInfo,
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)
         {
             var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -44,7 +47,7 @@ namespace Web.Host.Controllers
                                 GroupName = a.GroupName,
                                 HttpMethod = a.HttpMethod,
                                 Class = a.Class,
-                                RelativePath = a.RelativePath,
+                                RelativePath = serviceInfo.Value.ServiceRoute(a.RelativePath),
                                 Enable = item?.Enable == true
                             };
 

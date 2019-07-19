@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Web.Host.Models
+﻿namespace Web.Core.ServiceRegistration
 {
     /// <summary>
     /// 表示服务信息
@@ -11,14 +6,19 @@ namespace Web.Host.Models
     public class ServiceInfo
     {
         /// <summary>
-        /// 名称
-        /// </summary>
-        public string FriendlyName { get; set; }
-
-        /// <summary>
         /// 服务名称
         /// </summary>
-        public string ServiceName { get; set; }
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 局域网ip
+        /// </summary>
+        public string IPAddress { get; set; }
+
+        /// <summary>
+        /// 端口
+        /// </summary>
+        public int Port { get; set; }
 
         /// <summary>
         /// 是否使用服务路由
@@ -36,7 +36,7 @@ namespace Web.Host.Models
             {
                 return uri;
             }
-            return $"/{this.ServiceName}/{uri.TrimStart('/')}";
+            return $"/{this.Name}/{uri.TrimStart('/')}";
         }
     }
 }

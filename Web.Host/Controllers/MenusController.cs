@@ -6,9 +6,9 @@ using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Web.Core.ServiceRegistration;
 using Web.Core.Controllers;
 using Web.Core.FilterAttributes;
-using Web.Host.Models;
 
 namespace Web.Host.Controllers
 {

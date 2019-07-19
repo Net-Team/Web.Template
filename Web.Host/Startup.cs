@@ -18,8 +18,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
+using Web.Core.ServiceRegistration;
 using Web.Core.Startups;
-using Web.Host.Models;
 using Web.Host.Startups;
 
 namespace Web.Host
@@ -58,6 +58,7 @@ namespace Web.Host
         public void ConfigureServices(IServiceCollection services)
         {
             // 配置绑定
+            services.Configure<ConsulInfo>(Configuration.GetSection(nameof(ConsulInfo)));
             services.Configure<ServiceInfo>(Configuration.GetSection(nameof(ServiceInfo)));
 
             // 添加缓存和数据库
@@ -104,6 +105,7 @@ namespace Web.Host
 
             // 添加心跳检测支持
             services.AddHealthChecks();
+            services.AddHostedService<ConsulHostService>();
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ namespace Web.Host
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/healthy");
+                endpoints.MapHealthChecks("/health");
             });
         }
     }

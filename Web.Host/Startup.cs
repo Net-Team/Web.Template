@@ -125,8 +125,6 @@ namespace Web.Host
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();

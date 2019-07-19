@@ -1,4 +1,4 @@
-using Core.Paging;
+using Core;
 using Microsoft.EntityFrameworkCore;
 using PredicateLib;
 using System;

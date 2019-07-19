@@ -10,7 +10,7 @@ namespace Web.Core.Startups
     /// <summary>
     /// HttpApi注册
     /// </summary>
-    public static class HttpApiClient
+    public static class HttpApiExtensions
     {
         /// <summary>
         /// 注册程序集下所有IHttpApi
@@ -20,7 +20,7 @@ namespace Web.Core.Startups
         public static void AddHttpApis(this IServiceCollection services, Assembly assembly)
         {
             var httpApis = assembly.GetTypes().Where(item => item.IsInheritFrom<IHttpApi>());
-            var method = typeof(HttpApiClient).GetMethod(nameof(AddHttpApi), BindingFlags.Static | BindingFlags.NonPublic);
+            var method = typeof(HttpApiExtensions).GetMethod(nameof(AddHttpApi), BindingFlags.Static | BindingFlags.NonPublic);
 
             foreach (var item in httpApis)
             {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Core.Paging
+namespace Core
 {
     /// <summary>
     /// 表示分页内容

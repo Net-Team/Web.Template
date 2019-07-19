@@ -64,6 +64,7 @@ namespace Web.Host
             services.Configure<ConsulInfo>(Configuration.GetSection(nameof(ConsulInfo)));
             services.Configure<ServiceInfo>(Configuration.GetSection(nameof(ServiceInfo)));
 
+
             // 添加缓存和数据库
             services.AddMemoryCache();
             services.AddDbContext<SqlDbContext>(options =>
@@ -106,7 +107,7 @@ namespace Web.Host
                 services.AddControllers();
             }
 
-            // 添加心跳检测支持
+            // 添加心跳检测、服务注册
             services.AddHealthChecks();
             services.AddHostedService<ConsulRegistryService>();
         }

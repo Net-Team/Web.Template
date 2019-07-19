@@ -1,4 +1,4 @@
-﻿using Core.Dependency;
+﻿using Core;
 
 namespace Application
 {

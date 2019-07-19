@@ -1,4 +1,4 @@
-﻿namespace Core.Dependency
+﻿namespace Core
 {
     /// <summary>
     /// 定义Singleton模式的对象注入接口

@@ -1,17 +1,15 @@
-﻿using Core.Dependency;
+﻿using Core;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Web.Core.Startups
 {
     /// <summary>
     /// 依赖注入注册
     /// </summary>
-    public static class Dependency
+    public static class DependencyExtensions
     {
         /// <summary>
         /// 注册程序集下实现依赖注入接口的类型

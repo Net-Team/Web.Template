@@ -1,5 +1,6 @@
 using Application;
 using Domain;
+using Exceptionless;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,7 @@ using StackExchange.Redis;
 using System;
 using System.IO;
 using Web.Core.Configs;
+using Web.Core.FilterAttributes;
 using Web.Core.HostServices;
 using Web.Core.Startups;
 using Web.Host.Startups;
@@ -106,13 +108,13 @@ namespace Web.Host
             });
 
             // 添加控制器
+            var mvcBuilder = services.AddControllers(c =>
+            {
+                c.Filters.Add<ApiGlobalExceptionFilter>();
+            });
             if (Environment.IsDevelopment())
             {
-                services.AddControllers().AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
-            }
-            else
-            {
-                services.AddControllers();
+                mvcBuilder.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             }
 
             // 添加心跳检测、服务注册

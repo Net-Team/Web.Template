@@ -1,3 +1,4 @@
+using Exceptionless;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -32,23 +33,35 @@ namespace Web.Host
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            var listen = configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.Listen)}");
+            InitExceptionLess(configuration);
 
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                        .UseUrls(listen)
+                        .UseUrls(configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.Listen)}"))
                         .UseStartup<Startup>()
                         .UseSerilog((hosting, logger) => logger
                             .Enrich.FromLogContext()
                             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                             .WriteTo.Debug()
                             .WriteTo.Console()
-                            .WriteTo.File(Path.Combine("logs", @"log.txt"), rollingInterval: RollingInterval.Day,outputTemplate: "{NewLine}{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]{NewLine}{Message:lj}{NewLine}{Exception}")
+                            .WriteTo.Exceptionless(restrictedToMinimumLevel: LogEventLevel.Error)
+                            .WriteTo.File(Path.Combine("logs", @"error.txt"), restrictedToMinimumLevel: LogEventLevel.Error, rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
                         );
                 });
+        }
+
+        /// <summary>
+        /// 初始化ExceptionLess客户端
+        /// </summary>
+        /// <param name="configuration"></param>
+        private static void InitExceptionLess(IConfigurationRoot configuration)
+        {
+            ExceptionlessClient.Default.Configuration.ApiKey = configuration.GetValue<string>("Logger:ExceptionLess:ApiKey");
+            ExceptionlessClient.Default.Configuration.ServerUrl = configuration.GetValue<string>("Logger:ExceptionLess:ServerUrl");
+            ExceptionlessClient.Default.Startup();
         }
     }
 }

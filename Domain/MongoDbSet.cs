@@ -165,12 +165,12 @@ namespace Domain
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <param name="where">条件</param>
-        /// <param name="pageIndex">页面索引</param>
-        /// <param name="pageSize">页面大小</param>
         /// <param name="orderBy">排序</param>
         /// <param name="asc">是否升序</param>
+        /// <param name="pageIndex">页面索引</param>
+        /// <param name="pageSize">页面大小</param>
         /// <returns></returns>
-        public async Task<Page<T>> ToPageAsync<TKey>(Expression<Func<T, bool>> where, int pageIndex, int pageSize, Expression<Func<T, TKey>> orderBy, bool asc)
+        public async Task<Page<T>> ToPageAsync<TKey>(Expression<Func<T, bool>> where, Expression<Func<T, TKey>> orderBy, bool asc, int pageIndex, int pageSize)
         {
             int total = (int)await this.Collection.CountDocumentsAsync(where);
             var inc = total % pageSize > 0 ? 0 : -1;

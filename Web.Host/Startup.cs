@@ -62,13 +62,13 @@ namespace Web.Host
             services.AddMemoryCache();
             services.AddDbContext<SqlDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetValue<string>("ConnectionStrings:SqlDbContext"));
+                options.UseSqlServer(Configuration.GetConnectionString("SqlDbContext"));
             });
 
             // 添加Redis连接
             services.AddSingleton<IConnectionMultiplexer>(p =>
             {
-                var connectionString = Configuration.GetValue<string>("ConnectionStrings:Redis");
+                var connectionString = Configuration.GetConnectionString("Redis");
                 return ConnectionMultiplexer.Connect(connectionString);
             }).AddTransient(p =>
             {
@@ -78,7 +78,7 @@ namespace Web.Host
             // 添加mongodb
             services.AddSingleton(p =>
             {
-                var connectionString = Configuration.GetValue<string>("ConnectionStrings:Mongodb");
+                var connectionString = Configuration.GetConnectionString("Mongodb");
                 return new MongoDbContext(connectionString);
             });
 

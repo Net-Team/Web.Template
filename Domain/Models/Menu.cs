@@ -8,7 +8,7 @@ namespace Domain.Models
     /// 菜单模型
     /// </summary>
     [Table("Menu")]
-    public class Menu : IStringId
+    public class Menu : IStringIdable
     {
         /// <summary>
         /// 菜单Id

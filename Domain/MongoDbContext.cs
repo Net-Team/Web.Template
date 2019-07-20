@@ -27,7 +27,7 @@ namespace Domain
         /// <typeparam name="T">集合对象类型</typeparam>
         /// <param name="dbName">db名称</param>
         /// <returns></returns>
-        public MongoDbSet<T> Set<T>(string dbName) where T : class
+        public MongoDbSet<T> Set<T>(string dbName) where T : class, IStringIdable
         {
             return this.Set<T>(dbName, typeof(T).Name);
         }
@@ -39,7 +39,7 @@ namespace Domain
         /// <param name="dbName">db名称</param>
         /// <param name="collectionName">集合名称</param>
         /// <returns></returns>
-        public MongoDbSet<T> Set<T>(string dbName, string collectionName) where T : class
+        public MongoDbSet<T> Set<T>(string dbName, string collectionName) where T : class, IStringIdable
         {
             var db = client.GetDatabase(dbName);
             var collection = db.GetCollection<T>(collectionName);

@@ -12,7 +12,7 @@ namespace Domain
     /// 表示Mongo的集合
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class MongoDbSet<T> : IQueryable<T> where T : class
+    public class MongoDbSet<T> : IQueryable<T> where T : class, IStringIdable
     {
         /// <summary>
         /// IQueryable对象

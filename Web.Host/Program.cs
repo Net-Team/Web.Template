@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 using System;
+using System.IO;
 using Web.Core.Configs;
 
 namespace Web.Host
@@ -35,7 +38,16 @@ namespace Web.Host
                 .CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls(listen).UseStartup<Startup>();
+                    webBuilder
+                        .UseUrls(listen)
+                        .UseStartup<Startup>()
+                        .UseSerilog((hosting, logger) => logger
+                            .Enrich.FromLogContext()
+                            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                            .WriteTo.Debug()
+                            .WriteTo.Console()
+                            .WriteTo.File(Path.Combine("logs", @"log.txt"), rollingInterval: RollingInterval.Day,outputTemplate: "{NewLine}{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]{NewLine}{Message:lj}{NewLine}{Exception}")
+                        );
                 });
         }
     }

@@ -1,26 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Application;
 using Domain;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
-using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.IO;
 using Web.Core.Configs;
 using Web.Core.HostServices;
 using Web.Core.Startups;
@@ -73,14 +63,21 @@ namespace Web.Host
                 options.UseSqlServer(Configuration.GetValue<string>("ConnectionStrings:SqlDbContext"));
             });
 
-            // 添加Redis连接与db
+            // 添加Redis连接
             services.AddSingleton<IConnectionMultiplexer>(p =>
             {
-                var config = Configuration.GetValue<string>("ConnectionStrings:Redis");
-                return ConnectionMultiplexer.Connect(config);
+                var connectionString = Configuration.GetValue<string>("ConnectionStrings:Redis");
+                return ConnectionMultiplexer.Connect(connectionString);
             }).AddTransient(p =>
             {
                 return p.GetService<IConnectionMultiplexer>().GetDatabase();
+            });
+
+            // 添加mongodb
+            services.AddSingleton(p =>
+            {
+                var connectionString = Configuration.GetValue<string>("ConnectionStrings:Mongodb");
+                return new MongoDbContext(connectionString);
             });
 
             // 添加httpApi与applicationService服务

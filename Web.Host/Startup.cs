@@ -14,7 +14,6 @@ using System;
 using System.IO;
 using Web.Core.Configs;
 using Web.Core.FilterAttributes;
-using Web.Core.HostServices;
 using Web.Core.Startups;
 using Web.Host.Startups;
 
@@ -31,7 +30,7 @@ namespace Web.Host
         public IConfiguration Configuration { get; }
 
         /// <summary>
-        /// 获取环境
+        /// 环境
         /// </summary>
         public IWebHostEnvironment Environment { get; }
 
@@ -39,7 +38,7 @@ namespace Web.Host
         /// 构造器
         /// </summary>
         /// <param name="configuration"></param>
-        /// <param name="environment"></param>
+        /// <param name="environment"></param>     
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
@@ -50,13 +49,12 @@ namespace Web.Host
         /// <summary>
         /// 添加服务
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services"></param>  
         public void ConfigureServices(IServiceCollection services)
         {
             // 配置绑定
-            services.Configure<ConsulInfo>(Configuration.GetSection(nameof(ConsulInfo)));
+            services.Configure<KongInfo>(Configuration.GetSection(nameof(KongInfo)));
             services.Configure<ServiceInfo>(Configuration.GetSection(nameof(ServiceInfo)));
-
 
             // 添加缓存和数据库
             services.AddMemoryCache();
@@ -117,19 +115,18 @@ namespace Web.Host
                 mvcBuilder.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             }
 
-            // 添加心跳检测、服务注册
+            // 添加心跳检测
             services.AddHealthChecks();
-            services.AddHostedService<ConsulRegistryService>();
+            services.AddExceptionLess(this.Configuration.GetSection("ExceptionLess"));
         }
 
         /// <summary>
         /// 配置中间件
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="app"></param>      
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -143,14 +140,11 @@ namespace Web.Host
 
             app.UseAuthorization();
 
-            if (env.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "swagger doc");
-                });
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "swagger doc");
+            });
 
             app.UseEndpoints(endpoints =>
             {

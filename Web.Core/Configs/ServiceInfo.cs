@@ -18,11 +18,6 @@ namespace Web.Core.Configs
         public Uri Uri { get; set; }
 
         /// <summary>
-        /// 监听的ip与端口
-        /// </summary>
-        public string Listen { get; set; }
-
-        /// <summary>
         /// 健康检查的路由
         /// </summary>
         public string HealthRoute { get; set; }

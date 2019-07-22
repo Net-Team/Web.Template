@@ -1,12 +1,8 @@
-using Exceptionless;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-using System;
 using System.IO;
-using Web.Core.Configs;
 
 namespace Web.Host
 {
@@ -28,19 +24,11 @@ namespace Web.Host
         /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            InitExceptionLess(configuration);
-
             return Microsoft.Extensions.Hosting.Host
                 .CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder
-                        .UseUrls(configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.Listen)}"))
+                    webBuilder                        
                         .UseStartup<Startup>()
                         .UseSerilog((hosting, logger) => logger
                             .Enrich.FromLogContext()
@@ -53,15 +41,6 @@ namespace Web.Host
                 });
         }
 
-        /// <summary>
-        /// 初始化ExceptionLess客户端
-        /// </summary>
-        /// <param name="configuration"></param>
-        private static void InitExceptionLess(IConfigurationRoot configuration)
-        {
-            ExceptionlessClient.Default.Configuration.ApiKey = configuration.GetValue<string>("Logger:ExceptionLess:ApiKey");
-            ExceptionlessClient.Default.Configuration.ServerUrl = configuration.GetValue<string>("Logger:ExceptionLess:ServerUrl");
-            ExceptionlessClient.Default.Startup();
-        }
+
     }
 }

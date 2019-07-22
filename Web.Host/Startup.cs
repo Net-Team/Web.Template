@@ -1,7 +1,6 @@
 using Application;
 using Domain;
 using Exceptionless;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -85,14 +84,15 @@ namespace Web.Host
             services.AddDependencyServices(typeof(ApplicationService).Assembly);
 
             // 添加认证配置
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtParser();
-            //.AddJwtBearer()
-            //.AddIdentityServerAuthentication(options =>
-            //{
-            //    Configuration.GetSection("IdentityServer").Bind(options);
-            //});
+            services.AddJwtParser();
+
+            //services
+            //    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer()
+            //    .AddIdentityServerAuthentication(options =>
+            //    {
+            //        Configuration.GetSection("IdentityServer").Bind(options);
+            //    });
 
             // 添加swagger文档
             services.AddSwaggerGen(c =>
@@ -140,7 +140,7 @@ namespace Web.Host
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseJwtParser();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -153,8 +153,6 @@ namespace Web.Host
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks(Configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.HealthRoute)}"));
             });
-
-
         }
     }
 }

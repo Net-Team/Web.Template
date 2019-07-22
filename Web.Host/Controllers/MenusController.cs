@@ -1,6 +1,5 @@
 ﻿using Application.Menus;
 using Core.Menus;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Linq;
@@ -21,10 +20,9 @@ namespace Web.Host.Controllers
         /// <param name="menuService"></param>
         /// <param name="apiExplorer"></param>
         /// <returns></returns>
-        [HttpGet]     
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet]
         public async Task<MenuGroup[]> Get(
-            [FromServices]MenuService menuService,      
+            [FromServices]MenuService menuService,
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)
         {
             var userId = this.HttpContext.User.FindFirst("sub")?.Value;

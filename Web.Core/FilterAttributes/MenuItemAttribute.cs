@@ -16,7 +16,7 @@ namespace Web.Core.FilterAttributes
     /// 并提供菜单访问的验证
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public sealed class MenuItemAttribute : CustomAuthorizeAttribute
+    public sealed class MenuItemAttribute : Attribute, IAsyncAuthorizationFilter
     {
         /// <summary>
         /// 获取菜单项名称
@@ -50,14 +50,14 @@ namespace Web.Core.FilterAttributes
             this.Name = name;
             this.Group = group;
         }
-         
+
 
         /// <summary>
         /// 菜单请求权限验证
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async override Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var userId = context.HttpContext.User.FindFirst("sub")?.Value;
             if (userId.IsNullOrEmpty() == true)

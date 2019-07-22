@@ -10,6 +10,18 @@ namespace System
     public static class StringExtensions
     {
         /// <summary>
+        /// 是否相等
+        /// 不区分大小写
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool EqualsIgnoreCase(this string source, string value)
+        {
+            return string.Equals(source, value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// 如果为null则返回String.Empty
         /// </summary>
         /// <param name="source">源</param>

@@ -26,7 +26,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "nativeDebugging": true,
-      "applicationUrl": "http://localhost:5178"
+      "applicationUrl": "http://v5:5178"
     },
     "Docker": {
       "commandName": "Docker",

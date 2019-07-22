@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Application;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Reflection;
+using Web.Core.Configs;
 using WebApiClient;
 
 namespace Web.Core.Startups
@@ -35,10 +38,17 @@ namespace Web.Core.Startups
         /// <param name="services"></param>
         private static void AddHttpApi<TInterface>(IServiceCollection services) where TInterface : class, IHttpApi
         {
+            var apiType = typeof(TInterface);
+            var key = $"HttpApi:{apiType.Name}";
+            var useGatewayHost = apiType.IsDefined(typeof(GatewayAttribute), false);
+
             services.AddHttpApiTypedClient<TInterface>((c, p) =>
             {
-                var key = $"HttpApi:{typeof(TInterface).Name}";
                 p.GetService<IConfiguration>().GetSection(key).Bind(c);
+                if (useGatewayHost == true)
+                {
+                    c.HttpHost = p.GetService<IOptions<KongInfo>>().Value.ProxyUri;
+                }
             });
         }
 

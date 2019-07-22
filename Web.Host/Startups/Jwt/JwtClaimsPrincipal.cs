@@ -9,16 +9,19 @@ namespace Web.Host.Startups.Jwt
     /// </summary>
     public class JwtClaimsPrincipal : ClaimsPrincipal
     {
+        private readonly string roleClaimType;
         private readonly string payloadJson;
 
         /// <summary>
         /// jwt凭据信息
         /// </summary>
         /// <param name="identity"></param>
+        /// <param name="roleClaimType"></param>
         /// <param name="payloadJson"></param>
-        public JwtClaimsPrincipal(ClaimsIdentity identity, string payloadJson)
+        public JwtClaimsPrincipal(ClaimsIdentity identity, string roleClaimType, string payloadJson)
             : base(identity)
         {
+            this.roleClaimType = roleClaimType;
             this.payloadJson = payloadJson;
         }
 
@@ -29,7 +32,7 @@ namespace Web.Host.Startups.Jwt
         /// <returns></returns>
         public override bool IsInRole(string role)
         {
-            return this.HasClaim("role", role);
+            return this.HasClaim(this.roleClaimType, role);
         }
 
         /// <summary>

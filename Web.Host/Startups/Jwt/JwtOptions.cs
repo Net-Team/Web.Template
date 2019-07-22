@@ -8,11 +8,17 @@
         /// <summary>
         /// jwt的cookie名称
         /// </summary>
-        public string CookieName { get; set; }
+        public string JwtCookieName { get; set; } = "jwt";
 
         /// <summary>
         /// jwt的query名称
         /// </summary>
-        public string QueryName { get; set; }
+        public string JwtQueryName { get; set; } = "jwt";
+
+        /// <summary>
+        /// 角色名称
+        /// 默认是role
+        /// </summary>
+        public string RoleClaimType { get; set; } = "role";
     }
 }

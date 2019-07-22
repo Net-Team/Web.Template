@@ -40,7 +40,7 @@ namespace Web.Host.Startups.Jwt
                 var json = jwt.Payload.SerializeToJson();
                 var identity = new ClaimsIdentity(JwtBearerDefaults.AuthenticationScheme);
                 identity.AddClaims(jwt.Claims);
-                httpContext.User = new JwtClaimsPrincipal(identity, json);
+                httpContext.User = new JwtClaimsPrincipal(identity, this.options.RoleClaimType, json);
             }
 
             return this.Next.Invoke(httpContext);
@@ -60,17 +60,17 @@ namespace Web.Host.Startups.Jwt
                 return new JwtSecurityToken(token);
             }
 
-            if (string.IsNullOrEmpty(this.options.CookieName) == false)
+            if (string.IsNullOrEmpty(this.options.JwtCookieName) == false)
             {
-                if (httpContext.Request.Cookies.TryGetValue(this.options.CookieName, out string token) == true)
+                if (httpContext.Request.Cookies.TryGetValue(this.options.JwtCookieName, out string token) == true)
                 {
                     return new JwtSecurityToken(token);
                 }
             }
 
-            if (string.IsNullOrEmpty(this.options.QueryName) == false)
+            if (string.IsNullOrEmpty(this.options.JwtQueryName) == false)
             {
-                if (httpContext.Request.Query.TryGetValue(this.options.QueryName, out var queryToken) == true)
+                if (httpContext.Request.Query.TryGetValue(this.options.JwtQueryName, out var queryToken) == true)
                 {
                     var token = queryToken[0];
                     return new JwtSecurityToken(token);

@@ -1,10 +1,9 @@
 ﻿using Application.Menus;
 using Core.Menus;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Options;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Web.Core.Controllers;
 using Web.Core.FilterAttributes;
@@ -22,13 +21,13 @@ namespace Web.Host.Controllers
         /// <param name="menuService"></param>
         /// <param name="apiExplorer"></param>
         /// <returns></returns>
-        [HttpGet]
-        [ApiExplorerSettings()]
+        [HttpGet]     
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<MenuGroup[]> Get(
-            [FromServices]MenuService menuService,
+            [FromServices]MenuService menuService,      
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)
         {
-            var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = this.HttpContext.User.FindFirst("sub")?.Value;
             var userMenus = await menuService.GetMenusAsync(userId);
             var allMenuItems = GetMenuItems(apiExplorer);
 

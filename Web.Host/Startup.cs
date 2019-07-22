@@ -87,10 +87,12 @@ namespace Web.Host
             // 添加认证配置
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddIdentityServerAuthentication(options =>
-                {
-                    Configuration.GetSection("IdentityServer").Bind(options);
-                });
+                .AddJwtParser();
+            //.AddJwtBearer()
+            //.AddIdentityServerAuthentication(options =>
+            //{
+            //    Configuration.GetSection("IdentityServer").Bind(options);
+            //});
 
             // 添加swagger文档
             services.AddSwaggerGen(c =>
@@ -151,6 +153,8 @@ namespace Web.Host
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks(Configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.HealthRoute)}"));
             });
+
+
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Web.Host.Startups.Jwt
         /// <returns></returns>
         public override bool HasClaim(string type, string value)
         {
-            return this.Claims.Any(item => item.Type.EqualsIgnoreCase(type) && item.Value.Equals(value));
+            return this.Claims.Any(item => item.Type.EqualsIgnoreCase(type) && item.Value.EqualsIgnoreCase(value));
         }
 
         /// <summary>

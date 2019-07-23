@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Web.Core.Configs
+namespace Web.Core.Options
 {
     /// <summary>
     /// kong
     /// </summary>
-    public class KongInfo
+    public class KongOptions
     {
         /// <summary>
         /// admin接口地址

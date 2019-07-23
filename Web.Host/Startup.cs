@@ -14,9 +14,8 @@ using StackExchange.Redis;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using Web.Core.Configs;
 using Web.Core.FilterAttributes;
+using Web.Core.Options;
 using Web.Core.Startups;
 using Web.Host.Startups;
 
@@ -56,8 +55,8 @@ namespace Web.Host
         public void ConfigureServices(IServiceCollection services)
         {
             // 配置绑定
-            services.Configure<KongInfo>(Configuration.GetSection(nameof(KongInfo)));
-            services.Configure<ServiceInfo>(Configuration.GetSection(nameof(ServiceInfo)));
+            services.Configure<KongOptions>(Configuration.GetSection(nameof(KongOptions)));
+            services.Configure<ServiceOptions>(Configuration.GetSection(nameof(ServiceOptions)));
 
             // 添加缓存和数据库
             services.AddMemoryCache();
@@ -107,6 +106,8 @@ namespace Web.Host
             var mvcBuilder = services
                 .AddControllers(c =>
                 {
+                    var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
+                    c.Conventions.Add(new ServiceTemplateConvention(serviceName));
                     c.Filters.Add<ApiGlobalExceptionFilter>();
                 }).ConfigureApiBehaviorOptions(c =>
                 {
@@ -159,7 +160,7 @@ namespace Web.Host
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks(Configuration.GetValue<string>($"{nameof(ServiceInfo)}:{nameof(ServiceInfo.HealthRoute)}"));
+                endpoints.MapHealthChecks(Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.HealthRoute)}"));
             });
         }
     }

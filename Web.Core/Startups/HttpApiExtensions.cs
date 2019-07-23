@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Reflection;
-using Web.Core.Configs;
+using Web.Core.Options;
 using WebApiClient;
 
 namespace Web.Core.Startups
@@ -47,7 +47,7 @@ namespace Web.Core.Startups
                 p.GetService<IConfiguration>().GetSection(key).Bind(c);
                 if (useGatewayHost == true)
                 {
-                    c.HttpHost = p.GetService<IOptions<KongInfo>>().Value.ProxyUri;
+                    c.HttpHost = p.GetService<IOptions<KongOptions>>().Value.ProxyUri;
                 }
             });
         }

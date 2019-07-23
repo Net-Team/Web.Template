@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Web.Core.Configs
+namespace Web.Core.Options
 {
     /// <summary>
     /// 表示服务信息
     /// </summary>
-    public class ServiceInfo
+    public class ServiceOptions
     {
         /// <summary>
         /// 服务名称
@@ -20,15 +20,6 @@ namespace Web.Core.Configs
         /// <summary>
         /// 健康检查的路由
         /// </summary>
-        public string HealthRoute { get; set; }
-
-        /// <summary>
-        /// 获取唯一标识
-        /// </summary>
-        /// <returns></returns>
-        public string GetServiceId()
-        {
-            return $"{this.Name}_{this.Uri.Port}";
-        }
+        public string HealthRoute { get; set; }         
     }
 }

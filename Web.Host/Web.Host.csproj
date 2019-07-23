@@ -30,6 +30,6 @@
     <ProjectReference Include="..\Web.Core\Web.Core.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="5178" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="5178" appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

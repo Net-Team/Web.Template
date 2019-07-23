@@ -12,6 +12,7 @@ namespace Web.Host.Controllers
     /// <summary>
     /// 菜单控制器
     /// </summary>   
+    [UserLimited(Role = Role.None, Scope = "uhome.rke")]
     public class MenusController : ApiController
     {
         /// <summary>

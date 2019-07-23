@@ -37,9 +37,31 @@
     }
 
     /// <summary>
+    /// Api响应结果接口
+    /// </summary>
+    public interface IApiResult
+    {
+        /// <summary>
+        /// 获取或设置状态码
+        /// </summary>
+        public Code Code { get; set; }
+
+        /// <summary>
+        /// 获取或设置提示消息
+        /// </summary>
+        public string Message { get; set; }
+
+        /// <summary>
+        /// 获取或设置数据
+        /// </summary>
+        public object Data { get; set; }
+    }
+
+
+    /// <summary>
     /// 表示Api响应结果
     /// </summary>
-    public class ApiResult<T>
+    public class ApiResult<T> : IApiResult
     {
         /// <summary>
         /// 获取或设置状态码
@@ -55,6 +77,15 @@
         /// 获取或设置数据
         /// </summary>
         public T Data { get; set; }
+
+        /// <summary>
+        /// 获取或设置数据
+        /// </summary>
+        object IApiResult.Data
+        {
+            get => this.Data;
+            set => this.Data = (T)value;
+        }
 
         /// <summary>
         /// 从data转换得到

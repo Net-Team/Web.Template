@@ -1,8 +1,10 @@
 using Application;
+using Core;
 using Domain;
 using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Web.Core.Configs;
 using Web.Core.FilterAttributes;
 using Web.Core.Startups;
@@ -112,6 +116,25 @@ namespace Web.Host
             // 添加心跳检测
             services.AddHealthChecks();
             services.AddExceptionLess(this.Configuration.GetSection("ExceptionLess"));
+
+            // 模型验证结果转换
+            services.Configure<ApiBehaviorOptions>(c =>
+            {
+                c.InvalidModelStateResponseFactory = context =>
+                {
+                    dynamic actionDescriptor = context.ActionDescriptor;
+                    var returnType = ((MethodInfo)actionDescriptor.MethodInfo).ReturnType;
+                    var apiResult = Activator.CreateInstance(returnType) as IApiResult;
+
+                    var keyValue = context.ModelState.FirstOrDefault(item => item.Value.Errors.Count > 0);
+                    var message = $"参数{keyValue.Key}验证失败：{keyValue.Value.Errors[0].ErrorMessage}";
+
+                    apiResult.Code = Code.ParameterError;
+                    apiResult.Message = message;
+
+                    return new ObjectResult(apiResult);
+                };
+            });
         }
 
         /// <summary>

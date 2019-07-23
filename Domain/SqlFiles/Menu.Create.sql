@@ -10,12 +10,8 @@ GO
 
 CREATE TABLE [dbo].[Menu](
 	[Id] [nvarchar](50) NOT NULL,
-	[UserId] [nvarchar](50) NOT NULL,
-	[Name] [nvarchar](20) NOT NULL,
-	[GroupName] [nvarchar](20) NULL,
-	[HttpMethod] [nvarchar](20) NOT NULL,
+	[UserId] [nvarchar](50) NOT NULL,	
 	[RelativePath] [nvarchar](200) NOT NULL,
-	[Enable] [bit] NOT NULL,
 	[CreateTime] [datetime] NOT NULL,
  CONSTRAINT [PK_Menu] PRIMARY KEY CLUSTERED 
 (

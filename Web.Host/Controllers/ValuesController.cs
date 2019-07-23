@@ -7,12 +7,12 @@ using Web.Core.Controllers;
 using Web.Core.FilterAttributes;
 
 namespace Web.Host.Controllers
-{   
+{
     public class ValuesController : ApiController
     {
         // GET api/values
         [HttpGet]
-        [MenuItem("接口安全", Group.基础数据)]
+        [MenuItem(Name.房间结构, Group.基础数据)]
         public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
         {
             var where = this.GetQueryPredicate<Baidu>();
@@ -28,7 +28,7 @@ namespace Web.Host.Controllers
         /// <param name="apiDescription"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [MenuItem("开锁日志", Group.日志管理, Order = 1, Class = "open")]
+        [MenuItem(Name.开锁日志, Group.日志管理, Class = "open")]
         public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
         {
             return "value";
@@ -36,7 +36,7 @@ namespace Web.Host.Controllers
 
         // POST api/values
         [HttpPost]
-        [MenuItem("报警日志", Group.日志管理, Order = 0)]
+        [MenuItem(Name.报警日志, Group.日志管理)]
         public void Post([FromBody] Baidu value)
         {
         }

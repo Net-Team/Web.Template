@@ -12,15 +12,24 @@ namespace Web.Core.FilterAttributes
     public class UserLimitedAttribute : Attribute, IAuthorizationFilter
     {
         /// <summary>
+        /// 允许访问的scope
+        /// </summary>
+        public Scope Scope { get; }
+
+        /// <summary>
         /// 获取或设置允许的角色
         /// role1|role2
         /// </summary>
-        public Role Role { get; set; }
+        public Role Role { get; set; } = Role.None;
 
         /// <summary>
-        /// 允许访问的scope
+        /// 用户限制特性
         /// </summary>
-        public string Scope { get; set; }
+        /// <param name="scope">允许访问的scope</param>
+        public UserLimitedAttribute(Scope scope)
+        {
+            this.Scope = scope;
+        }
 
         /// <summary>
         /// 验证身份
@@ -63,11 +72,7 @@ namespace Web.Core.FilterAttributes
         /// <returns></returns>
         private bool IsScopeOk(HttpContext context)
         {
-            if (this.Scope.IsNullOrEmpty() == true)
-            {
-                return true;
-            }
-            return context.User.HasClaim("scope", this.Scope);
+            return context.User.HasClaim("scope", this.Scope.ToString());
         }
 
         /// <summary>
@@ -83,7 +88,7 @@ namespace Web.Core.FilterAttributes
             }
 
             foreach (var role in this.Role.GetFlagEnums())
-            {                
+            {
                 if (context.User.IsInRole(role.ToString()) == true)
                 {
                     return true;

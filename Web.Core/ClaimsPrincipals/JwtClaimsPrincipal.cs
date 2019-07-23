@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
-namespace Web.Host.Startups.Jwt
+namespace Web.Core.ClaimsPrincipals
 {
     /// <summary>
     /// jwt凭据信息
     /// </summary>
-    public class JwtClaimsPrincipal : ClaimsPrincipal
+    public class JwtClaimsPrincipal : ClaimsPrincipal, IJwtClaimsPrincipal
     {
         private readonly string roleClaimType;
         private readonly string payloadJson;
@@ -63,6 +64,17 @@ namespace Web.Host.Startups.Jwt
         public override string ToString()
         {
             return this.payloadJson;
+        }
+
+
+        /// <summary>
+        /// 转换为T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T As<T>()
+        {
+            return JsonSerializer.Parse<T>(this.payloadJson);
         }
     }
 }

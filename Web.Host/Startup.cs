@@ -91,6 +91,12 @@ namespace Web.Host
             // 添加认证配置
             services.AddJwtParser();
 
+            // 添加swagger的Bearer token
+            services.AddSwaggerJwtAuth();
+
+            // 模型验证转换为ApiResult输出
+            services.AddApiResultInvalidModelState();
+
             // 添加swagger文档
             services.AddSwaggerGen(c =>
             {
@@ -106,31 +112,18 @@ namespace Web.Host
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Host.xml"));
             });
 
-            // 添加swagger的Bearer token
-            services.AddSwaggerJwtAuth();
 
             // 添加控制器
-            var mvcBuilder = services
-                .AddControllers(c =>
-                {
-                    var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
-                    c.Conventions.Add(new ServiceTemplateConvention(serviceName));
-                    c.Filters.Add<ApiGlobalExceptionFilter>();
-                }).ConfigureApiBehaviorOptions(c =>
-                {
-                    c.InvalidModelStateResponseFactory = context =>
-                    {
-                        var keyValue = context.ModelState.FirstOrDefault(item => item.Value.Errors.Count > 0);
-                        var message = $"参数{keyValue.Key}验证失败：{keyValue.Value.Errors[0].ErrorMessage}";
-
-                        var apiResult = ApiResult.ParameterError<object>(message);
-                        return new ObjectResult(apiResult);
-                    };
-                });
+            var mvc = services.AddControllers(c =>
+            {
+                var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
+                c.Conventions.Add(new ServiceTemplateConvention(serviceName));
+                c.Filters.Add<ApiGlobalExceptionFilter>();
+            });
 
             if (Environment.IsDevelopment())
             {
-                mvcBuilder.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
+                mvc.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
             }
 
             // 添加心跳检测

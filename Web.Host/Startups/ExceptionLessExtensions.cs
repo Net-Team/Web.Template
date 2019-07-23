@@ -20,8 +20,7 @@ namespace Web.Host.Startups
         /// <param name="configurationSection"></param>
         public static void SetDefaultExceptionLess(this IConfigurationSection configurationSection)
         {
-            ExceptionlessClient.Default.Configuration.ApiKey = configurationSection.GetValue<string>("ApiKey");
-            ExceptionlessClient.Default.Configuration.ServerUrl = configurationSection.GetValue<string>("ServerUrl");
+            configurationSection.Bind(ExceptionlessClient.Default.Configuration);
             ExceptionlessClient.Default.Startup();
         }
     }

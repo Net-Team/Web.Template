@@ -17,7 +17,7 @@ namespace Web.Host.Startups
         /// <param name="services"></param>    
         public static void AddSwaggerJwtAuth(this IServiceCollection services)
         {
-            services.Configure<SwaggerGenOptions>(c =>
+            services.PostConfigure<SwaggerGenOptions>(c =>
             {
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

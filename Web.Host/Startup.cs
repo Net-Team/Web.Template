@@ -12,7 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Web.Core.FilterAttributes;
@@ -46,6 +45,8 @@ namespace Web.Host
         {
             Configuration = configuration;
             Environment = environment;
+
+            configuration.GetSection("ExceptionLess").SetDefaultExceptionLess();
         }
 
 
@@ -134,7 +135,6 @@ namespace Web.Host
 
             // Ìí¼ÓÐÄÌø¼ì²â
             services.AddHealthChecks();
-            services.AddExceptionLess(this.Configuration.GetSection("ExceptionLess"));
         }
 
         /// <summary>

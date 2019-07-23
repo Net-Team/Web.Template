@@ -15,11 +15,10 @@ namespace Web.Host.Startups
     public static class ExceptionLessExtensions
     {
         /// <summary>
-        /// 添加ExceptionLess客户端
-        /// </summary>
-        /// <param name="services"></param>
+        /// 初始化ExceptionLess客户端
+        /// </summary>      
         /// <param name="configurationSection"></param>
-        public static void AddExceptionLess(this IServiceCollection services, IConfigurationSection configurationSection)
+        public static void SetDefaultExceptionLess(this IConfigurationSection configurationSection)
         {
             ExceptionlessClient.Default.Configuration.ApiKey = configurationSection.GetValue<string>("ApiKey");
             ExceptionlessClient.Default.Configuration.ServerUrl = configurationSection.GetValue<string>("ServerUrl");

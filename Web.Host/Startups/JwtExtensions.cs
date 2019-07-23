@@ -17,19 +17,17 @@ namespace Web.Host.Startups
         /// <param name="services"></param> 
         public static void AddJwtParser(this IServiceCollection services)
         {
-            services.AddJwtParser(null);
+            services.AddJwtParser(c => { });
         }
 
         /// <summary>
         /// 添加jwt解析器
         /// </summary>
         /// <param name="services"></param> 
-        /// <param name="options"></param>
-        public static void AddJwtParser(this IServiceCollection services, Action<JwtOptions> options)
+        /// <param name="config"></param>
+        public static void AddJwtParser(this IServiceCollection services, Action<JwtOptions> config)
         {
-            var opt = new JwtOptions();
-            options?.Invoke(opt);
-            services.AddTransient(p => opt);
+            services.Configure(config);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -23,10 +24,10 @@ namespace Web.Host.Middlewares
         /// <summary>
         /// 中间件基类
         /// </summary> 
-        public JWTMiddleware(RequestDelegate next, JwtOptions options)
+        public JWTMiddleware(RequestDelegate next, IOptions<JwtOptions> options)
             : base(next)
         {
-            this.options = options;
+            this.options = options.Value;
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Web.Host.Startups.Jwt
+﻿namespace Web.Host.Startups.Options
 {
     /// <summary>
     /// jwt选项

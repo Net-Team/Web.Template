@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Web.Core.FilterAttributes;
@@ -93,15 +94,19 @@ namespace Web.Host
             services.AddSwaggerGen(c =>
             {
                 var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
-                c.SchemaFilter<RequiredSchemaFilter>(true);
+                c.IgnoreObsoleteActions();
+                c.EnableAnnotations();
+                c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{serviceName} Api", Version = "v1" });
-
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Core.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Host.xml"));
             });
+
+            // 添加swagger的Bearer token
+            services.AddSwaggerJwtAuth();
 
             // 添加控制器
             var mvcBuilder = services

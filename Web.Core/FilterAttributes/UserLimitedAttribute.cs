@@ -87,11 +87,14 @@ namespace Web.Core.FilterAttributes
                 return true;
             }
 
-            foreach (var role in this.Role.GetFlagEnums())
+            foreach (var role in this.Role.GetFlagEnums<Role>())
             {
-                if (context.User.IsInRole(role.ToString()) == true)
+                if (role != Role.None)
                 {
-                    return true;
+                    if (context.User.IsInRole(role.ToString()) == true)
+                    {
+                        return true;
+                    }
                 }
             }
 

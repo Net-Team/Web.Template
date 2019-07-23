@@ -1,13 +1,14 @@
-﻿using Web.Core.ClaimsPrincipals;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Web.Core;
+using Web.Core.ClaimsPrincipals;
+using Web.Host.Startups.Options;
 
-namespace Web.Host.Startups.Jwt
+namespace Web.Host.Middlewares
 {
     /// <summary>
     /// jwt解析器中间件

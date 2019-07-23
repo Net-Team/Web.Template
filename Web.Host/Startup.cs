@@ -92,8 +92,9 @@ namespace Web.Host
             // Ìí¼ÓswaggerÎÄµµ
             services.AddSwaggerGen(c =>
             {
+                var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
                 c.SchemaFilter<RequiredSchemaFilter>(true);
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{serviceName} Api", Version = "v1" });
 
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
@@ -143,7 +144,6 @@ namespace Web.Host
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -154,7 +154,7 @@ namespace Web.Host
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "swagger doc");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1 doc");
             });
 
             app.UseEndpoints(endpoints =>

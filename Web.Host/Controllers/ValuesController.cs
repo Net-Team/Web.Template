@@ -12,7 +12,7 @@ namespace Web.Host.Controllers
     /// <summary>
     /// 演示控制器
     /// </summary>
-    [Route("api/[service][controller]")]
+    [Route("api/[service]/values")]
     public class ValuesController : ApiController
     {
         // GET api/values

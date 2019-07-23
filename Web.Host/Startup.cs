@@ -122,16 +122,10 @@ namespace Web.Host
             {
                 c.InvalidModelStateResponseFactory = context =>
                 {
-                    dynamic actionDescriptor = context.ActionDescriptor;
-                    var returnType = ((MethodInfo)actionDescriptor.MethodInfo).ReturnType;
-                    var apiResult = Activator.CreateInstance(returnType) as IApiResult;
-
                     var keyValue = context.ModelState.FirstOrDefault(item => item.Value.Errors.Count > 0);
                     var message = $"参数{keyValue.Key}验证失败：{keyValue.Value.Errors[0].ErrorMessage}";
 
-                    apiResult.Code = Code.ParameterError;
-                    apiResult.Message = message;
-
+                    var apiResult = ApiResult.ParameterError<object>(message);
                     return new ObjectResult(apiResult);
                 };
             });

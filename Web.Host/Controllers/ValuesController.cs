@@ -19,6 +19,7 @@ namespace Web.Host.Controllers
         [HttpGet]
         public async Task<ApiResult<IEnumerable<string>>> Get([FromServices] BaiduService baidu, [FromServices] IUserApi userApi)
         {
+            throw new System.Exception("dfdf");
             var where = this.GetQueryPredicate<Baidu>();
             var sum = baidu.Sum(1, 3);
             return new string[] { sum.ToString() };

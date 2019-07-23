@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Web.Host.Middlewares;
-using Web.Host.Startups.Options;
+using Web.Host.Options;
 
 namespace Web.Host.Startups
 {
@@ -26,7 +26,7 @@ namespace Web.Host.Startups
         /// <param name="services"></param> 
         /// <param name="config"></param>
         public static void AddJwtParser(this IServiceCollection services, Action<JwtOptions> config)
-        {
+        { 
             services.Configure(config);
         }
 

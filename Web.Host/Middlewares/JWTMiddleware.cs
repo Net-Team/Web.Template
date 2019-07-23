@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Web.Core;
 using Web.Core.ClaimsPrincipals;
-using Web.Host.Startups.Options;
+using Web.Host.Options;
 
 namespace Web.Host.Middlewares
 {

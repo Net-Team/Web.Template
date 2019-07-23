@@ -1,10 +1,8 @@
 using Application;
-using Core;
 using Domain;
 using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +11,6 @@ using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
 using System.IO;
-using System.Linq;
 using Web.Core.FilterAttributes;
 using Web.Core.Options;
 using Web.Core.Startups;
@@ -26,6 +23,11 @@ namespace Web.Host
     /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// 获取服务名
+        /// </summary>
+        private readonly string serviceName;
+
         /// <summary>
         /// 获取配置
         /// </summary>
@@ -47,6 +49,7 @@ namespace Web.Host
             Environment = environment;
 
             configuration.GetSection("ExceptionLess").SetDefaultExceptionLess();
+            serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
         }
 
 
@@ -100,7 +103,6 @@ namespace Web.Host
             // 添加swagger文档
             services.AddSwaggerGen(c =>
             {
-                var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
                 c.IgnoreObsoleteActions();
                 c.EnableAnnotations();
                 c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
@@ -116,7 +118,6 @@ namespace Web.Host
             // 添加控制器
             var mvc = services.AddControllers(c =>
             {
-                var serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
                 c.Conventions.Add(new ServiceTemplateConvention(serviceName));
                 c.Filters.Add<ApiGlobalExceptionFilter>();
             });

@@ -1,4 +1,5 @@
 ﻿using Application.Baidus;
+using Application.UserCenters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Collections.Generic;
@@ -16,11 +17,10 @@ namespace Web.Host.Controllers
     {
         // GET api/values
         [HttpGet]
-        public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
+        public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IUserApi  userApi)
         {
             var where = this.GetQueryPredicate<Baidu>();
-            var sum = baidu.Sum(1, 3);
-            var html = await baiduApi.GetAsync();
+            var sum = baidu.Sum(1, 3);            
             return new string[] { sum.ToString() };
         }
 

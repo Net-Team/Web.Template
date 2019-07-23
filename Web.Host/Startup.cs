@@ -104,10 +104,22 @@ namespace Web.Host
             });
 
             // 添加控制器
-            var mvcBuilder = services.AddControllers(c =>
-            {
-                c.Filters.Add<ApiGlobalExceptionFilter>();
-            });
+            var mvcBuilder = services
+                .AddControllers(c =>
+                {
+                    c.Filters.Add<ApiGlobalExceptionFilter>();
+                }).ConfigureApiBehaviorOptions(c =>
+                {
+                    c.InvalidModelStateResponseFactory = context =>
+                    {
+                        var keyValue = context.ModelState.FirstOrDefault(item => item.Value.Errors.Count > 0);
+                        var message = $"参数{keyValue.Key}验证失败：{keyValue.Value.Errors[0].ErrorMessage}";
+
+                        var apiResult = ApiResult.ParameterError<object>(message);
+                        return new ObjectResult(apiResult);
+                    };
+                });
+
             if (Environment.IsDevelopment())
             {
                 mvcBuilder.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
@@ -116,19 +128,6 @@ namespace Web.Host
             // 添加心跳检测
             services.AddHealthChecks();
             services.AddExceptionLess(this.Configuration.GetSection("ExceptionLess"));
-
-            // 模型验证结果转换
-            services.Configure<ApiBehaviorOptions>(c =>
-            {
-                c.InvalidModelStateResponseFactory = context =>
-                {
-                    var keyValue = context.ModelState.FirstOrDefault(item => item.Value.Errors.Count > 0);
-                    var message = $"参数{keyValue.Key}验证失败：{keyValue.Value.Errors[0].ErrorMessage}";
-
-                    var apiResult = ApiResult.ParameterError<object>(message);
-                    return new ObjectResult(apiResult);
-                };
-            });
         }
 
         /// <summary>

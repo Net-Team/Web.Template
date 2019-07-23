@@ -1,4 +1,6 @@
-﻿namespace Core.Menus
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Core.Menus
 {
     /// <summary>
     /// 表示菜单信息
@@ -8,11 +10,13 @@
         /// <summary>
         /// 获取或设置分组名称
         /// </summary>
+        [Required]
         public string GroupName { get; set; }
 
         /// <summary>
         /// 或取或设置名称
         /// </summary>
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
@@ -23,6 +27,7 @@
         /// <summary>
         /// 获取或设置相对Uri
         /// </summary>
+        [Required]
         public string RelativePath { get; set; }
 
         /// <summary>

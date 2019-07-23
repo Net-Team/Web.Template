@@ -9,18 +9,18 @@ namespace Web.Core
     public static class ClaimsPrincipalExtensions
     {
         /// <summary>
-        /// 转换为
+        /// 转换为用户模型
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static T As<T>(this ClaimsPrincipal user)
+        public static TUser As<TUser>(this ClaimsPrincipal user)
         {
             if (user is IJwtClaimsPrincipal jwtUser)
             {
-                return jwtUser.As<T>();
+                return jwtUser.As<TUser>();
             }
-            return default(T);
+            return default(TUser);
         }
     }
 }

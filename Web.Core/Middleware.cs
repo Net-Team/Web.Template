@@ -5,6 +5,7 @@ namespace Web.Core
 {
     /// <summary>
     /// 中间件基类
+    /// 所有参数通过DI注册
     /// </summary>
     public abstract class Middleware
     {

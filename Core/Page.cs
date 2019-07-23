@@ -12,20 +12,17 @@ namespace Core
     {
         /// <summary>
         /// 页面索引，0开始
-        /// </summary>
-        [Required]
+        /// </summary>     
         public int PageIndex { get; set; }
 
         /// <summary>
         /// 页面记录大小
-        /// </summary>
-        [Required]
+        /// </summary>      
         public int PageSize { get; set; }
 
         /// <summary>
         /// 全部记录条数
-        /// </summary>
-        [Required]
+        /// </summary>       
         public int TotalCount { get; set; }
 
         /// <summary>

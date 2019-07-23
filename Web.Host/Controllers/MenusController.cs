@@ -14,7 +14,7 @@ namespace Web.Host.Controllers
     /// 菜单控制器
     /// </summary>   
     [UserLimited(Scope.RKE, Role = Role.Admin)]
-    [Route("api/[service]/[controller]")]
+    [Route("api/[service]/menus")]
     public class MenusController : ApiController
     {
         /// <summary>

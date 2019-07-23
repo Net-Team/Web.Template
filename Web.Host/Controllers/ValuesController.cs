@@ -1,23 +1,27 @@
 ﻿using Application.Baidus;
+using Application.UserCenters;
+using Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Web.Core.Controllers;
-using Web.Core.FilterAttributes;
 
 namespace Web.Host.Controllers
-{   
+{
+    /// <summary>
+    /// 演示控制器
+    /// </summary>
+    [Route("api/[controller]")]
     public class ValuesController : ApiController
     {
         // GET api/values
         [HttpGet]
-        [MenuItem("接口安全", Group.基础数据)]
-        public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IBaiduApi baiduApi)
+        public async Task<ApiResult<IEnumerable<string>>> Get([FromServices] BaiduService baidu, [FromServices] IUserApi userApi)
         {
+            throw new System.Exception("dfdf");
             var where = this.GetQueryPredicate<Baidu>();
             var sum = baidu.Sum(1, 3);
-            var html = await baiduApi.GetAsync();
             return new string[] { sum.ToString() };
         }
 
@@ -28,15 +32,13 @@ namespace Web.Host.Controllers
         /// <param name="apiDescription"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [MenuItem("开锁日志", Group.日志管理, Order = 1, Class = "open")]
-        public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
+        public ApiResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
         {
             return "value";
         }
 
         // POST api/values
         [HttpPost]
-        [MenuItem("报警日志", Group.日志管理, Order = 0)]
         public void Post([FromBody] Baidu value)
         {
         }

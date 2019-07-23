@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System;
 
 namespace Web.Core.FilterAttributes
 {
@@ -13,6 +16,18 @@ namespace Web.Core.FilterAttributes
         /// <param name="context"></param>
         public void OnException(ExceptionContext context)
         {
+            var apiResult = new ApiResult<object>
+            {
+                Code = Code.ServiceError,
+                Message = context.Exception.Message
+            };
+
+            if (context.Exception is ArgumentException)
+            {
+                apiResult.Code = Code.ParameterError;
+            }
+
+            context.Result = new ObjectResult(apiResult);
         }
     }
 }

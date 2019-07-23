@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Web.Core.ClaimsPrincipals;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Web.Host.Startups.Jwt
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        public override Task Invoke(HttpContext httpContext)
+        public override Task InvokeAsync(HttpContext httpContext)
         {
             var jwt = this.ReadJwtSecurityToken(httpContext);
             if (jwt != null)
@@ -43,7 +44,7 @@ namespace Web.Host.Startups.Jwt
                 httpContext.User = new JwtClaimsPrincipal(identity, this.options.RoleClaimType, json);
             }
 
-            return this.Next.Invoke(httpContext);
+            return this.Next(httpContext);
         }
 
 

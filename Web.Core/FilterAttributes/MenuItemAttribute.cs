@@ -21,13 +21,7 @@ namespace Web.Core.FilterAttributes
         /// <summary>
         /// 获取菜单项名称
         /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// 获取或设置排序
-        /// 从小到大排序
-        /// </summary>
-        public int Order { get; set; }
+        public Name Name { get; }
 
         /// <summary>
         /// 获取或设置类名
@@ -45,7 +39,7 @@ namespace Web.Core.FilterAttributes
         /// </summary>
         /// <param name="name">菜单项名称</param>
         /// <param name="group">所在分组</param>
-        public MenuItemAttribute(string name, Group group)
+        public MenuItemAttribute(Name name, Group group)
         {
             this.Name = name;
             this.Group = group;
@@ -79,7 +73,7 @@ namespace Web.Core.FilterAttributes
 
             // 查找与当前api的RelativePath对应的菜单
             var api = apiExplorer.ApiDescriptionGroups.Items.SelectMany(item => item.Items).FirstOrDefault(item => item.ActionDescriptor.Id == context.ActionDescriptor.Id);
-            var enable = menus.FirstOrDefault(item => item.RelativePath == api.RelativePath)?.Enable == true;
+            var enable = menus.FirstOrDefault(item => item.RelativePath == api.RelativePath) != null;
 
             // 找不到菜单或菜单设置为禁用
             if (enable == false)

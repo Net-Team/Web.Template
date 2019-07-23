@@ -1,8 +1,10 @@
 using Application;
+using Core;
 using Domain;
 using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Web.Core.Configs;
 using Web.Core.FilterAttributes;
 using Web.Core.Startups;
@@ -86,14 +90,6 @@ namespace Web.Host
             // 添加认证配置
             services.AddJwtParser();
 
-            //services
-            //    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer()
-            //    .AddIdentityServerAuthentication(options =>
-            //    {
-            //        Configuration.GetSection("IdentityServer").Bind(options);
-            //    });
-
             // 添加swagger文档
             services.AddSwaggerGen(c =>
             {
@@ -108,10 +104,22 @@ namespace Web.Host
             });
 
             // 添加控制器
-            var mvcBuilder = services.AddControllers(c =>
-            {
-                c.Filters.Add<ApiGlobalExceptionFilter>();
-            });
+            var mvcBuilder = services
+                .AddControllers(c =>
+                {
+                    c.Filters.Add<ApiGlobalExceptionFilter>();
+                }).ConfigureApiBehaviorOptions(c =>
+                {
+                    c.InvalidModelStateResponseFactory = context =>
+                    {
+                        var keyValue = context.ModelState.FirstOrDefault(item => item.Value.Errors.Count > 0);
+                        var message = $"参数{keyValue.Key}验证失败：{keyValue.Value.Errors[0].ErrorMessage}";
+
+                        var apiResult = ApiResult.ParameterError<object>(message);
+                        return new ObjectResult(apiResult);
+                    };
+                });
+
             if (Environment.IsDevelopment())
             {
                 mvcBuilder.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);

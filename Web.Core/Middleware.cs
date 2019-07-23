@@ -27,6 +27,6 @@ namespace Web.Core
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        public abstract Task Invoke(HttpContext httpContext);
+        public abstract Task InvokeAsync(HttpContext httpContext);
     }
 }

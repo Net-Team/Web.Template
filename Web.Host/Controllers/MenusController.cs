@@ -1,4 +1,5 @@
 ﻿using Application.Menus;
+using Core;
 using Core.Menus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -23,7 +24,7 @@ namespace Web.Host.Controllers
         /// <param name="apiExplorer"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<MenuGroup[]> Get(
+        public async Task<ApiResult<MenuGroup[]>> Get(
             [FromServices]MenuService menuService,
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)
         {
@@ -63,7 +64,7 @@ namespace Web.Host.Controllers
         /// <returns></returns>
         [HttpGet("{userId}")]
         [MenuItem(Name.功能权限, Group.基础数据)]
-        public async Task<MenuGroup[]> Get(
+        public async Task<ApiResult<MenuGroup[]>> Get(
             string userId,
             [FromServices]MenuService menuService,
             [FromServices]IApiDescriptionGroupCollectionProvider apiExplorer)

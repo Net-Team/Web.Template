@@ -1,11 +1,11 @@
 ﻿using Application.Baidus;
 using Application.UserCenters;
+using Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Web.Core.Controllers;
-using Web.Core.FilterAttributes;
 
 namespace Web.Host.Controllers
 {
@@ -17,10 +17,10 @@ namespace Web.Host.Controllers
     {
         // GET api/values
         [HttpGet]
-        public async Task<IEnumerable<string>> Get([FromServices] BaiduService baidu, [FromServices] IUserApi  userApi)
+        public async Task<ApiResult<IEnumerable<string>>> Get([FromServices] BaiduService baidu, [FromServices] IUserApi userApi)
         {
             var where = this.GetQueryPredicate<Baidu>();
-            var sum = baidu.Sum(1, 3);            
+            var sum = baidu.Sum(1, 3);
             return new string[] { sum.ToString() };
         }
 
@@ -30,14 +30,14 @@ namespace Web.Host.Controllers
         /// <param name="id">开锁id</param>
         /// <param name="apiDescription"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]       
-        public ActionResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
+        [HttpGet("{id}")]
+        public ApiResult<string> Get(int id, [FromServices]IApiDescriptionGroupCollectionProvider apiDescription)
         {
             return "value";
         }
 
         // POST api/values
-        [HttpPost]       
+        [HttpPost]
         public void Post([FromBody] Baidu value)
         {
         }

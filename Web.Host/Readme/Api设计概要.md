@@ -1,14 +1,17 @@
 ﻿## 1 定义
 > [service]
+
 * 独立部署的一个单元
 * 名称完全小写
  
 > [controller]
+
 * 控制器名，一般代表某项小功能，比如[books] [users] [roomstucts]等，
 * 都是是复数形式
 * 名称完全小写
 
 > [id]
+
 * 表示某项的一个唯一标识
 * 比如用户名或用户id
 
@@ -35,8 +38,7 @@
 ## 3 请求方式
 > GET
 
-用于获取资源的请求，其最大特点是多次获取一个资源不会对资源有改变的风险，
-客户端可以在一个业务请求里进行多次重试GET操作。
+用于获取资源的请求，其最大特点是多次获取一个资源不会对资源有改变的风险，客户端可以在一个业务请求里进行多次重试GET操作。
 
 > POST
 
@@ -76,8 +78,7 @@
 * 500 服务器内部异常
 
 ### 4.2 使用统一的模型描述业务状态与数据
-> 业务状态码是指请求已经正确到达接口，
-> 接口处理业务结果的一个状态分类
+> 业务状态码是指请求已经正确到达接口，接口处理业务结果的一个状态分类
 
 * code定义业务操作状态码
 * message为对应的提示语
@@ -131,16 +132,13 @@ public enum Code
 * api/rke-admin/users?name=laojiu&nickName=九
 * api/rke-admin/users?name=laojiu&nickName=九&userType=3
 
-后端应当有能力适应前端传入不确定数量的查询字段的能力，
-并且有权利使用合适的比较符号和忽略传入的query参数名，
-比如以上查询后端可以解释为
+后端应当有能力适应前端传入不确定数量的查询字段的能力，并且有权利使用合适的比较符号和忽略传入的query参数名，比如以上查询后端可以解释为
 * name like '%laojiu%'
 * name like '%laojiu%' // 强制忽略了nickName
 * name like '%laojiu%' and nickName like '%九%' and userType = 3
 
 ### 5.2 分页模型
-前端使用pageIndex和pageSize两个query参数定位分页，pageIndex为索引，从0开始。
-后端返回如数据的data对应以下分页模型:
+前端使用pageIndex和pageSize两个query参数定位分页，pageIndex为索引，从0开始。后端返回如数据的data对应以下分页模型:
 
 ```
 {

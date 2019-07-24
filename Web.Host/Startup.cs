@@ -2,6 +2,7 @@ using Application;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -147,10 +148,16 @@ namespace Web.Host
 
             app.UseJwtParser();
 
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = $"/swagger/{serviceOptions.Name}/{{documentName}}/swagger.json";
+            });
+
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1 doc");
+                c.DocumentTitle = $"{serviceOptions.Name}µÄopenApiÎÄµµ";
+                c.RoutePrefix = $"swagger/{serviceOptions.Name}";
+                c.SwaggerEndpoint($"/swagger/{serviceOptions.Name}/v1/swagger.json", "v1 doc");
             });
 
             app.UseEndpoints(endpoints =>

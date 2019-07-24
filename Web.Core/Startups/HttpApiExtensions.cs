@@ -47,7 +47,7 @@ namespace Web.Core.Startups
                 p.GetService<IConfiguration>().GetSection(key).Bind(c);
                 if (useGatewayHost == true)
                 {
-                    c.HttpHost = p.GetService<IOptions<KongOptions>>().Value.ProxyUri;
+                    c.HttpHost = p.GetService<IOptions<ServiceOptions>>().Value.GatewayProxyUri;
                 }
             });
         }

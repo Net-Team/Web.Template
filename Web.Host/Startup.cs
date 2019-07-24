@@ -24,9 +24,9 @@ namespace Web.Host
     public class Startup
     {
         /// <summary>
-        /// 获取服务名
+        /// 获取服务
         /// </summary>
-        private readonly string serviceName;
+        private readonly ServiceOptions serviceOptions;
 
         /// <summary>
         /// 获取配置
@@ -48,8 +48,8 @@ namespace Web.Host
             Configuration = configuration;
             Environment = environment;
 
-            configuration.GetSection("ExceptionLess").SetDefaultExceptionLess();
-            serviceName = Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.Name)}");
+            configuration.GetSection("ExceptionLess").BindDefaultExceptionLess();
+            serviceOptions = Configuration.GetValue<ServiceOptions>($"{nameof(ServiceOptions)}");
         }
 
 
@@ -59,8 +59,7 @@ namespace Web.Host
         /// <param name="services"></param>  
         public void ConfigureServices(IServiceCollection services)
         {
-            // 配置绑定
-            services.Configure<KongOptions>(Configuration.GetSection(nameof(KongOptions)));
+            // 配置绑定       
             services.Configure<ServiceOptions>(Configuration.GetSection(nameof(ServiceOptions)));
 
             // 添加缓存和数据库
@@ -106,7 +105,7 @@ namespace Web.Host
                 c.IgnoreObsoleteActions();
                 c.EnableAnnotations();
                 c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{serviceName} Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{serviceOptions.Name} Api", Version = "v1" });
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
@@ -118,7 +117,7 @@ namespace Web.Host
             // 添加控制器
             var mvc = services.AddControllers(c =>
             {
-                c.Conventions.Add(new ServiceTemplateConvention(serviceName));
+                c.Conventions.Add(new ServiceTemplateConvention(serviceOptions.Name));
                 c.Filters.Add<ApiGlobalExceptionFilter>();
             });
 
@@ -159,7 +158,7 @@ namespace Web.Host
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks(Configuration.GetValue<string>($"{nameof(ServiceOptions)}:{nameof(ServiceOptions.HealthRoute)}"));
+                endpoints.MapHealthChecks(serviceOptions.HealthRoute);
             });
         }
     }

@@ -7,9 +7,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Web.Core;
 using Web.Core.ClaimsPrincipals;
-using Web.Host.Options;
 
-namespace Web.Host.Middlewares
+namespace Web.Host.Startups.Jwt
 {
     /// <summary>
     /// jwt解析器中间件

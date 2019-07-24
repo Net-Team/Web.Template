@@ -18,6 +18,11 @@ namespace Web.Core.Options
         public Uri Uri { get; set; }
 
         /// <summary>
+        /// 网关代理接口地址
+        /// </summary>
+        public Uri GatewayProxyUri { get; set; }
+
+        /// <summary>
         /// 健康检查的路由
         /// </summary>
         public string HealthRoute { get; set; }         

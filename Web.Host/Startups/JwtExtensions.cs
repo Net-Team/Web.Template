@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using Web.Host.Middlewares;
-using Web.Host.Options;
+using Web.Host.Startups.Jwt;
 
 namespace Web.Host.Startups
 {

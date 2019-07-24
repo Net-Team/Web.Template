@@ -1,11 +1,6 @@
 ﻿using Exceptionless;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Web.Host.Startups
 {
@@ -18,7 +13,7 @@ namespace Web.Host.Startups
         /// 初始化ExceptionLess客户端
         /// </summary>      
         /// <param name="configurationSection"></param>
-        public static void SetDefaultExceptionLess(this IConfigurationSection configurationSection)
+        public static void BindDefaultExceptionLess(this IConfigurationSection configurationSection)
         {
             configurationSection.Bind(ExceptionlessClient.Default.Configuration);
             ExceptionlessClient.Default.Startup();

@@ -109,15 +109,14 @@ namespace Web.Host
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Core.xml"));
-                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Web.Host.xml"));
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{this.GetType().Assembly.GetName().Name}.xml"));
             });
-
 
             // Ìí¼Ó¿ØÖÆÆ÷
             var mvc = services.AddControllers(c =>
             {
-                c.Conventions.Add(new ServiceTemplateConvention(serviceOptions.Name));
                 c.Filters.Add<ApiGlobalExceptionFilter>();
+                c.Conventions.Add(new ServiceTemplateConvention(serviceOptions.Name));
             });
 
             if (Environment.IsDevelopment())

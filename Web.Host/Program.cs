@@ -36,7 +36,7 @@ namespace Web.Host
                             .WriteTo.Debug()
                             .WriteTo.Console()
                             .WriteTo.Exceptionless(restrictedToMinimumLevel: LogEventLevel.Error)
-                            .WriteTo.File(Path.Combine("logs", @"error.txt"), restrictedToMinimumLevel: LogEventLevel.Error, rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
+                            .WriteTo.File(Path.Combine("Logs", @"Error.txt"), restrictedToMinimumLevel: LogEventLevel.Error, rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
                         );
                 });
         }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
 using System.Collections.Generic;
 
 namespace Web.Host.Startups
@@ -15,13 +14,25 @@ namespace Web.Host.Startups
         /// 添加swagger的Bearer token
         /// </summary>
         /// <param name="services"></param>    
-        public static void AddSwaggerJwtAuth(this IServiceCollection services)
+        /// <returns></returns>
+        public static IServiceCollection AddSwaggerJwtAuth(this IServiceCollection services)
         {
-            services.PostConfigure<SwaggerGenOptions>(c =>
+            return services.AddSwaggerJwtAuth(null);
+        }
+
+        /// <summary>
+        /// 添加swagger的Bearer token
+        /// </summary>
+        /// <param name="services"></param>  
+        /// <param name="description">说明</param>
+        /// <returns></returns>
+        public static IServiceCollection AddSwaggerJwtAuth(this IServiceCollection services, string description)
+        {
+            return services.PostConfigure<SwaggerGenOptions>(c =>
             {
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "请在下面输入token值",
+                    Description = description ?? "请在下面输入token值",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Scheme = "bearer",

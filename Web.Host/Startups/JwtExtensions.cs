@@ -14,9 +14,10 @@ namespace Web.Host.Startups
         /// 添加jwt解析器
         /// </summary>
         /// <param name="services"></param> 
-        public static void AddJwtParser(this IServiceCollection services)
+        /// <returns></returns>
+        public static IServiceCollection AddJwtParser(this IServiceCollection services)
         {
-            services.AddJwtParser(c => { });
+            return services.AddJwtParser(c => { });
         }
 
         /// <summary>
@@ -24,9 +25,10 @@ namespace Web.Host.Startups
         /// </summary>
         /// <param name="services"></param> 
         /// <param name="config"></param>
-        public static void AddJwtParser(this IServiceCollection services, Action<JwtOptions> config)
-        { 
-            services.Configure(config);
+        /// <returns></returns>
+        public static IServiceCollection AddJwtParser(this IServiceCollection services, Action<JwtOptions> config)
+        {
+            return services.Configure(config);
         }
 
         /// <summary>

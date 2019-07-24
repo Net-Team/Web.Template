@@ -1,6 +1,5 @@
 using Application;
 using Domain;
-using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +48,7 @@ namespace Web.Host
             Environment = environment;
 
             configuration.GetSection("ExceptionLess").BindDefaultExceptionLess();
-            serviceOptions = Configuration.GetValue<ServiceOptions>($"{nameof(ServiceOptions)}");
+            serviceOptions = Configuration.GetSection($"{nameof(ServiceOptions)}").Get<ServiceOptions>();
         }
 
 
@@ -59,7 +58,7 @@ namespace Web.Host
         /// <param name="services"></param>  
         public void ConfigureServices(IServiceCollection services)
         {
-            // 配置绑定       
+            // 添加IOptions<ServiceInfo>       
             services.Configure<ServiceOptions>(Configuration.GetSection(nameof(ServiceOptions)));
 
             // 添加缓存和数据库

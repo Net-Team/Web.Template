@@ -1,6 +1,8 @@
 ﻿using Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Web.Core.FilterAttributes
@@ -26,6 +28,11 @@ namespace Web.Core.FilterAttributes
             {
                 apiResult.Code = Code.ParameterError;
             }
+
+            context.HttpContext
+                .RequestServices
+                .GetService<ILogger<ApiGlobalExceptionFilter>>()
+                .LogError(context.Exception, context.Exception.Message);
 
             context.Result = new ObjectResult(apiResult);
         }

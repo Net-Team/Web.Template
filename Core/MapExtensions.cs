@@ -1,4 +1,5 @@
 ﻿using Nelibur.ObjectMapper;
+using System;
 
 namespace Core
 {
@@ -13,9 +14,14 @@ namespace Core
         /// </summary>
         /// <typeparam name="TMap"></typeparam>
         /// <param name="value"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
         public static IMap<TMap> AsMap<TMap>(this TMap value) where TMap : class
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
             return new Map<TMap>(value);
         }
 
@@ -50,7 +56,7 @@ namespace Core
         /// IMap的默认实现者
         /// </summary>
         /// <typeparam name="TMap"></typeparam>
-        private class Map<TMap> : IMap<TMap>
+        private class Map<TMap> : IMap<TMap> where TMap : class
         {
             private readonly TMap map;
 
@@ -66,8 +72,12 @@ namespace Core
             /// <typeparam name="TSource"></typeparam>
             /// <param name="source">来源</param>
             /// <returns></returns>
-            public TMap From<TSource>(TSource source)
+            public TMap From<TSource>(TSource source) where TSource : class
             {
+                if (source == null)
+                {
+                    return this.map;
+                }
                 return Mapper<TSource, TMap>.Map(source, this.map);
             }
 
@@ -78,10 +88,14 @@ namespace Core
             /// <typeparam name="TDestination"></typeparam>
             /// <param name="destination">目标对象</param>
             /// <returns></returns>
-            public TDestination To<TDestination>(TDestination destination)
+            public TDestination To<TDestination>(TDestination destination) where TDestination : class
             {
+                if (destination == null)
+                {
+                    return null;
+                }
                 return Mapper<TMap, TDestination>.Map(this.map, destination);
-            }  
+            }
         }
     }
 }

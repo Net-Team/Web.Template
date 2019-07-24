@@ -5,7 +5,7 @@
     /// 提供对相同名称的属性进行映射
     /// </summary>
     /// <typeparam name="TMap"></typeparam>
-    public interface IMap<TMap>
+    public interface IMap<TMap> where TMap : class
     {
         /// <summary>
         /// 映射到目标对象
@@ -14,7 +14,7 @@
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="destination">目标对象</param>
         /// <returns></returns>
-        TDestination To<TDestination>(TDestination destination);
+        TDestination To<TDestination>(TDestination destination) where TDestination : class;
 
         /// <summary>
         /// 从其它对象映射过来
@@ -23,6 +23,6 @@
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source">来源</param>
         /// <returns></returns>
-        TMap From<TSource>(TSource source);
+        TMap From<TSource>(TSource source) where TSource : class;
     }
 }

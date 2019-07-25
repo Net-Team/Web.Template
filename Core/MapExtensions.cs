@@ -45,12 +45,12 @@ namespace Core
             /// <summary>
             /// 忽略的字段
             /// </summary>
-            private Lazy<HashSet<string>> ignoreMembers = new Lazy<HashSet<string>>();
+            private readonly Lazy<HashSet<string>> ignoreMembers = new Lazy<HashSet<string>>(() => new HashSet<string>(StringComparer.InvariantCulture));
 
             /// <summary>
             /// 包含的字段
             /// </summary>
-            private Lazy<HashSet<string>> includeMembers = new Lazy<HashSet<string>>();
+            private readonly Lazy<HashSet<string>> includeMembers = new Lazy<HashSet<string>>(() => new HashSet<string>(StringComparer.InvariantCulture));
 
             /// <summary>
             /// IMap的默认实现者
@@ -187,14 +187,16 @@ namespace Core
                     return null;
                 }
 
-                if (this.includeMembers.IsValueCreated == true)
-                {
-                    return Property<TMap>.MemberNames.Except(this.includeMembers.Value).ToArray();
-                }
-
                 if (this.ignoreMembers.IsValueCreated == true)
                 {
                     return this.ignoreMembers.Value.ToArray();
+                }
+
+                if (this.includeMembers.IsValueCreated == true)
+                {
+                    return Property<TMap>.MemberNames
+                        .Except(this.includeMembers.Value)
+                        .ToArray();
                 }
 
                 return Property<TMap>.MemberNames

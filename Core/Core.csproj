@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="EmitMapper.Core" Version="1.0.0" />
-    <PackageReference Include="TinyMapper" Version="3.0.2-beta" />
   </ItemGroup>
 
   <ItemGroup>

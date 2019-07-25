@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace Core
+namespace System
 {
     /// <summary>
     /// 定义表示映射体的接口
     /// 提供对相同名称的属性进行映射
     /// </summary>
-    /// <typeparam name="TMap"></typeparam>
-    public interface IMap<TMap> where TMap : class
+    /// <typeparam name="TSource"></typeparam>
+    public interface IMap<TSource> where TSource : class
     {
         /// <summary>
         /// 忽略映射的字段
@@ -16,14 +15,14 @@ namespace Core
         /// <typeparam name="TKey"></typeparam>
         /// <param name="ignoreKey">忽略的字段</param>
         /// <returns></returns>
-        IMap<TMap> Ignore<TKey>(Expression<Func<TMap, TKey>> ignoreKey);
+        IMap<TSource> Ignore<TKey>(Expression<Func<TSource, TKey>> ignoreKey);
 
         /// <summary>
         /// 忽略映射的字段
         /// </summary>
         /// <param name="memberName">忽略的字段</param>
         /// <returns></returns>
-        IMap<TMap> Ignore(params string[] memberName); 
+        IMap<TSource> Ignore(params string[] memberName); 
 
         /// <summary>
         /// 映射到目标对象

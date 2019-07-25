@@ -11,12 +11,12 @@ namespace System.Reflection
         /// <summary>
         /// 获取器
         /// </summary>
-        private readonly Method geter;
+        private readonly Func<object, object> geter;
 
         /// <summary>
         /// 设置器
         /// </summary>
-        private readonly Method seter;
+        private readonly Action<object, object> seter;
 
         /// <summary>
         /// 获取属性名称
@@ -29,11 +29,6 @@ namespace System.Reflection
         public PropertyInfo Info { get; private set; }
 
         /// <summary>
-        /// 获取是否是Virtual
-        /// </summary>
-        public bool IsVirtual { get; private set; }
-
-        /// <summary>
         /// 属性
         /// </summary>
         /// <param name="property">属性信息</param>
@@ -42,18 +37,15 @@ namespace System.Reflection
             this.Name = property.Name;
             this.Info = property;
 
-            var getMethod = property.GetGetMethod();
-            if (getMethod != null)
+            if (property.CanRead == true)
             {
-                this.geter = new Method(getMethod);
+                this.geter = Lambda.CreateGetFunc<object, object>(property);
             }
 
-            var setMethod = property.GetSetMethod();
-            if (setMethod != null)
+            if (property.CanWrite == true)
             {
-                this.seter = new Method(setMethod);
+                this.seter = Lambda.CreateSetAction<object, object>(property);
             }
-            this.IsVirtual = this.geter.Info.IsVirtual;
         }
 
         /// <summary>
@@ -63,7 +55,7 @@ namespace System.Reflection
         /// <returns></returns>
         public object GetValue(object instance)
         {
-            return this.geter.Invoke(instance, null);
+            return this.geter.Invoke(instance);
         }
 
         /// <summary>
@@ -75,7 +67,6 @@ namespace System.Reflection
         {
             this.seter.Invoke(instance, value);
         }
-
 
         /// <summary>
         /// 类型属性的Setter缓存
@@ -89,9 +80,7 @@ namespace System.Reflection
         /// <returns></returns>
         public static Property[] GetProperties(Type type)
         {
-            return cached.GetOrAdd(type, t =>
-              t.GetProperties().Select(p => new Property(p)).ToArray()
-           );
+            return cached.GetOrAdd(type, t => t.GetProperties().Select(p => new Property(p)).ToArray());
         }
     }
 }

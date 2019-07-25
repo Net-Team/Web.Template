@@ -41,6 +41,7 @@ namespace Web.Host.Controllers
         [HttpPost]
         public void Post([FromBody] Baidu value)
         {
+            //var tmp = value.AsMap().To<str>
         }
 
         // PUT api/values/5

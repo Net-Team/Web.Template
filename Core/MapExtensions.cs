@@ -3,6 +3,7 @@ using EmitMapper.MappingConfiguration;
 using Nelibur.ObjectMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Core
@@ -36,13 +37,25 @@ namespace Core
         /// <typeparam name="TMap"></typeparam>
         private class Map<TMap> : IMap<TMap> where TMap : class
         {
+            /// <summary>
+            /// 映射源
+            /// </summary>
             private readonly TMap map;
 
             /// <summary>
             /// 忽略的字段
             /// </summary>
-            private List<string> ignoreMembers;
+            private Lazy<HashSet<string>> ignoreMembers = new Lazy<HashSet<string>>();
 
+            /// <summary>
+            /// 包含的字段
+            /// </summary>
+            private Lazy<HashSet<string>> includeMembers = new Lazy<HashSet<string>>();
+
+            /// <summary>
+            /// IMap的默认实现者
+            /// </summary>
+            /// <param name="map"></param>
             public Map(TMap map)
             {
                 this.map = map;
@@ -52,24 +65,76 @@ namespace Core
             /// 忽略映射的字段
             /// </summary>
             /// <typeparam name="TKey"></typeparam>
-            /// <param name="ignore"></param>  
+            /// <param name="ignoreKey"></param>  
             /// <exception cref="ArgumentNullException"></exception>
             /// <returns></returns>
-            public IMap<TMap> Ignore<TKey>(Expression<Func<TMap, TKey>> ignore)
+            public IMap<TMap> Ignore<TKey>(Expression<Func<TMap, TKey>> ignoreKey)
             {
-                if (ignore == null)
+                if (ignoreKey == null)
                 {
-                    throw new ArgumentNullException(nameof(ignore));
+                    throw new ArgumentNullException(nameof(ignoreKey));
                 }
 
-                if (this.ignoreMembers == null)
+                if (ignoreKey.Body is MemberExpression body)
                 {
-                    this.ignoreMembers = new List<string>();
+                    this.ignoreMembers.Value.Add(body.Member.Name);
+                }
+                return this;
+            }
+
+            /// <summary>
+            /// 忽略映射的字段
+            /// </summary>
+            /// <param name="memberName">忽略的字段</param>
+            /// <returns></returns>
+            public IMap<TMap> Ignore(params string[] memberName)
+            {
+                foreach (var item in memberName)
+                {
+                    this.ignoreMembers.Value.Add(item);
+                }
+                return this;
+            }
+
+            /// <summary>
+            /// 设置要映射的字段名
+            /// 留空表示全部字段
+            /// </summary>
+            /// <typeparam name="TKey"></typeparam>
+            /// <param name="includeKey">包含的字段</param>
+            /// <exception cref="ArgumentNullException"></exception>
+            /// <returns></returns>
+            public IMap<TMap> Include<TKey>(Expression<Func<TMap, TKey>> includeKey)
+            {
+                if (includeKey == null)
+                {
+                    throw new ArgumentNullException(nameof(includeKey));
                 }
 
-                if (ignore.Body is MemberExpression body)
+                if (includeKey.Body is MemberExpression body)
                 {
-                    this.ignoreMembers.Add(body.Member.Name);
+                    this.includeMembers.Value.Add(body.Member.Name);
+                }
+                return this;
+            }
+
+
+            /// <summary>
+            /// 设置要映射的字段名
+            /// 留空表示全部字段
+            /// </summary>
+            /// <param name="members"></param>
+            /// <returns></returns>
+            public IMap<TMap> Include(params string[] members)
+            {
+                if (members == null)
+                {
+                    return this;
+                }
+
+                foreach (var m in members)
+                {
+                    this.includeMembers.Value.Add(m);
                 }
                 return this;
             }
@@ -99,16 +164,56 @@ namespace Core
                     return null;
                 }
 
-                if (this.ignoreMembers == null || this.ignoreMembers.Count == 0)
+                var ignores = this.GetIgnoreMembers();
+                if (ignores == null || ignores.Length == 0)
                 {
                     return Tiny<TMap, TDestination>.Map(this.map, destination);
                 }
                 else
                 {
-                    var config = new DefaultMapConfig().IgnoreMembers<TMap, TDestination>(ignoreMembers.ToArray());
+                    var config = new DefaultMapConfig().IgnoreMembers<TMap, TDestination>(ignores);
                     return ObjectMapperManager.DefaultInstance.GetMapper<TMap, TDestination>(config).Map(this.map);
                 }
             }
+
+            /// <summary>
+            /// 获取忽略的属性
+            /// </summary>
+            /// <returns></returns>
+            private string[] GetIgnoreMembers()
+            {
+                if (this.ignoreMembers.IsValueCreated == false && this.includeMembers.IsValueCreated == false)
+                {
+                    return null;
+                }
+
+                if (this.includeMembers.IsValueCreated == true)
+                {
+                    return Property<TMap>.MemberNames.Except(this.includeMembers.Value).ToArray();
+                }
+
+                if (this.ignoreMembers.IsValueCreated == true)
+                {
+                    return this.ignoreMembers.Value.ToArray();
+                }
+
+                return Property<TMap>.MemberNames
+                    .Except(this.includeMembers.Value)
+                    .Union(this.ignoreMembers.Value)
+                    .ToArray();
+            }
+        }
+
+        /// <summary>
+        /// 提供类型的属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        private static class Property<T>
+        {
+            /// <summary>
+            /// 获取类型的所有属性名称
+            /// </summary>
+            public static string[] MemberNames { get; } = typeof(T).GetProperties().Select(item => item.Name).ToArray();
         }
 
         /// <summary>

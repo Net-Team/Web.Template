@@ -19,6 +19,31 @@ namespace Core
         IMap<TMap> Ignore<TKey>(Expression<Func<TMap, TKey>> ignoreKey);
 
         /// <summary>
+        /// 忽略映射的字段
+        /// </summary>
+        /// <param name="memberName">忽略的字段</param>
+        /// <returns></returns>
+        IMap<TMap> Ignore(params string[] memberName);
+
+
+        /// <summary>
+        /// 设置要映射的字段名
+        /// 留空表示全部字段
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="includeKey">包含的字段</param>
+        /// <returns></returns>
+        IMap<TMap> Include<TKey>(Expression<Func<TMap, TKey>> includeKey);
+
+        /// <summary>
+        /// 设置要映射的字段名
+        /// 留空表示全部字段
+        /// </summary>
+        /// <param name="memberName">包含的字段</param>
+        /// <returns></returns>
+        IMap<TMap> Include(params string[] memberName);
+
+        /// <summary>
         /// 映射到目标对象
         /// 要求destination为public修饰
         /// </summary>

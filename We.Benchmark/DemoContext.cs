@@ -5,7 +5,7 @@ using System.Text;
 
 namespace We.Benchmark
 {
-    class DemoContext
+    public class DemoContext
     {
         [Benchmark]
         public void Method1()

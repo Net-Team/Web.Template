@@ -1,5 +1,8 @@
 ﻿using Nelibur.ObjectMapper;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Core
 {
@@ -33,7 +36,17 @@ namespace Core
         private static class Mapper<TSource, TDestination>
         {
             /// <summary>
-            /// 初始化绑定
+            /// 当前是否为有ignore的绑定
+            /// </summary>
+            private static bool hasIgnoreBinding = false;
+
+            /// <summary>
+            /// 排它锁
+            /// </summary>
+            private static object syncRoot = new object();
+
+            /// <summary>
+            /// 静态初始化NoneIgnoreBinding
             /// </summary>
             static Mapper()
             {
@@ -48,7 +61,32 @@ namespace Core
             /// <returns></returns>
             public static TDestination Map(TSource source, TDestination destination)
             {
-                return TinyMapper.Map(source, destination);
+                lock (syncRoot)
+                {
+                    if (hasIgnoreBinding == true)
+                    {
+                        TinyMapper.Bind<TSource, TDestination>();
+                        hasIgnoreBinding = false;
+                    }
+                    return TinyMapper.Map(source, destination);
+                }
+            }
+
+            /// <summary>
+            /// 映射对象
+            /// </summary>
+            /// <param name="source"></param>
+            /// <param name="destination"></param>
+            /// <param name="ignores">忽略项</param>
+            /// <returns></returns>
+            public static TDestination Map(TSource source, TDestination destination, IEnumerable<Expression<Func<TSource, object>>> ignores)
+            {
+                lock (syncRoot)
+                {
+                    hasIgnoreBinding = true;
+                    TinyMapper.Bind<TSource, TDestination>(c => ignores.ForEach(i => c.Ignore(i)));
+                    return TinyMapper.Map(source, destination);
+                }
             }
         }
 
@@ -60,25 +98,39 @@ namespace Core
         {
             private readonly TMap map;
 
+            /// <summary>
+            /// 忽略的字段
+            /// </summary>
+            private readonly IList<Expression<Func<TMap, object>>> ignores = new List<Expression<Func<TMap, object>>>();
+
             public Map(TMap map)
             {
                 this.map = map;
             }
 
             /// <summary>
-            /// 从其它对象映射过来
-            /// 要求source为public修饰
+            /// 忽略映射的字段
             /// </summary>
-            /// <typeparam name="TSource"></typeparam>
-            /// <param name="source">来源</param>
+            /// <typeparam name="TKey"></typeparam>
+            /// <param name="ignore"></param>           
             /// <returns></returns>
-            public TMap From<TSource>(TSource source) where TSource : class
+            public IMap<TMap> Ignore<TKey>(Expression<Func<TMap, TKey>> ignore)
             {
-                if (source == null)
-                {
-                    return this.map;
-                }
-                return Mapper<TSource, TMap>.Map(source, this.map);
+                var body = Expression.Convert(ignore.Body, typeof(object));
+                var expression = Expression.Lambda<Func<TMap, object>>(body, ignore.Parameters);
+                this.ignores.Add(expression);
+                return this;
+            }
+
+            /// <summary>
+            /// 映射到目标对象
+            /// 要求destination为public修饰
+            /// </summary>
+            /// <typeparam name="TDestination"></typeparam>
+            /// <returns></returns>
+            public TDestination To<TDestination>() where TDestination : class, new()
+            {
+                return this.To(new TDestination());
             }
 
             /// <summary>
@@ -94,7 +146,15 @@ namespace Core
                 {
                     return null;
                 }
-                return Mapper<TMap, TDestination>.Map(this.map, destination);
+
+                if (this.ignores.Count == 0)
+                {
+                    return Mapper<TMap, TDestination>.Map(this.map, destination);
+                }
+                else
+                {
+                    return Mapper<TMap, TDestination>.Map(this.map, destination, this.ignores);
+                }
             }
         }
     }

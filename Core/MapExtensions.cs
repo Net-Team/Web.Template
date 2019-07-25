@@ -30,6 +30,45 @@ namespace Core
             return new Map<TMap>(value);
         }
 
+        /// <summary>
+        /// 转换为可映射对象
+        /// 要求对象为public修饰
+        /// </summary>
+        /// <typeparam name="TMap"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="includeMembers">要映射的成员名称</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
+        public static IMap<TMap> AsMap<TMap>(this TMap value, IEnumerable<string> includeMembers) where TMap : class
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            if (includeMembers == null || includeMembers.Any() == false)
+            {
+                return new Map<TMap>(value);
+            }
+            else
+            {
+                var ignoreMembers = Property<TMap>.MemberNames.Except(includeMembers);
+                return new Map<TMap>(value, ignoreMembers);
+            }
+        }
+
+        /// <summary>
+        /// 提供类型的属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        private static class Property<T>
+        {
+            /// <summary>
+            /// 获取类型的所有属性名称
+            /// </summary>
+            public static string[] MemberNames { get; } = typeof(T).GetProperties().Select(item => item.Name).ToArray();
+        }
+
 
         /// <summary>
         /// IMap的默认实现者
@@ -45,20 +84,26 @@ namespace Core
             /// <summary>
             /// 忽略的字段
             /// </summary>
-            private readonly Lazy<HashSet<string>> ignoreMembers = new Lazy<HashSet<string>>(() => new HashSet<string>(StringComparer.InvariantCulture));
-
-            /// <summary>
-            /// 包含的字段
-            /// </summary>
-            private readonly Lazy<HashSet<string>> includeMembers = new Lazy<HashSet<string>>(() => new HashSet<string>(StringComparer.InvariantCulture));
+            private readonly HashSet<string> ignoreMembers = new HashSet<string>(StringComparer.InvariantCulture);
 
             /// <summary>
             /// IMap的默认实现者
             /// </summary>
             /// <param name="map"></param>
             public Map(TMap map)
+                : this(map, null)
+            {
+            }
+
+            /// <summary>
+            /// IMap的默认实现者
+            /// </summary>
+            /// <param name="map"></param>
+            /// <param name="ignores">忽略的字段</param>
+            public Map(TMap map, IEnumerable<string> ignores)
             {
                 this.map = map;
+                ignores.ForEach(i => this.ignoreMembers.Add(i));
             }
 
             /// <summary>
@@ -77,7 +122,7 @@ namespace Core
 
                 if (ignoreKey.Body is MemberExpression body)
                 {
-                    this.ignoreMembers.Value.Add(body.Member.Name);
+                    this.ignoreMembers.Add(body.Member.Name);
                 }
                 return this;
             }
@@ -91,50 +136,7 @@ namespace Core
             {
                 foreach (var item in memberName)
                 {
-                    this.ignoreMembers.Value.Add(item);
-                }
-                return this;
-            }
-
-            /// <summary>
-            /// 设置要映射的字段名
-            /// 留空表示全部字段
-            /// </summary>
-            /// <typeparam name="TKey"></typeparam>
-            /// <param name="includeKey">包含的字段</param>
-            /// <exception cref="ArgumentNullException"></exception>
-            /// <returns></returns>
-            public IMap<TMap> Include<TKey>(Expression<Func<TMap, TKey>> includeKey)
-            {
-                if (includeKey == null)
-                {
-                    throw new ArgumentNullException(nameof(includeKey));
-                }
-
-                if (includeKey.Body is MemberExpression body)
-                {
-                    this.includeMembers.Value.Add(body.Member.Name);
-                }
-                return this;
-            }
-
-
-            /// <summary>
-            /// 设置要映射的字段名
-            /// 留空表示全部字段
-            /// </summary>
-            /// <param name="members"></param>
-            /// <returns></returns>
-            public IMap<TMap> Include(params string[] members)
-            {
-                if (members == null)
-                {
-                    return this;
-                }
-
-                foreach (var m in members)
-                {
-                    this.includeMembers.Value.Add(m);
+                    this.ignoreMembers.Add(item);
                 }
                 return this;
             }
@@ -164,59 +166,18 @@ namespace Core
                     return null;
                 }
 
-                var ignores = this.GetIgnoreMembers();
-                if (ignores == null || ignores.Length == 0)
+                if (this.ignoreMembers.Count == 0)
                 {
                     return Tiny<TMap, TDestination>.Map(this.map, destination);
                 }
                 else
                 {
-                    var config = new DefaultMapConfig().IgnoreMembers<TMap, TDestination>(ignores);
+                    var config = new DefaultMapConfig().IgnoreMembers<TMap, TDestination>(this.ignoreMembers.ToArray());
                     return ObjectMapperManager.DefaultInstance.GetMapper<TMap, TDestination>(config).Map(this.map);
                 }
             }
-
-            /// <summary>
-            /// 获取忽略的属性
-            /// </summary>
-            /// <returns></returns>
-            private string[] GetIgnoreMembers()
-            {
-                if (this.ignoreMembers.IsValueCreated == false && this.includeMembers.IsValueCreated == false)
-                {
-                    return null;
-                }
-
-                if (this.ignoreMembers.IsValueCreated == true)
-                {
-                    return this.ignoreMembers.Value.ToArray();
-                }
-
-                if (this.includeMembers.IsValueCreated == true)
-                {
-                    return Property<TMap>.MemberNames
-                        .Except(this.includeMembers.Value)
-                        .ToArray();
-                }
-
-                return Property<TMap>.MemberNames
-                    .Except(this.includeMembers.Value)
-                    .Union(this.ignoreMembers.Value)
-                    .ToArray();
-            }
         }
 
-        /// <summary>
-        /// 提供类型的属性
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        private static class Property<T>
-        {
-            /// <summary>
-            /// 获取类型的所有属性名称
-            /// </summary>
-            public static string[] MemberNames { get; } = typeof(T).GetProperties().Select(item => item.Name).ToArray();
-        }
 
         /// <summary>
         /// 提供TinyMapper的静态初始化与映射操作

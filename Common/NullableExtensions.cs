@@ -25,6 +25,7 @@
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         public static T NullThen<T>(this T? source, T value) where T : struct
         {

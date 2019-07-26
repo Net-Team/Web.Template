@@ -72,7 +72,7 @@ namespace System
             /// <summary>
             /// 源类型的所有属性
             /// </summary>
-            private static readonly Property[] sourceProperies = Property.GetProperties(typeof(TSource));
+            private static readonly PropertyInfo[] sourceProperies = typeof(TSource).GetProperties();
 
             /// <summary>
             /// 源类型的所有属性名称
@@ -181,9 +181,9 @@ namespace System
                 static MapItem()
                 {
                     var q = from s in sourceProperies
-                            join d in Property.GetProperties(typeof(TDestination))
+                            join d in typeof(TDestination).GetProperties()
                             on s.Name equals d.Name
-                            where s.Info.CanRead && d.Info.CanWrite
+                            where s.CanRead && d.CanWrite
                             select new MapProperty(s.Name);
 
                     mapTable = q.ToDictionary(item => item.Name, item => item, StringComparer.OrdinalIgnoreCase);

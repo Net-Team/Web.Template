@@ -126,10 +126,9 @@ namespace System.Data
                 return 0;
             }
 
-            int mid = begin;
             while (end - begin > 1)
             {
-                mid = (end + begin) / 2;
+                int mid = (end + begin) / 2;
                 if (this.hashKeys[mid] >= hashCode)
                 {
                     end = mid;

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace We.Benchmark
+namespace Web.Benchmark
 {
     public class DemoContext
     {

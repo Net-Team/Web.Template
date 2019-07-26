@@ -2,7 +2,7 @@
 using Core;
 using System;
 
-namespace We.Benchmark
+namespace Web.Benchmark
 {
     public class MapContext
     {

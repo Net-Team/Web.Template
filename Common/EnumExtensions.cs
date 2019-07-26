@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace System
@@ -38,6 +39,16 @@ namespace System
         public static Enum[] GetValues(this Enum e)
         {
             return e.GetValues<Enum>();
+        }
+
+        /// <summary>
+        /// 获取DisplayName
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static string GetDisplayName(this Enum e)
+        {
+            return e.GetAttribute<DisplayNameAttribute>()?.DisplayName ?? e.ToString();
         }
 
         /// <summary>

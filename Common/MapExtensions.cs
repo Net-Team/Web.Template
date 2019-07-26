@@ -11,6 +11,11 @@ namespace System
     public static class MapExtensions
     {
         /// <summary>
+        /// 类型转换方法
+        /// </summary>
+        private static readonly MethodInfo convertToTypeMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConvertToType)}", BindingFlags.Static | BindingFlags.Public);
+
+        /// <summary>
         /// 转换为可映射对象
         /// 要求对象为public修饰
         /// </summary>
@@ -179,7 +184,7 @@ namespace System
                             join d in Property.GetProperties(typeof(TDestination))
                             on s.Name equals d.Name
                             where s.Info.CanRead && d.Info.CanWrite
-                            select new MapProperty(s, d);
+                            select new MapProperty(s.Name);
 
                     mapTable = q.ToDictionary(item => item.Name, item => item, StringComparer.OrdinalIgnoreCase);
                 }
@@ -197,46 +202,83 @@ namespace System
                     {
                         if (mapTable.TryGetValue(item, out var map) == true)
                         {
-                            var value = map.Source.GetValue(source);
-                            map.Destination.SetValue(destination, value);
+                            map.Invoke(source, destination);
                         }
                     }
                     return destination;
                 }
-            }
-        }
 
+                /// <summary>
+                /// 表示映射属性
+                /// </summary>
+                private class MapProperty
+                {
+                    /// <summary>
+                    /// 映射委托
+                    /// </summary>
+                    private readonly Action<TSource, TDestination> mapAction;
 
-        /// <summary>
-        /// 表示属性映射关系
-        /// </summary>
-        private class MapProperty
-        {
-            /// <summary>
-            /// 获取属性名
-            /// </summary>
-            public string Name { get; }
+                    /// <summary>
+                    /// 获取属性名称
+                    /// </summary>
+                    public string Name { get; }
 
-            /// <summary>
-            /// 获取源属性
-            /// </summary>
-            public Property Source { get; }
+                    /// <summary>
+                    /// 映射属性
+                    /// </summary>
+                    /// <param name="name">属性名称</param>
+                    public MapProperty(string name)
+                    {
+                        this.Name = name;
+                        this.mapAction = CreateMapAction(name);
+                    }
 
-            /// <summary>
-            /// 获取目标属性
-            /// </summary>
-            public Property Destination { get; }
+                    /// <summary>
+                    /// 创建映射委托
+                    /// (source,destination) => source.Name =  destination.Name;
+                    /// </summary>
+                    /// <param name="name">属性名</param>
+                    /// <returns></returns>
+                    private static Action<TSource, TDestination> CreateMapAction(string name)
+                    {
+                        var parameterSource = Expression.Parameter(typeof(TSource), "source");
+                        var parameterDestination = Expression.Parameter(typeof(TDestination), "destination");
 
-            /// <summary>
-            /// 属性映射关系
-            /// </summary>
-            /// <param name="source">源属性</param>
-            /// <param name="destination">目标属性</param>
-            public MapProperty(Property source, Property destination)
-            {
-                this.Name = source.Name;
-                this.Source = source;
-                this.Destination = destination;
+                        var propertySource = typeof(TSource).GetProperty(name);
+                        var propertyDestination = typeof(TDestination).GetProperty(name);
+
+                        var value = (Expression)Expression.Property(parameterSource, name);
+                        if (propertySource.PropertyType != propertyDestination.PropertyType)
+                        {
+                            var valueArg = Expression.Convert(value, typeof(object));
+                            var targetTypeArg = Expression.Constant(propertyDestination.PropertyType);
+                            var objectValue = Expression.Call(null, convertToTypeMethod, valueArg, targetTypeArg);
+                            value = Expression.Convert(objectValue, propertyDestination.PropertyType);
+                        }
+
+                        var body = Expression.Call(parameterDestination, propertyDestination.GetSetMethod(), value);
+                        return Expression.Lambda<Action<TSource, TDestination>>(body, parameterSource, parameterDestination).Compile();
+                    }
+
+                    /// <summary>
+                    /// 执行映射
+                    /// </summary>
+                    /// <param name="source">源</param>
+                    /// <param name="destination">目标</param>
+                    public void Invoke(TSource source, TDestination destination)
+                    {
+                        this.mapAction.Invoke(source, destination);
+                    }
+
+                    /// <summary>
+                    /// 转换为字符串
+                    /// </summary>
+                    /// <returns></returns>
+                    public override string ToString()
+                    {
+                        return this.Name;
+                    }
+                }
             }
         }
     }

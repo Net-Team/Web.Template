@@ -24,9 +24,9 @@ namespace Web.Host
     public class Startup
     {
         /// <summary>
-        /// 获取服务
+        /// 获取本服务的配置信息
         /// </summary>
-        private readonly ServiceOptions serviceOptions;
+        private readonly ServiceOptions thisService;
 
         /// <summary>
         /// 获取配置
@@ -49,7 +49,7 @@ namespace Web.Host
             Environment = environment;
 
             configuration.GetSection("ExceptionLess").BindDefaultExceptionLess();
-            serviceOptions = Configuration.GetSection($"{nameof(ServiceOptions)}").Get<ServiceOptions>();
+            thisService = Configuration.GetSection($"{nameof(ServiceOptions)}").Get<ServiceOptions>();
         }
 
 
@@ -105,7 +105,7 @@ namespace Web.Host
                 c.IgnoreObsoleteActions();
                 c.EnableAnnotations();
                 c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{serviceOptions.Name} Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{thisService.Name} Api", Version = "v1" });
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
@@ -117,7 +117,7 @@ namespace Web.Host
             var mvc = services.AddControllers(c =>
             {
                 c.Filters.Add<ApiGlobalExceptionFilter>();
-                c.Conventions.Add(new ServiceTemplateConvention(serviceOptions.Name));
+                c.Conventions.Add(new ServiceTemplateConvention(thisService.Name));
             });
 
             if (Environment.IsDevelopment())
@@ -126,7 +126,7 @@ namespace Web.Host
             }
 
             // 添加心跳检测
-            services.AddHealthChecks();
+            services.AddHealthChecks();              
         }
 
         /// <summary>
@@ -150,20 +150,20 @@ namespace Web.Host
 
             app.UseSwagger(c =>
             {
-                c.RouteTemplate = $"/swagger/{serviceOptions.Name}/{{documentName}}/swagger.json";
+                c.RouteTemplate = $"/swagger/{thisService.Name}/{{documentName}}/swagger.json";
             });
 
             app.UseSwaggerUI(c =>
             {
-                c.DocumentTitle = $"{serviceOptions.Name}的openApi文档";
-                c.RoutePrefix = $"swagger/{serviceOptions.Name}";
-                c.SwaggerEndpoint($"/swagger/{serviceOptions.Name}/v1/swagger.json", "v1 doc");
+                c.DocumentTitle = $"{thisService.Name}的openApi文档";
+                c.RoutePrefix = $"swagger/{thisService.Name}";
+                c.SwaggerEndpoint($"/swagger/{thisService.Name}/v1/swagger.json", "v1 doc");
             });
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks(serviceOptions.HealthRoute);
+                endpoints.MapHealthChecks(thisService.HealthRoute);
             });
         }
     }

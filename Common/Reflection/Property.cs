@@ -83,4 +83,77 @@ namespace System.Reflection
             return cached.GetOrAdd(type, t => t.GetProperties().Select(p => new Property(p)).ToArray());
         }
     }
+
+
+    /// <summary>
+    /// 表示属性
+    /// </summary>
+    /// <typeparam name="TDeclaringType"></typeparam>
+    public class Property<TDeclaringType>
+    {
+        /// <summary>
+        /// 获取器
+        /// </summary>
+        private readonly Func<TDeclaringType, object> geter;
+
+        /// <summary>
+        /// 设置器
+        /// </summary>
+        private readonly Action<TDeclaringType, object> seter;
+
+        /// <summary>
+        /// 获取属性名称
+        /// </summary>
+        public string Name { get; protected set; }
+
+        /// <summary>
+        /// 获取属性信息
+        /// </summary>
+        public PropertyInfo Info { get; private set; }
+
+        /// <summary>
+        /// 从类型的属性获取属性
+        /// </summary>       
+        public static Property<TDeclaringType>[] Properties { get; } = typeof(TDeclaringType).GetProperties().Select(p => new Property<TDeclaringType>(p)).ToArray();
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        /// <param name="property">属性信息</param>
+        public Property(PropertyInfo property)
+        {
+            this.Name = property.Name;
+            this.Info = property;
+
+            if (property.CanRead == true)
+            {
+                this.geter = Lambda.CreateGetFunc<TDeclaringType, object>(property);
+            }
+
+            if (property.CanWrite == true)
+            {
+                this.seter = Lambda.CreateSetAction<TDeclaringType, object>(property);
+            }
+        }
+
+        /// <summary>
+        /// 获取属性的值
+        /// </summary>
+        /// <param name="instance">实例</param>
+        /// <returns></returns>
+        public object GetValue(TDeclaringType instance)
+        {
+            return this.geter.Invoke(instance);
+        }
+
+        /// <summary>
+        /// 设置属性的值
+        /// </summary>
+        /// <param name="instance">实例</param>
+        /// <param name="value">值</param>
+        public void SetValue(TDeclaringType instance, object value)
+        {
+            this.seter.Invoke(instance, value);
+        }
+    }
 }

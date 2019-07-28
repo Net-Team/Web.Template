@@ -4,5 +4,3 @@ set /p imagetag=ÇëÊäÈë{image}:{tag}
 
 docker.exe rmi %imagetag% -f
 docker.exe build -t %imagetag% .
-
-pause

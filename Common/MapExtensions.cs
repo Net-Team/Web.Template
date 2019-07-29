@@ -67,7 +67,7 @@ namespace System
             /// <summary>
             /// 包含的属性名称
             /// </summary>
-            private readonly HashSet<string> includeMembers;
+            private HashSet<string> includeMembers;
 
             /// <summary>
             /// 源类型的所有属性
@@ -77,7 +77,8 @@ namespace System
             /// <summary>
             /// 源类型的所有属性名称
             /// </summary>
-            private static string[] sourceMemberNames = sourceProperies.Select(item => item.Name).ToArray();
+            private static readonly string[] sourceMembers = sourceProperies.Select(item => item.Name).ToArray();
+
 
             /// <summary>
             /// 映射体
@@ -85,8 +86,8 @@ namespace System
             /// <param name="source">数据源</param>
             /// <exception cref="ArgumentNullException"></exception>
             public Map(TSource source)
-                : this(source, sourceMemberNames)
             {
+                this.source = source ?? throw new ArgumentNullException(nameof(source));
             }
 
             /// <summary>
@@ -117,8 +118,9 @@ namespace System
 
                 if (ignoreKey.Body is MemberExpression body)
                 {
-                    this.includeMembers.Remove(body.Member.Name);
+                    this.Ignore(body.Member.Name);
                 }
+
                 return this;
             }
 
@@ -129,10 +131,16 @@ namespace System
             /// <returns></returns>
             public IMap<TSource> Ignore(params string[] memberName)
             {
+                if (this.includeMembers == null)
+                {
+                    this.includeMembers = new HashSet<string>(sourceMembers, StringComparer.OrdinalIgnoreCase);
+                }
+
                 foreach (var item in memberName)
                 {
                     this.includeMembers.Remove(item);
                 }
+
                 return this;
             }
 
@@ -161,7 +169,14 @@ namespace System
                     return null;
                 }
 
-                return MapItem<TDestination>.Map(this.source, destination, this.includeMembers);
+                if (this.includeMembers == null)
+                {
+                    return MapItem<TDestination>.Map(this.source, destination);
+                }
+                else
+                {
+                    return MapItem<TDestination>.Map(this.source, destination, this.includeMembers);
+                }
             }
 
             /// <summary>
@@ -170,6 +185,11 @@ namespace System
             /// <typeparam name="TDestination"></typeparam>
             private static class MapItem<TDestination>
             {
+                /// <summary>
+                /// 所有映射属性
+                /// </summary>
+                private static readonly MapProperty[] maps;
+
                 /// <summary>
                 /// 属性名与属性操作映射表
                 /// </summary>
@@ -182,11 +202,29 @@ namespace System
                 {
                     var q = from s in sourceProperies
                             join d in typeof(TDestination).GetProperties()
-                            on s.Name equals d.Name
-                            where s.CanRead && d.CanWrite
-                            select new MapProperty(s.Name);
+                            on s.Name.ToLower() equals d.Name.ToLower()
+                            let getter = s.GetGetMethod()
+                            let setter = d.GetSetMethod()
+                            where getter != null && setter != null
+                            select new MapProperty(s.Name, getter, setter);
 
+                    maps = q.ToArray();
                     mapTable = q.ToDictionary(item => item.Name, item => item, StringComparer.OrdinalIgnoreCase);
+                }
+
+                /// <summary>
+                /// 映射
+                /// </summary>
+                /// <param name="source">源</param>
+                /// <param name="destination">目标</param>             
+                /// <returns></returns>
+                public static TDestination Map(TSource source, TDestination destination)
+                {
+                    foreach (var map in maps)
+                    {
+                        map.Invoke(source, destination);
+                    }
+                    return destination;
                 }
 
                 /// <summary>
@@ -196,7 +234,7 @@ namespace System
                 /// <param name="destination">目标</param>
                 /// <param name="members">映射的属性</param>
                 /// <returns></returns>
-                public static TDestination Map(TSource source, TDestination destination, IEnumerable<string> members)
+                public static TDestination Map(TSource source, TDestination destination, HashSet<string> members)
                 {
                     foreach (var item in members)
                     {
@@ -214,9 +252,20 @@ namespace System
                 private class MapProperty
                 {
                     /// <summary>
+                    /// get方法
+                    /// </summary>
+                    private readonly MethodInfo getter;
+
+                    /// <summary>
+                    /// set方法
+                    /// </summary>
+                    private readonly MethodInfo setter;
+
+                    /// <summary>
                     /// 映射委托
                     /// </summary>
                     private readonly Action<TSource, TDestination> mapAction;
+
 
                     /// <summary>
                     /// 获取属性名称
@@ -227,9 +276,13 @@ namespace System
                     /// 映射属性
                     /// </summary>
                     /// <param name="name">属性名称</param>
-                    public MapProperty(string name)
+                    /// <param name="getter"></param>
+                    /// <param name="setter"></param>
+                    public MapProperty(string name, MethodInfo getter, MethodInfo setter)
                     {
                         this.Name = name;
+                        this.getter = getter;
+                        this.setter = setter;
                         this.mapAction = CreateMapAction(name);
                     }
 

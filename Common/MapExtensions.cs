@@ -17,7 +17,6 @@ namespace System
 
         /// <summary>
         /// 转换为可映射对象
-        /// 要求对象为public修饰
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="value"></param>
@@ -35,7 +34,6 @@ namespace System
 
         /// <summary>
         /// 转换为可映射对象
-        /// 要求对象为public修饰
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="value"></param>
@@ -203,17 +201,14 @@ namespace System
                     var q = from s in sourceProperies
                             join d in typeof(TDestination).GetProperties()
                             on s.Name.ToLower() equals d.Name.ToLower()
-                            let getter = s.GetGetMethod()
-                            let setter = d.GetSetMethod()
-                            where getter != null && setter != null
-                            select new MapProperty(s.Name, getter, setter);
+                            select new MapProperty(s, d);
 
-                    maps = q.ToArray();
-                    mapTable = q.ToDictionary(item => item.Name, item => item, StringComparer.OrdinalIgnoreCase);
+                    maps = q.Where(item => item.IsEnable).ToArray();
+                    mapTable = maps.ToDictionary(item => item.Name, item => item, StringComparer.OrdinalIgnoreCase);
                 }
 
                 /// <summary>
-                /// 映射
+                /// 映射所有默认匹配的属性
                 /// </summary>
                 /// <param name="source">源</param>
                 /// <param name="destination">目标</param>             
@@ -228,13 +223,13 @@ namespace System
                 }
 
                 /// <summary>
-                /// 映射
+                /// 映射目标属性
                 /// </summary>
                 /// <param name="source">源</param>
                 /// <param name="destination">目标</param>
                 /// <param name="members">映射的属性</param>
                 /// <returns></returns>
-                public static TDestination Map(TSource source, TDestination destination, HashSet<string> members)
+                public static TDestination Map(TSource source, TDestination destination, IEnumerable<string> members)
                 {
                     foreach (var item in members)
                     {
@@ -252,20 +247,9 @@ namespace System
                 private class MapProperty
                 {
                     /// <summary>
-                    /// get方法
-                    /// </summary>
-                    private readonly MethodInfo getter;
-
-                    /// <summary>
-                    /// set方法
-                    /// </summary>
-                    private readonly MethodInfo setter;
-
-                    /// <summary>
                     /// 映射委托
                     /// </summary>
                     private readonly Action<TSource, TDestination> mapAction;
-
 
                     /// <summary>
                     /// 获取属性名称
@@ -273,34 +257,42 @@ namespace System
                     public string Name { get; }
 
                     /// <summary>
+                    /// 获取是否可用
+                    /// </summary>
+                    public bool IsEnable { get; }
+
+                    /// <summary>
                     /// 映射属性
                     /// </summary>
-                    /// <param name="name">属性名称</param>
-                    /// <param name="getter"></param>
-                    /// <param name="setter"></param>
-                    public MapProperty(string name, MethodInfo getter, MethodInfo setter)
+                    /// <param name="propertySource">源属性</param>
+                    /// <param name="propertyDestination">目标属性</param>
+                    public MapProperty(PropertyInfo propertySource, PropertyInfo propertyDestination)
                     {
-                        this.Name = name;
-                        this.getter = getter;
-                        this.setter = setter;
-                        this.mapAction = CreateMapAction(name);
+                        this.mapAction = CreateMapAction(propertySource, propertyDestination);
+                        this.Name = propertySource.Name;
+                        this.IsEnable = this.mapAction != null;
                     }
 
                     /// <summary>
                     /// 创建映射委托
-                    /// (source,destination) => source.Name =  destination.Name;
-                    /// </summary>
-                    /// <param name="name">属性名</param>
+                    /// (source,destination) => destination.SetName(source.Name);
+                    /// </summary>                  
+                    /// <param name="propertySource">源属性</param>
+                    /// <param name="propertyDestination">目标属性</param>
                     /// <returns></returns>
-                    private static Action<TSource, TDestination> CreateMapAction(string name)
+                    private static Action<TSource, TDestination> CreateMapAction(PropertyInfo propertySource, PropertyInfo propertyDestination)
                     {
-                        var parameterSource = Expression.Parameter(typeof(TSource), "source");
-                        var parameterDestination = Expression.Parameter(typeof(TDestination), "destination");
+                        var getter = propertySource.GetGetMethod();
+                        var setter = propertyDestination.GetSetMethod();
+                        if (getter == null || setter == null)
+                        {
+                            return null;
+                        }
 
-                        var propertySource = typeof(TSource).GetProperty(name);
-                        var propertyDestination = typeof(TDestination).GetProperty(name);
+                        var source = Expression.Parameter(typeof(TSource), "source");
+                        var destination = Expression.Parameter(typeof(TDestination), "destination");
+                        var value = (Expression)Expression.Property(source, propertySource);
 
-                        var value = (Expression)Expression.Property(parameterSource, name);
                         if (propertySource.PropertyType != propertyDestination.PropertyType)
                         {
                             var valueArg = Expression.Convert(value, typeof(object));
@@ -309,8 +301,8 @@ namespace System
                             value = Expression.Convert(objectValue, propertyDestination.PropertyType);
                         }
 
-                        var body = Expression.Call(parameterDestination, propertyDestination.GetSetMethod(), value);
-                        return Expression.Lambda<Action<TSource, TDestination>>(body, parameterSource, parameterDestination).Compile();
+                        var body = Expression.Call(destination, setter, value);
+                        return Expression.Lambda<Action<TSource, TDestination>>(body, source, destination).Compile();
                     }
 
                     /// <summary>

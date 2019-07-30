@@ -189,11 +189,6 @@ namespace System
                 private static readonly MapProperty[] maps;
 
                 /// <summary>
-                /// 属性名与属性操作映射表
-                /// </summary>
-                private static readonly Dictionary<string, MapProperty> mapTable;
-
-                /// <summary>
                 /// 静态构造器
                 /// </summary>
                 static MapItem()
@@ -201,10 +196,11 @@ namespace System
                     var q = from s in sourceProperies
                             join d in typeof(TDestination).GetProperties()
                             on s.Name.ToLower() equals d.Name.ToLower()
-                            select new MapProperty(s, d);
+                            let map = new MapProperty(s, d)
+                            where map.IsEnable
+                            select map;
 
-                    maps = q.Where(item => item.IsEnable).ToArray();
-                    mapTable = maps.ToDictionary(item => item.Name, item => item, StringComparer.OrdinalIgnoreCase);
+                    maps = q.ToArray();
                 }
 
                 /// <summary>
@@ -229,11 +225,11 @@ namespace System
                 /// <param name="destination">目标</param>
                 /// <param name="members">映射的属性</param>
                 /// <returns></returns>
-                public static TDestination Map(TSource source, TDestination destination, IEnumerable<string> members)
+                public static TDestination Map(TSource source, TDestination destination, HashSet<string> members)
                 {
-                    foreach (var item in members)
+                    foreach (var map in maps)
                     {
-                        if (mapTable.TryGetValue(item, out var map) == true)
+                        if (members.Contains(map.Name) == true)
                         {
                             map.Invoke(source, destination);
                         }

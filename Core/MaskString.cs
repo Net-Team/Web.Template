@@ -1,4 +1,5 @@
-﻿namespace Core
+﻿using System;
+namespace Core
 {
     /// <summary>
     /// 表示掩码字符串
@@ -25,17 +26,7 @@
         public MaskString(string sourceValue, int skipLeft, int skipRight, char mask = '*')
         {
             this.SourceValue = sourceValue;
-            if (sourceValue?.Length > skipLeft + skipRight)
-            {
-                var left = sourceValue.Substring(0, skipLeft);
-                var right = sourceValue.Substring(sourceValue.Length - skipRight);
-                var maskValue = new string(mask, sourceValue.Length - skipLeft - skipRight);
-                this.MaskValue = $"{left}{maskValue}{right}";
-            }
-            else
-            {
-                this.MaskValue = sourceValue;
-            }
+            this.MaskValue = sourceValue.MaskAs(skipLeft, skipRight, mask);
         }
     }
 }

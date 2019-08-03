@@ -38,11 +38,7 @@ namespace System
         /// <returns></returns>
         public static string NullThenEmpty(this string source)
         {
-            if (source == null)
-            {
-                return string.Empty;
-            }
-            return source;
+            return source == null ? string.Empty : source;
         }
 
         /// <summary>
@@ -53,11 +49,7 @@ namespace System
         /// <returns></returns>
         public static string NullThen(this string source, string value)
         {
-            if (source.IsNullOrEmpty())
-            {
-                return value;
-            }
-            return source;
+            return source.IsNullOrEmpty() ? value : source;
         }
 
         /// <summary>
@@ -79,11 +71,7 @@ namespace System
         /// <returns></returns>
         public static string WhenThen(this string source, string when, string then)
         {
-            if (source == when)
-            {
-                return then;
-            }
-            return source;
+            return source == when ? then : source;
         }
 
         /// <summary>
@@ -93,11 +81,7 @@ namespace System
         /// <returns></returns>
         public static string ToLowerIfNoNull(this string source)
         {
-            if (string.IsNullOrEmpty(source))
-            {
-                return source;
-            }
-            return source.ToLower();
+            return string.IsNullOrEmpty(source) ? source : source.ToLower();
         }
 
         /// <summary>
@@ -107,11 +91,7 @@ namespace System
         /// <returns></returns>
         public static string ToUpperIfNoNull(this string source)
         {
-            if (string.IsNullOrEmpty(source))
-            {
-                return source;
-            }
-            return source.ToUpper();
+            return string.IsNullOrEmpty(source) ? source : source.ToUpper();
         }
 
         /// <summary>
@@ -122,8 +102,7 @@ namespace System
         /// <returns></returns>
         public static int ToInt32(this string source)
         {
-            int value = 0;
-            int.TryParse(source, out value);
+            int.TryParse(source, out int value);
             return value;
         }
 
@@ -136,12 +115,7 @@ namespace System
         /// <returns></returns>
         public static int ToInt32(this string source, int defalut)
         {
-            int value = 0;
-            if (int.TryParse(source, out value))
-            {
-                return value;
-            }
-            return defalut;
+            return int.TryParse(source, out int value) ? value : defalut;
         }
 
         /// <summary>
@@ -154,7 +128,7 @@ namespace System
         {
             source = source.NullThenEmpty();
             pattert = pattert.NullThenEmpty();
-            return System.Text.RegularExpressions.Regex.IsMatch(source, pattert);
+            return Regex.IsMatch(source, pattert);
         }
 
         /// <summary>
@@ -167,7 +141,7 @@ namespace System
         {
             source = source.NullThenEmpty();
             pattert = pattert.NullThenEmpty();
-            return System.Text.RegularExpressions.Regex.Match(source, pattert).Value;
+            return Regex.Match(source, pattert).Value;
         }
 
         /// <summary>
@@ -262,21 +236,27 @@ namespace System
         }
 
         /// <summary>
-        /// 字符串马赛克
+        /// 掩码字符串
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="mask">马赛克</param>
-        /// <param name="left">左边长度</param>
-        /// <param name="length">打码长度</param>
-        /// <returns></returns>
-        public static string MaskAs(this string source, char mask, int left, int length)
+        /// <param name="sourceValue">原始值</param>
+        /// <param name="skipLeft">左边跳过的字数</param>
+        /// <param name="skipRight">右边跳过的字数</param>
+        /// <param name="mask">掩码字符</param>
+        public static string MaskAs(this string sourceValue, int skipLeft, int skipRight, char mask = '*')
         {
-            if (source.IsNullOrEmpty())
+            if (sourceValue?.Length > skipLeft + skipRight)
             {
-                return source;
+                var span = sourceValue.ToCharArray();
+                for (var i = skipLeft; i < span.Length - skipRight; i++)
+                {
+                    span[i] = mask;
+                }
+                return new string(span);
             }
-            var pattern = string.Format(@"(?<=^.{{{0}}}).{{{1}}}", left, length);
-            return Regex.Replace(source, pattern, mask.Pad(length));
+            else
+            {
+                return sourceValue;
+            }
         }
 
         /// <summary>
@@ -317,30 +297,37 @@ namespace System
         }
 
         /// <summary>
-        /// 转换为驼峰格式
+        /// 骆驼命名
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="source">名称</param>
         /// <returns></returns>
         public static string CamelCase(this string source)
         {
-            if (source.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(source) || char.IsUpper(source[0]) == false)
             {
                 return source;
             }
-            return Regex.Replace(source, @"^[A-Z]+", m =>
+
+            var charArray = source.ToCharArray();
+            for (int i = 0; i < charArray.Length; i++)
             {
-                if (m.Success == false)
+                if (i == 1 && char.IsUpper(charArray[i]) == false)
                 {
-                    return m.Value;
+                    break;
                 }
-                if (m.Value.Length > 1)
+
+                var hasNext = (i + 1 < charArray.Length);
+                if (i > 0 && hasNext && !char.IsUpper(charArray[i + 1]))
                 {
-                    var charArray = m.Value.ToLower().ToCharArray();
-                    charArray[charArray.Length - 1] = Char.ToUpper(charArray[charArray.Length - 1]);
-                    return new string(charArray);
+                    if (char.IsSeparator(charArray[i + 1]))
+                    {
+                        charArray[i] = char.ToLowerInvariant(charArray[i]);
+                    }
+                    break;
                 }
-                return m.Value.ToLower();
-            });
+                charArray[i] = char.ToLowerInvariant(charArray[i]);
+            }
+            return new string(charArray);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Web.Benchmark
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<MapContext>();
+            var summary = BenchmarkRunner.Run<DemoContext>();
             Console.ReadLine();
         }
     }

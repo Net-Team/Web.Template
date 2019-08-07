@@ -165,9 +165,9 @@ namespace System
         /// <param name="source">源</param>
         /// <param name="totalLength">填充后的长度</param>
         /// <returns></returns>
-        public static string Pad(this char source, int totalLength)
+        public static string Repeat(this char source, int totalLength)
         {
-            return string.Empty.PadRight(totalLength, source);
+            return new string(source, totalLength);
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace System
             {
                 return source;
             }
-            return string.Concat(source, padChar.Pad(count));
+            return string.Concat(source, padChar.Repeat(count));
         }
 
         /// <summary>

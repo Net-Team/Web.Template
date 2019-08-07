@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QMapper;
+using System;
 using Xunit;
 
 namespace Web.Test.Common

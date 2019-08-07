@@ -20,7 +20,7 @@ namespace Web.Core.Startups
         /// </summary>
         /// <param name="services"></param>
         /// <param name="assembly"></param>
-        public static void AddHttpApis(this IServiceCollection services, Assembly assembly)
+        public static IServiceCollection AddHttpApis(this IServiceCollection services, Assembly assembly)
         {
             var httpApis = assembly.GetTypes().Where(item => item.IsInheritFrom<IHttpApi>());
             var method = typeof(HttpApiExtensions).GetMethod(nameof(AddHttpApi), BindingFlags.Static | BindingFlags.NonPublic);
@@ -29,6 +29,7 @@ namespace Web.Core.Startups
             {
                 method.MakeGenericMethod(item).Invoke(null, new object[] { services });
             }
+            return services;
         }
 
         /// <summary>
@@ -40,14 +41,19 @@ namespace Web.Core.Startups
         {
             var apiType = typeof(TInterface);
             var key = $"HttpApi:{apiType.Name}";
-            var useGatewayHost = apiType.IsDefined(typeof(GatewayAttribute), false);
+            var gateway = apiType.GetCustomAttribute<GatewayAttribute>(false);
 
             services.AddHttpApiTypedClient<TInterface>((c, p) =>
             {
                 p.GetService<IConfiguration>().GetSection(key).Bind(c);
-                if (useGatewayHost == true)
+                if (gateway != null)
                 {
-                    c.HttpHost = p.GetService<IOptions<ServiceOptions>>().Value.GatewayProxyUri;
+                    var host = p.GetService<IOptions<ServiceOptions>>().Value.GatewayProxyUri;
+                    if (gateway.Path.IsNullOrEmpty() == false)
+                    {
+                        host = new Uri(host, gateway.Path);
+                    }
+                    c.HttpHost = host;
                 }
             });
         }

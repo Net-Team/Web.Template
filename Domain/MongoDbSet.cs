@@ -12,13 +12,8 @@ namespace Domain
     /// 表示Mongo的集合
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class MongoDbSet<T> : IQueryable<T> where T : class, IStringIdable
+    public class MongoDbSet<T> where T : class, IStringIdable
     {
-        /// <summary>
-        /// IQueryable对象
-        /// </summary>
-        private readonly Lazy<IQueryable<T>> queryableLazy;
-
         /// <summary>
         /// 获取原始集合对象
         /// </summary>
@@ -31,7 +26,15 @@ namespace Domain
         public MongoDbSet(IMongoCollection<T> collection)
         {
             this.Collection = collection;
-            this.queryableLazy = new Lazy<IQueryable<T>>(() => collection.AsQueryable());
+        }
+
+        /// <summary>
+        /// 转换为IQueryable
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<T> AsQueryable()
+        {
+            return this.Collection.AsQueryable(new AggregateOptions { AllowDiskUse = true });
         }
 
         /// <summary>
@@ -49,6 +52,48 @@ namespace Domain
         public Task ClearAsync()
         {
             return this.Collection.Database.DropCollectionAsync(typeof(T).Name);
+        }
+
+        /// <summary>
+        /// 查找
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public T Find(Expression<Func<T, bool>> where)
+        {
+            return this.Collection.Find(where).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 查找
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public async Task<T> FindAsync(Expression<Func<T, bool>> where)
+        {
+            var cursor = await this.Collection.FindAsync(where);
+            return await cursor.FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// 查找多项
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public List<T> FindMany(Expression<Func<T, bool>> where)
+        {
+            return this.Collection.Find(where).ToList();
+        }
+
+        /// <summary>
+        /// 查找多项
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public async Task<List<T>> FindManyAsync(Expression<Func<T, bool>> where)
+        {
+            var cursor = await this.Collection.FindAsync(where);
+            return await cursor.ToListAsync();
         }
 
         /// <summary>
@@ -216,43 +261,5 @@ namespace Domain
             var body = Expression.Convert(keySelector.Body, typeof(object));
             return Expression.Lambda<Func<T, object>>(body, keySelector.Parameters);
         }
-
-
-        #region 接口实现
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
-        {
-            return this.queryableLazy.Value.GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return this.queryableLazy.Value.GetEnumerator();
-        }
-
-        Type IQueryable.ElementType
-        {
-            get
-            {
-                return this.queryableLazy.Value.ElementType;
-            }
-        }
-
-        Expression IQueryable.Expression
-        {
-            get
-            {
-
-                return this.queryableLazy.Value.Expression;
-            }
-        }
-
-        IQueryProvider IQueryable.Provider
-        {
-            get
-            {
-                return this.queryableLazy.Value.Provider;
-            }
-        }
-        #endregion
     }
 }

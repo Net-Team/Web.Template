@@ -1,11 +1,12 @@
 ﻿using System;
+using Core;
 
 namespace Web.Core.Options
 {
     /// <summary>
     /// 表示服务信息
     /// </summary>
-    public class ServiceOptions
+    public class ServiceOptions : IConfigureOptions
     {
         /// <summary>
         /// 服务名称
@@ -25,6 +26,6 @@ namespace Web.Core.Options
         /// <summary>
         /// 健康检查的路由
         /// </summary>
-        public string HealthRoute { get; set; }         
+        public string HealthRoute { get; set; }
     }
 }

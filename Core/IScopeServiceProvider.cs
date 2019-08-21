@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Web.Core
+namespace Core
 {
     /// <summary>
     /// 定义具有指定生命周期范围的服务提供者接口

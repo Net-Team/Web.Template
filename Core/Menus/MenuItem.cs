@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Core.Menus
 {
     /// <summary>
     /// 表示菜单信息
     /// </summary>
-    public class MenuItem
+    public class MenuItem : IEquatable<MenuItem>
     {
         /// <summary>
         /// 获取或设置分组名称
@@ -34,5 +36,24 @@ namespace Core.Menus
         /// 是否可用
         /// </summary>
         public bool Enable { get; set; }
+
+        /// <summary>
+        /// 与目标是否相等
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals([AllowNull] MenuItem other)
+        {
+            return other != null && other.RelativePath == this.RelativePath;
+        }
+
+        /// <summary>
+        /// 获取哈希码
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return this.RelativePath == null ? 0 : this.RelativePath.GetHashCode();
+        }
     }
 }

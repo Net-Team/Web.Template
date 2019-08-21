@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Core.Jwt
 {
@@ -64,17 +64,6 @@ namespace Core.Jwt
         public override string ToString()
         {
             return this.payloadJson;
-        }
-
-
-        /// <summary>
-        /// 转换为T
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T As<T>()
-        {
-            return JsonSerializer.Parse<T>(this.payloadJson);
         }
     }
 }

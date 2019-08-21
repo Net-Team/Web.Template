@@ -44,17 +44,17 @@
         /// <summary>
         /// 获取或设置状态码
         /// </summary>
-        public Code Code { get; set; }
+        Code Code { get; set; }
 
         /// <summary>
         /// 获取或设置提示消息
         /// </summary>
-        public string Message { get; set; }
+        string Message { get; set; }
 
         /// <summary>
         /// 获取或设置数据
         /// </summary>
-        public object Data { get; set; }
+        object Data { get; set; }
     }
 
 

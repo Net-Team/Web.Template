@@ -1,3 +1,4 @@
+using Application;
 using Core;
 using Core.HttpApis;
 using Core.Web;
@@ -58,9 +59,9 @@ namespace Web.Host
             services
                 .AddMemoryCache()
                 .AddHttpContextAccessor()
-                .AddHttpApis(this.GetType().Assembly) // 添加httpApi
-                .AddDependencyServices(this.GetType().Assembly) // ApplicationService服务
-                .AddConfigureOptions(this.Configuration.GetSection("Options"), typeof(ApiResult).Assembly, typeof(ApiController).Assembly, this.GetType().Assembly)
+                .AddHttpApis(typeof(ApplicationService).Assembly) // 添加httpApi
+                .AddDependencyServices(typeof(ApplicationService).Assembly) // ApplicationService服务
+                .AddConfigureOptions(this.Configuration.GetSection("Options"), typeof(ApiResult).Assembly, typeof(ApplicationService).Assembly, typeof(ApiController).Assembly, this.GetType().Assembly)
                 .AddJwtParser() // 添加认证配置                
                 .AddApiResultInvalidModelState() // 模型验证转换为ApiResult输出
                 .AddSwaggerJwtAuth() // 添加swagger的Bearer token

@@ -1,4 +1,5 @@
 ﻿using Core.Jwt;
+using Core.Web.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -6,14 +7,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Core.Web.Options;
 
-namespace Core.Web.Middlewares
+namespace Core.Web
 {
     /// <summary>
     /// jwt解析器中间件
     /// </summary>
-    public class JwtParserMiddleware : Middleware
+    class JwtParserMiddleware : Middleware
     {
         /// <summary>
         /// 选项

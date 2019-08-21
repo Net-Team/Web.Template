@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Core.Web.Options;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Core.Web.Middlewares;
-using Core.Web.Options;
 
 namespace Core.Web.Startups
 {

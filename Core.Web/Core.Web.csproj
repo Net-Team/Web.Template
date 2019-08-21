@@ -4,6 +4,9 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Taichuan.Core.Web</PackageId>
+    <Description>asp.net Web层的一些核心公共处理</Description>
   </PropertyGroup>
 
   <ItemGroup>

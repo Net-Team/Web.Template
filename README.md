@@ -9,5 +9,5 @@ asp.net core 3.x项目模板
 #### Core
 框架需要的核心接口、类型或者Web相关等工具
 
-#### Core.Wev
+#### Core.Web
 asp.net Web层的一些核心公共处理

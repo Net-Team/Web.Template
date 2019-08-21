@@ -1,5 +1,4 @@
-﻿using Core;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,13 +15,30 @@ namespace Core.Web
     public class ApiExceptionFilterAttribute : Attribute, IExceptionFilter
     {
         /// <summary>
+        /// 获取或设置是否启用
+        /// 默认为true
+        /// </summary>
+        public bool Enbale { get; set; } = true;
+
+        /// <summary>
+        /// 获取或设置是否过滤开发环境的异常
+        /// 默认为false
+        /// </summary>
+        public bool FilterDevelopmentException { get; set; } = false;
+
+        /// <summary>
         /// 异常时
         /// </summary>
         /// <param name="context"></param>
         public void OnException(ExceptionContext context)
         {
-            var env = context.HttpContext.RequestServices.GetService<IWebHostEnvironment>();
-            if (env.IsDevelopment() == true)
+            if (this.Enbale == false)
+            {
+                return;
+            }
+
+            if (this.FilterDevelopmentException == false &&
+                context.HttpContext.RequestServices.GetService<IWebHostEnvironment>().IsDevelopment())
             {
                 return;
             }
@@ -41,7 +57,7 @@ namespace Core.Web
             context.HttpContext
                 .RequestServices
                 .GetService<ILogger<ApiExceptionFilterAttribute>>()
-                .LogError(context.Exception, context.Exception.Message);
+                        .LogError(context.Exception, context.Exception.Message);
 
             context.Result = new ObjectResult(apiResult);
         }

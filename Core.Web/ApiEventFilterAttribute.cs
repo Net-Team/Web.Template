@@ -15,6 +15,12 @@ namespace Core.Web
     public class ApiEventFilterAttribute : Attribute, IAsyncActionFilter
     {
         /// <summary>
+        /// 获取或设置是否启用
+        /// 默认为true
+        /// </summary>
+        public bool Enbale { get; set; } = true;
+
+        /// <summary>
         /// Action执行
         /// </summary>
         /// <param name="context"></param>
@@ -24,6 +30,19 @@ namespace Core.Web
         {
             await next.Invoke();
 
+            if (this.Enbale == true)
+            {
+                await this.OnActionExecutedAsync(context);
+            }
+        }
+
+        /// <summary>
+        /// Action执行后
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private async Task OnActionExecutedAsync(ActionExecutingContext context)
+        {
             var publisher = context.HttpContext.RequestServices.GetService<IApiEventPublisher>();
             if (publisher == null)
             {

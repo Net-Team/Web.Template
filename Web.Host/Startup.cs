@@ -100,6 +100,7 @@ namespace Web.Host
                     c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{thisService.Name} Api", Version = "v1" });
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
+                    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{this.GetType().Assembly.GetName().Name}.xml"));
                 });
 

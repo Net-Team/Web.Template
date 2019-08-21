@@ -1,6 +1,7 @@
 ﻿using Core;
 using Core.Web;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,7 +12,10 @@ namespace Web.Host.Controllers
     /// </summary>
     public class ValuesController : ApiController
     {
-        // GET api/values
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ApiResult<IEnumerable<string>>> Get()
         {
@@ -19,9 +23,9 @@ namespace Web.Host.Controllers
         }
 
         /// <summary>
-        /// 开锁日志
+        /// 获取列表一条
         /// </summary>
-        /// <param name="id">开锁id</param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
         public ApiResult<string> Get(int id)
@@ -29,22 +33,36 @@ namespace Web.Host.Controllers
             return "value";
         }
 
-        // POST api/values
+        /// <summary>
+        /// 添加记录
+        /// </summary>
+        /// <param name="value"></param>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ApiResult<bool> Post([FromBody] string value)
         {
+            return true;
         }
 
-        // PUT api/values/5
+        /// <summary>
+        /// 更新记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="value"></param>
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ApiResult<bool> Put(int id, [FromBody] string value)
         {
+            return true;
         }
 
-        // DELETE api/values/5
+        /// <summary>
+        /// 删除记录
+        /// </summary>
+        /// <param name="id"></param>
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ApiResult<bool> Delete(int id)
         {
+            throw new Exception();
+            return true;
         }
     }
 }

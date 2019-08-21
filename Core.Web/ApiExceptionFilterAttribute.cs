@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 
 namespace Core.Web
 {
     /// <summary>
     /// 表示Api异常处理过滤器
+    /// 将异常转换为IApiResult返回值
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     public class ApiExceptionFilterAttribute : Attribute, IExceptionFilter
@@ -19,12 +19,6 @@ namespace Core.Web
         /// 默认为true
         /// </summary>
         public bool Enbale { get; set; } = true;
-
-        /// <summary>
-        /// 获取或设置是否过滤开发环境的异常
-        /// 默认为false
-        /// </summary>
-        public bool FilterDevelopmentException { get; set; } = false;
 
         /// <summary>
         /// 异常时
@@ -37,17 +31,20 @@ namespace Core.Web
                 return;
             }
 
-            if (this.FilterDevelopmentException == false &&
-                context.HttpContext.RequestServices.GetService<IWebHostEnvironment>().IsDevelopment())
+            var apiResultType = context.GetApiDescription()
+                .SupportedResponseTypes
+                .Select(item => item.Type)
+                .Where(item => item.IsInheritFrom<IApiResult>())
+                .FirstOrDefault();
+
+            if (apiResultType == null)
             {
-                return;
+                apiResultType = typeof(ApiResult<object>);
             }
 
-            var apiResult = new ApiResult<object>
-            {
-                Code = Code.ServiceError,
-                Message = context.Exception.Message
-            };
+            var apiResult = Activator.CreateInstance(apiResultType) as IApiResult;
+            apiResult.Code = Code.ServiceError;
+            apiResult.Message = context.Exception.Message;
 
             if (context.Exception is ArgumentException)
             {
@@ -57,7 +54,7 @@ namespace Core.Web
             context.HttpContext
                 .RequestServices
                 .GetService<ILogger<ApiExceptionFilterAttribute>>()
-                        .LogError(context.Exception, context.Exception.Message);
+                .LogError(context.Exception, context.Exception.Message);
 
             context.Result = new ObjectResult(apiResult);
         }

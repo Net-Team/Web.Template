@@ -4,12 +4,15 @@ using Core.HttpApis;
 using Core.Web;
 using Core.Web.Options;
 using Core.Web.Startups;
+using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System;
 using System.IO;
 
@@ -56,6 +59,30 @@ namespace Web.Host
         /// <param name="services"></param>  
         public void ConfigureServices(IServiceCollection services)
         {
+            // 数据库相关
+            services
+                .AddDbContext<SqlDbContext>(options => // 关系数据库
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("SqlDbContext"), c =>
+                    {
+                        c.UseNetTopologySuite();
+                    });
+                })
+                .AddSingleton<IConnectionMultiplexer>(p => // Redis连接
+                {
+                    var connectionString = Configuration.GetConnectionString("Redis");
+                    return ConnectionMultiplexer.Connect(connectionString);
+                })
+                .AddTransient(p =>  // Redis IDatabase
+                {
+                    return p.GetService<IConnectionMultiplexer>().GetDatabase();
+                })
+                .AddSingleton(p => // mongodb
+                {
+                    var connectionString = Configuration.GetConnectionString("Mongodb");
+                    return new MongoDbContext(connectionString);
+                });
+
             services
                 .AddMemoryCache()
                 .AddHttpContextAccessor()
@@ -72,7 +99,7 @@ namespace Web.Host
                     c.EnableAnnotations();
                     c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{thisService.Name} Api", Version = "v1" });
-                    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml")); 
+                    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{this.GetType().Assembly.GetName().Name}.xml"));
                 });
 

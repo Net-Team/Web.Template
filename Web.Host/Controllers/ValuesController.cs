@@ -17,7 +17,7 @@ namespace Web.Host.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<IEnumerable<string>>> Get()
+        public ApiResult<string[]> Get()
         {
             return new string[] { "ok" };
         }

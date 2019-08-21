@@ -1,30 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>19.8.22</Version>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <NoWarn>CS1591,WA2001,NU5104</NoWarn>   
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Taichuan.Core</PackageId>
-    <Description>框架需要的核心接口、类型或者Web相关等工具</Description>
+    <Description>通用应用需要的依赖注册、选项配置、Http客户端、Http接口返回类型和其它工具类</Description>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-  </PropertyGroup>
-
+ 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.0.0-preview8.19405.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0-preview8.19405.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0-preview8.19405.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0-preview8.19405.4" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-preview8.19405.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview8.19405.4" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0-preview8.19405.4" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-preview8.19405.4" />
+   
     <PackageReference Include="PredicateLib" Version="0.0.5" />
     <PackageReference Include="QMapper" Version="0.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.5.0" />

@@ -1,19 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>19.8.22</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>System</RootNamespace>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>公共基础类，是corefx项目的补充，此部分不依赖于asp.net core</Description>
+    <Description>corefx项目的补充，提供诸多基础类型和类型扩展功能</Description>
     <PackageId>Taichuan.Corefx</PackageId>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CodeAnalysisRuleSet />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet />
-  </PropertyGroup> 
 </Project>

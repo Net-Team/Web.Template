@@ -1,34 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>19.8.22</Version>
+    <NoWarn>NU5104</NoWarn>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Taichuan.Core.Web</PackageId>
-    <Description>asp.net Web层的一些核心公共处理</Description>
+    <Description>asp.net的Api控制器基类、异常过滤器和Startup扩展等</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="HostServices\**" />
-    <EmbeddedResource Remove="HostServices\**" />
-    <None Remove="HostServices\**" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview8.19405.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
-    
+    <PackageReference Include="Exceptionless.Signed" Version="4.3.2027" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview8.19405.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
-    <PackageReference Include="Serilog.Sinks.Exceptionless" Version="3.1.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>

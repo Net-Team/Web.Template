@@ -12,9 +12,21 @@ namespace Core
     public abstract class HostedService : Disposable, IHostedService
     {
         /// <summary>
+        /// 执行任务
+        /// </summary>
+        private Task executingTask;
+
+        /// <summary>
         /// 服务提供者
         /// </summary>
         private readonly IServiceProvider services;
+
+        /// <summary>
+        /// 停止取消
+        /// </summary>
+        private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
+
+
 
         /// <summary>
         /// 托管服务抽象类
@@ -24,6 +36,66 @@ namespace Core
         {
             this.services = services;
         }
+
+
+        /// <summary>
+        /// 启动服务
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        {
+            this.executingTask = this.StartAsync(this.stoppingCts.Token);
+            if (this.executingTask.IsCompleted)
+            {
+                return this.executingTask;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 启动服务
+        /// </summary>
+        /// <param name="stoppingToken">停止令牌</param>
+        /// <returns></returns>
+        protected abstract Task StartAsync(CancellationToken stoppingToken);
+
+
+        /// <summary>
+        /// 服务停止时
+        /// 如果应用意外关闭（例如，应用的进程失败），则可能不会调用 StopAsync
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        {
+            return this.StopAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// 服务停止时
+        /// 如果应用意外关闭（例如，应用的进程失败），则可能不会调用 StopAsync
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected virtual async Task StopAsync(CancellationToken cancellationToken)
+        {
+            if (this.executingTask == null)
+            {
+                return;
+            }
+
+            try
+            {
+                this.stoppingCts.Cancel();
+            }
+            finally
+            {
+                await Task.WhenAny(this.executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            }
+        }
+
 
         /// <summary>
         /// 创建具有指定生命周期范围的服务提供者
@@ -36,19 +108,13 @@ namespace Core
         }
 
         /// <summary>
-        /// 服务启动时
+        /// 释放资源
         /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public abstract Task StartAsync(CancellationToken cancellationToken);
-
-        /// <summary>
-        /// 服务停止时
-        /// 如果应用意外关闭（例如，应用的进程失败），则可能不会调用 StopAsync
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public abstract Task StopAsync(CancellationToken cancellationToken);
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
+        {
+            this.stoppingCts.Cancel();
+        }
 
 
         /// <summary>

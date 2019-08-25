@@ -33,10 +33,29 @@ namespace Core.Xls
         /// xls表格
         /// </summary>
         /// <param name="dataTable">数据源</param>
+        /// <exception cref="ArgumentException"></exception>
         public XlsSheet([NotNull]DataTable dataTable)
         {
+            this.CheckDataTable(dataTable);
             this.datas = this.Parse(dataTable).ToList();
             this.Name = dataTable.TableName;
+        }
+
+        /// <summary>
+        /// 检查表格
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <exception cref="ArgumentException"></exception>
+        private void CheckDataTable(DataTable dataTable)
+        {
+            var names = dataTable.Columns.Cast<DataColumn>().Select(item => item.ColumnName).ToHashSet();
+            foreach (var field in fieldDescriptors)
+            {
+                if (names.Contains(field.Name) == false)
+                {
+                    throw new ArgumentException($"表格{dataTable.TableName}未声明列{field.Name}");
+                }
+            }
         }
 
         /// <summary>

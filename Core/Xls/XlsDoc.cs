@@ -149,6 +149,11 @@ namespace Core.Xls
                 table.Columns.Clear();
 
                 var headerRow = sheet.GetRow(0);
+                if (headerRow == null)
+                {
+                    return table;
+                }
+
                 int colCount = headerRow.LastCellNum;
                 for (var c = 0; c < colCount; c++)
                 {

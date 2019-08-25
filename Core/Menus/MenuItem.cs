@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Core.Menus
@@ -9,6 +9,8 @@ namespace Core.Menus
     /// </summary>
     public class MenuItem : IEquatable<MenuItem>
     {
+        private string path;
+
         /// <summary>
         /// 获取或设置分组名称
         /// </summary>
@@ -25,6 +27,15 @@ namespace Core.Menus
         /// 获取或设置类名
         /// </summary>
         public string Class { get; set; }
+
+        /// <summary>
+        /// 获取或设置Path名称
+        /// </summary>
+        public string Path
+        {
+            get => path ?? (this.RelativePath == null ? null : System.IO.Path.GetFileName(this.RelativePath));
+            set => path = value;
+        }
 
         /// <summary>
         /// 获取或设置相对Uri

@@ -65,5 +65,28 @@ namespace System
         {
             return typeof(TBase).IsAssignableFrom(type);
         }
+
+        /// <summary>
+        /// 返回类型的非可空类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Type NonNullableType(this Type type)
+        {
+            return Nullable.GetUnderlyingType(type) ?? type;
+        }
+
+        /// <summary>
+        /// 值是可以为null
+        /// </summary>
+        public static bool CanBeNullValue(this Type type)
+        {
+            if (type.IsValueType == false)
+            {
+                return true;
+            }
+
+            return Nullable.GetUnderlyingType(type) != null;
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace Core.Web.Startups
     /// <summary>
     /// 表示swagger的值类型自动Required标记过滤器
     /// </summary>
-    public class SwaggerRequiredSchemaFilter : ISchemaFilter
+    public class SwaggerRequiredSchemaFilter : ISchemaFilter, IParameterFilter
     {
         private readonly CamelCasePropertyNamesContractResolver camelCaseContractResolver;
 
@@ -35,7 +35,7 @@ namespace Core.Web.Startups
         }
 
         /// <summary>
-        /// 应用过滤器
+        /// 应用模型过滤器
         /// </summary>
         /// <param name="schema"></param>
         /// <param name="context"></param>
@@ -59,6 +59,22 @@ namespace Core.Web.Startups
                             schema.Required.Add(schemaPropertyName);
                         }
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 应用参数过滤器
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="context"></param>
+        public void Apply(OpenApiParameter parameter, ParameterFilterContext context)
+        {
+            if (context.ApiParameterDescription.DefaultValue == null)
+            {
+                if (context.ApiParameterDescription.Type.CanBeNullValue() == false)
+                {
+                    parameter.Required = true;
                 }
             }
         }

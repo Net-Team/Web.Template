@@ -1,6 +1,5 @@
 ﻿using AndroidXml;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Security;
@@ -17,13 +16,37 @@ namespace Core.Apk
         /// <summary>
         /// 获取版本信息
         /// </summary>
-        /// <param name="apkFile">文件路径</param>
+        /// <param name="apkFile">apk文件路径</param>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="BadImageFormatException"></exception>
         /// <returns></returns>
-        public static ApkMedia ReadMedia([NotNull] string apkFile)
+        public static ApkMedia ReadMedia(string apkFile)
         {
-            using var fileStream = new FileStream(apkFile, FileMode.Open, FileAccess.Read);
-            var zip = new ZipArchive(fileStream, ZipArchiveMode.Read);
+            if (apkFile == null)
+            {
+                throw new ArgumentNullException(nameof(apkFile));
+            }
+
+            using var apkStream = new FileStream(apkFile, FileMode.Open, FileAccess.Read);
+            return ReadMedia(apkStream);
+        }
+
+        /// <summary>
+        /// 获取版本信息
+        /// </summary>
+        /// <param name="apkStream">apk流</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="BadImageFormatException"></exception>
+        /// <returns></returns>
+        public static ApkMedia ReadMedia(Stream apkStream)
+        {
+            if (apkStream == null)
+            {
+                throw new ArgumentNullException(nameof(apkStream));
+            }
+
+            var position = apkStream.CanSeek ? apkStream.Position : 0L;
+            var zip = new ZipArchive(apkStream, ZipArchiveMode.Read);
             var entry = zip.GetEntry("AndroidManifest.xml");
             if (entry == null)
             {
@@ -48,11 +71,12 @@ namespace Core.Apk
                 Package = package
             };
 
-            if (fileStream.CanSeek == true)
+            if (apkStream.CanSeek == true)
             {
-                fileStream.Seek(0L, SeekOrigin.Begin);
+                apkStream.Position = position;
+                media.FileMd5 = MD5.ComputeHashString(apkStream, false);
             }
-            media.FileMd5 = MD5.ComputeHashString(fileStream, false);
+
             return media;
         }
     }

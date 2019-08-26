@@ -97,7 +97,7 @@ namespace Web.Host
                     c.IgnoreObsoleteActions();
                     c.IgnoreObsoleteProperties();
                     c.EnableAnnotations();
-                    c.SchemaFilter<SwaggerRequiredSchemaFilter>(true);
+                    c.AddRequiredFilters();
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{thisService.Name} Api", Version = "v1" });
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));

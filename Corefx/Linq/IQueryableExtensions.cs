@@ -22,26 +22,25 @@ namespace System.Linq
         {
             if (string.IsNullOrEmpty(orderByKey))
             {
-                throw new ArgumentNullException("orderByKey");
+                throw new ArgumentNullException(nameof(orderByKey));
             }
 
-            var sourceTtype = typeof(T);
+            var sourceType = typeof(T);
             var keyProperty = Property
-                .GetProperties(sourceTtype)
-                .FirstOrDefault(p => p.Name.Equals(orderByKey, StringComparison.OrdinalIgnoreCase));
+                .GetProperties(sourceType)
+                .FirstOrDefault(p => p.Name.EqualsIgnoreCase(orderByKey));
 
             if (keyProperty == null)
             {
-                throw new ArgumentException("orderByKey不存在...");
+                throw new ArgumentException($"{nameof(orderByKey)}不存在...");
             }
 
-            var param = Expression.Parameter(sourceTtype, "item");
-            var body = Expression.MakeMemberAccess(param, keyProperty.Info);
+            var param = Expression.Parameter(sourceType, "item");
+            var body = Expression.Property(param, keyProperty.Info);
             var orderByLambda = Expression.Lambda(body, param);
 
-            var resultExp = Expression.Call(typeof(Queryable), orderByMethod, new Type[] { sourceTtype, keyProperty.Info.PropertyType }, source.Expression, Expression.Quote(orderByLambda));
-            var ordereQueryable = source.Provider.CreateQuery<T>(resultExp) as IOrderedQueryable<T>;
-            return ordereQueryable;
+            var resultExp = Expression.Call(typeof(Queryable), orderByMethod, new Type[] { sourceType, keyProperty.Info.PropertyType }, source.Expression, Expression.Quote(orderByLambda));
+            return source.Provider.CreateQuery<T>(resultExp) as IOrderedQueryable<T>;
         }
 
         /// <summary>
@@ -89,12 +88,15 @@ namespace System.Linq
         /// <returns></returns>
         public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string orderByString) where T : class
         {
-            if (orderByString.IsNullOrEmpty())
+            bool descFun(string[] item)
             {
-                throw new ArgumentNullException("orderByString");
+                return item.Length > 1 && item[1].EqualsIgnoreCase("desc");
             }
 
-            bool descFun(string[] item) => item.Length > 1 && item[1].Equals("desc", StringComparison.OrdinalIgnoreCase);
+            if (orderByString.IsNullOrEmpty() == true)
+            {
+                throw new ArgumentNullException(nameof(orderByString));
+            }
 
             var parameters = orderByString
                 .Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -104,12 +106,12 @@ namespace System.Linq
 
             if (parameters.Length == 0)
             {
-                throw new ArgumentNullException("orderByString");
+                throw new ArgumentNullException(nameof(orderByString));
             }
 
-            var firstP = parameters.FirstOrDefault();
-            var orderQuery = source.OrderBy(firstP.Key, firstP.Asc);
-            parameters.Skip(1).ToList().ForEach(p => orderQuery = orderQuery.ThenBy(p.Key, p.Asc));
+            var first = parameters.FirstOrDefault();
+            var orderQuery = source.OrderBy(first.Key, first.Asc);
+            parameters.Skip(1).ForEach(p => orderQuery = orderQuery.ThenBy(p.Key, p.Asc));
 
             return orderQuery;
         }

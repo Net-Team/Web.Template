@@ -17,6 +17,11 @@ namespace Core.HttpApis
         public string Path { get; }
 
         /// <summary>
+        /// 排序顺序
+        /// </summary>
+        public override int OrderIndex => int.MinValue;
+
+        /// <summary>
         /// http接口配置网关的域名
         /// </summary>
         public GatewayAttribute()

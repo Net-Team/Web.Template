@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>19.8.26</Version>
+    <Version>19.9.1</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>System</RootNamespace>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -9,4 +9,8 @@
     <Description>corefx项目的补充，提供诸多基础类型和类型扩展功能</Description>
     <PackageId>Taichuan.Corefx</PackageId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+  </ItemGroup>
 </Project>

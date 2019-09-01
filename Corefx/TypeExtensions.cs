@@ -60,6 +60,7 @@ namespace System
         /// </summary>
         /// <typeparam name="TBase"></typeparam>
         /// <param name="type"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
         public static bool IsInheritFrom<TBase>(this Type type)
         {
@@ -70,6 +71,7 @@ namespace System
         /// 返回类型的非可空类型
         /// </summary>
         /// <param name="type"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
         public static Type NonNullableType(this Type type)
         {
@@ -77,10 +79,18 @@ namespace System
         }
 
         /// <summary>
-        /// 值是可以为null
+        /// 值是可以为null      
         /// </summary>
+        /// <param name="type"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
         public static bool CanBeNullValue(this Type type)
         {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
             if (type.IsValueType == false)
             {
                 return true;

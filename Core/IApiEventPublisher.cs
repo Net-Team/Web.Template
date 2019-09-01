@@ -13,6 +13,6 @@ namespace Core
         /// <param name="channel">通道</param>
         /// <param name="apiEvent">Api事件</param>
         /// <returns></returns>
-        Task PulishAsync(string channel, ApiEvent apiEvent);
+        Task PulishAsync(string channel, IApiEvent apiEvent);
     }
 }

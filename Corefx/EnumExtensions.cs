@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace System
@@ -42,13 +42,13 @@ namespace System
         }
 
         /// <summary>
-        /// 获取DisplayName
+        /// 获取DisplayAttribute的Name值
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
         public static string GetDisplayName(this Enum e)
         {
-            return e.GetAttribute<DisplayNameAttribute>()?.DisplayName ?? e.ToString();
+            return e.GetAttribute<DisplayAttribute>()?.Name ?? e.ToString();
         }
 
         /// <summary>

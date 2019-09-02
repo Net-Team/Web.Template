@@ -89,9 +89,10 @@ namespace Web.Host
                 .AddHttpApis(typeof(ApplicationService).Assembly) // 添加httpApi
                 .AddDependencyServices(typeof(ApplicationService).Assembly) // ApplicationService服务
                 .AddConfigureOptions(this.Configuration.GetSection("Options"), typeof(ApiResult).Assembly, typeof(ApplicationService).Assembly, typeof(ApiController).Assembly, this.GetType().Assembly)
-                .AddJwtParser() // 添加认证配置                
+                .AddJwtParser()                  // 添加认证配置                
                 .AddApiResultInvalidModelState() // 模型验证转换为ApiResult输出
-                .AddSwaggerJwtAuth() // 添加swagger的Bearer token
+                .AddNamespaceApiVersioning()     // 添加版本控制
+                .AddSwaggerJwtAuth()             // 添加swagger的Bearer token
                 .AddSwaggerDocUIAndEndpoints()
                 .AddSwaggerGen(c =>
                 {
@@ -117,14 +118,6 @@ namespace Web.Host
 
             // 路由小写
             services.AddRouting(c => c.LowercaseUrls = true);
-
-            // api版本控制
-            services.AddApiVersioning(o =>
-            {
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.Conventions.Add(new VersionByNamespaceConvention());
-                o.ApiVersionReader = ApiVersionReader.Combine(new HeaderApiVersionReader("x-api-version"));
-            });
         }
 
         /// <summary>

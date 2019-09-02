@@ -24,9 +24,10 @@ namespace Core.Web
         /// 添加Api版本请求参数相关Filter
         /// </summary>
         /// <param name="options"></param>
-        public static void AddApiVersionHeaderFilter(this SwaggerGenOptions options)
+        /// <param name="headerName"></param>
+        public static void AddApiVersionHeaderFilter(this SwaggerGenOptions options, string headerName = "x-api-version")
         {
-            options.OperationFilter<SwaggerApiVersionHeaderFilter>();
+            options.OperationFilter<SwaggerApiVersionHeaderFilter>(headerName);
         }
     }
 }

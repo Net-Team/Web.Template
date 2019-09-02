@@ -21,8 +21,8 @@ namespace Core.Web
         {
             return services
                 .AddTransient<IConfigureOptions<SwaggerOptions>, SwaggerOptionsConfigureOptions>()
-               .AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigureOptions>()
-               .AddTransient<IConfigureOptions<SwaggerUIOptions>, SwaggerUIOptionsConfigureOptions>();
+                .AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigureOptions>()
+                .AddTransient<IConfigureOptions<SwaggerUIOptions>, SwaggerUIOptionsConfigureOptions>();
         }
     }
 }

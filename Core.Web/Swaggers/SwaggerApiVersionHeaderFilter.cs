@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Collections.Generic;
 
 namespace Core.Web.Swaggers
@@ -11,6 +12,20 @@ namespace Core.Web.Swaggers
     /// </summary>
     public class SwaggerApiVersionHeaderFilter : IOperationFilter
     {
+        /// <summary>
+        /// 获取请求头名 
+        /// </summary>
+        public string HeaderName { get; }
+
+        /// <summary>
+        /// swagger的api增加x-api-version请求头
+        /// </summary>
+        /// <param name="headerName"></param>
+        public SwaggerApiVersionHeaderFilter(string headerName = "x-api-version")
+        {
+            this.HeaderName = headerName ?? throw new ArgumentNullException(nameof(headerName));
+        }
+
         /// <summary>
         /// 添加请求头
         /// </summary>
@@ -30,7 +45,7 @@ namespace Core.Web.Swaggers
             {
                 In = ParameterLocation.Header,
                 Required = false,
-                Name = "x-api-version",
+                Name = this.HeaderName,
                 Style = ParameterStyle.Simple,
                 Description = "api版本，不填则对应1.0",
                 Schema = new OpenApiSchema { Type = "string", Default = new OpenApiString(GetVersionName()) }

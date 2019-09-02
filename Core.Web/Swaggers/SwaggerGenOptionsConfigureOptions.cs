@@ -1,5 +1,4 @@
-﻿using Core.Web;
-using Core.Web.Conventions;
+﻿using Core.Web.Conventions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

@@ -16,7 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Exceptionless.Signed" Version="4.3.2027" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview8.19405.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview8.19405.7" />    
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0-preview8.19405.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc2" />
   </ItemGroup>

@@ -2,16 +2,16 @@ using Application;
 using Core;
 using Core.HttpApis;
 using Core.Web;
-using Core.Web.Options;
-using Core.Web.Startups;
+using Core.Web.Conventions;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
 using System.IO;
@@ -92,35 +92,39 @@ namespace Web.Host
                 .AddJwtParser() // 添加认证配置                
                 .AddApiResultInvalidModelState() // 模型验证转换为ApiResult输出
                 .AddSwaggerJwtAuth() // 添加swagger的Bearer token
+                .AddSwaggerDocUIAndEndpoints()
                 .AddSwaggerGen(c =>
                 {
                     c.IgnoreObsoleteActions();
                     c.IgnoreObsoleteProperties();
                     c.EnableAnnotations();
                     c.AddRequiredFilters();
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{thisService.Name} Api", Version = "v1" });
+                    c.AddApiVersionHeaderFilter();
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Core.xml"));
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Domain.xml"));
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{this.GetType().Assembly.GetName().Name}.xml"));
                 });
 
             // 添加控制器
-            var mvc = services.AddControllers(c =>
+            services.AddControllers(c =>
             {
-                c.Filters.Add<ApiExceptionFilterAttribute>();
+                c.Conventions.Add(new ApiExplorerGroupNameConvention());
                 c.Conventions.Add(new ServiceTemplateConvention(thisService.Name));
             });
-
-            if (Environment.IsDevelopment())
-            {
-                mvc.AddNewtonsoftJson(o => o.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented);
-            }
 
             // 添加心跳检测
             services.AddHealthChecks();
 
             // 路由小写
             services.AddRouting(c => c.LowercaseUrls = true);
+
+            // api版本控制
+            services.AddApiVersioning(o =>
+            {
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.Conventions.Add(new VersionByNamespaceConvention());
+                o.ApiVersionReader = ApiVersionReader.Combine(new HeaderApiVersionReader("x-api-version"));
+            });
         }
 
         /// <summary>
@@ -142,17 +146,8 @@ namespace Web.Host
 
             app.UseJwtParser();
 
-            app.UseSwagger(c =>
-            {
-                c.RouteTemplate = $"/swagger/{thisService.Name}/{{documentName}}/swagger.json";
-            });
-
-            app.UseSwaggerUI(c =>
-            {
-                c.DocumentTitle = $"{thisService.Name}的openApi文档";
-                c.RoutePrefix = $"swagger/{thisService.Name}";
-                c.SwaggerEndpoint($"/swagger/{thisService.Name}/v1/swagger.json", "v1 doc");
-            });
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseEndpoints(endpoints =>
             {

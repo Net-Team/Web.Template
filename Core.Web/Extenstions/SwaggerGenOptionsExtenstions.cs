@@ -7,7 +7,7 @@ namespace Core.Web
     /// <summary>
     /// swagger不可空值类型参数或模型属性标记为Required
     /// </summary>
-    public static class SwaggerRequiredExtensions
+    public static class SwaggerGenOptionsExtenstions
     {
         /// <summary>
         /// 添加Required标记相关的Filters
@@ -18,6 +18,15 @@ namespace Core.Web
         {
             options.SchemaFilter<SwaggerRequiredSchemaFilter>(camelCasePropertyNames);
             options.ParameterFilter<SwaggerRequiredParameterFilter>();
+        }
+
+        /// <summary>
+        /// 添加Api版本请求参数相关Filter
+        /// </summary>
+        /// <param name="options"></param>
+        public static void AddApiVersionHeaderFilter(this SwaggerGenOptions options)
+        {
+            options.OperationFilter<SwaggerApiVersionHeaderFilter>();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Core.Jwt;
-using Core.Web.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Core.Web
+namespace Core.Web.Jwts
 {
     /// <summary>
     /// jwt解析器中间件

@@ -1,12 +1,11 @@
-﻿using Core;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.Web.Startups
+namespace Core.Web
 {
     /// <summary>
     /// 模型验证熔岩

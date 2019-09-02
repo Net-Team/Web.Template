@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace Core.Web.Startups
+namespace Core.Web.Conventions
 {
     /// <summary>
     /// 表示控制器路由模板添加[service]的约定

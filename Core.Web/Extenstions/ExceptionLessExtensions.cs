@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Web.Startups
+namespace Core.Web
 {
     /// <summary>
     /// ExceptionLess扩展

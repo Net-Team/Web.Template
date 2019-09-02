@@ -1,10 +1,9 @@
-﻿using Core.Web.Options;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Core.Web.Startups
+namespace Core.Web
 {
     /// <summary>
     /// jwt扩展

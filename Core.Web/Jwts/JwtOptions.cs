@@ -1,4 +1,4 @@
-﻿namespace Core.Web.Options
+﻿namespace Core.Web.Jwts
 {
     /// <summary>
     /// jwt选项

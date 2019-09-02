@@ -3,7 +3,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 
-namespace Core.Web.Startups
+namespace Core.Web
 {
     /// <summary>
     /// swagger的授权信息扩展

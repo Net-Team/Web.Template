@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Core.Web.Swaggers;
+using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Core.Web.Startups
+namespace Core.Web
 {
     /// <summary>
     /// swagger不可空值类型参数或模型属性标记为Required

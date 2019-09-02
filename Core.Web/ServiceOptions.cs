@@ -1,4 +1,4 @@
-﻿namespace Core.Web.Options
+﻿namespace Core.Web
 {
     /// <summary>
     /// 表示服务信息

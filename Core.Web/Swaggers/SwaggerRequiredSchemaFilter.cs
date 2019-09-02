@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Core.Web.Startups
+namespace Core.Web.Swaggers
 {
     /// <summary>
     /// 表示swagger的值类型自动Required标记过滤器

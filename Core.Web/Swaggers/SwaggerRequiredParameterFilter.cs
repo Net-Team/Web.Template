@@ -2,7 +2,7 @@
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 
-namespace Core.Web.Startups
+namespace Core.Web.Swaggers
 {
     /// <summary>
     /// 表示swagger的值类型参数自动Required标记过滤器

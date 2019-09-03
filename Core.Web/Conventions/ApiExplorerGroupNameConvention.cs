@@ -10,21 +10,34 @@ namespace Core.Web.Conventions
     /// </summary>
     public class ApiExplorerGroupNameConvention : IControllerModelConvention
     {
+        private readonly string defaultGroupName;
+
+        /// <summary>
+        /// ApiExplorer以Controllers下的子文件夹分组约定
+        /// </summary>
+        /// <param name="defaultGroupName">默认分组名称</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ApiExplorerGroupNameConvention(string defaultGroupName = "default.v1")
+        {
+            this.defaultGroupName = defaultGroupName ?? throw new ArgumentNullException(nameof(defaultGroupName));
+        }
+
         /// <summary>
         /// 应用约定
         /// </summary>
         /// <param name="controller"></param>
         public void Apply(ControllerModel controller)
         {
-            controller.ApiExplorer.GroupName = GetGroupName(controller.ControllerType);
+            controller.ApiExplorer.GroupName = GetGroupName(controller.ControllerType, this.defaultGroupName);
         }
 
         /// <summary>
         /// 获取控制器分组名称
         /// </summary>
         /// <param name="controllerType">控制器类型</param>
+        /// <param name="defaultGroupName">默认分组名称</param>
         /// <returns></returns>
-        private static string GetGroupName(Type controllerType)
+        private static string GetGroupName(Type controllerType, string defaultGroupName)
         {
             var names = controllerType.Namespace.Split("Controllers.");
             if (names.Length > 1)
@@ -32,7 +45,7 @@ namespace Core.Web.Conventions
                 var groupName = names.Last().ToLower();
                 return string.Join("_", groupName.Split('.').Select(item => FixIfVersion(item)));
             }
-            return "ungroup";
+            return defaultGroupName;
         }
 
         /// <summary>

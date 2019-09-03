@@ -1,9 +1,8 @@
-﻿using AndroidXml;
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace Core.Apk
@@ -46,24 +45,25 @@ namespace Core.Apk
             }
 
             var position = apkStream.CanSeek ? apkStream.Position : 0L;
-            var zip = new ZipArchive(apkStream, ZipArchiveMode.Read);
-            var entry = zip.GetEntry("AndroidManifest.xml");
-            if (entry == null)
+            using var zip = new ZipArchive(apkStream, ZipArchiveMode.Read);
+            const string manifestName = "AndroidManifest.xml";
+            var manifest = zip.Entries.FirstOrDefault(item => item.Name.EqualsIgnoreCase(manifestName));
+            if (manifest == null)
             {
-                throw new BadImageFormatException("找不到AndroidManifest.xml，文件可能不是有效有apk格式");
+                throw new BadImageFormatException($"找不到{manifestName}，文件可能不是有效有apk格式");
             }
 
-            var stream = new MemoryStream();
-            entry.Open().CopyTo(stream);
-            stream.Position = 0;
+            var manifestStream = new MemoryStream();
+            manifest.Open().CopyTo(manifestStream);
+            var manifestBytes = manifestStream.ToArray();
 
-            var reader = new AndroidXmlReader(stream);
-            var xml = XDocument.Load(reader).ToString();
-            Func<string, Match> getAttr = (attr) => Regex.Match(xml, @"(?<=" + attr + @"\=\"").*?(?=\"")", RegexOptions.IgnoreCase);
+            var xml = ManifestReader.ReadAsXmlString(manifestBytes);
+            var doc = XDocument.Parse(xml);
 
-            var versionCode = getAttr("versionCode").Value;
-            var versionName = getAttr("versionName").Value;
-            var package = getAttr("package").Value;
+            var versionCode = doc.Root.Attribute("versionCode").Value;
+            var versionName = doc.Root.Attribute("versionName").Value;
+            var package = doc.Root.Attribute("package").Value;
+
             var media = new ApkMedia
             {
                 VersionCode = int.Parse(versionCode),

@@ -177,11 +177,9 @@ namespace Core.Xls
                                         ? cell.DateCellValue.ToString(CultureInfo.InvariantCulture)
                                         : cell.NumericCellValue.ToString(CultureInfo.InvariantCulture);
                                     break;
-                                case CellType.String:
-                                    dr[j] = cell.StringCellValue;
-                                    break;
+
                                 case CellType.Blank:
-                                    dr[j] = string.Empty;
+                                    dr[j] = null;
                                     break;
 
                                 case CellType.Boolean:
@@ -189,7 +187,7 @@ namespace Core.Xls
                                     break;
 
                                 default:
-                                    dr[j] = null;
+                                    dr[j] = cell.StringCellValue;
                                     break;
                             }
                         }

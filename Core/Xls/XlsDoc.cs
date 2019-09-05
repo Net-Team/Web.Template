@@ -169,6 +169,7 @@ namespace Core.Xls
                     {
                         var cell = currentRow.GetCell(j);
                         if (cell != null)
+                        {
                             switch (cell.CellType)
                             {
                                 case CellType.Numeric:
@@ -182,7 +183,16 @@ namespace Core.Xls
                                 case CellType.Blank:
                                     dr[j] = string.Empty;
                                     break;
+
+                                case CellType.Boolean:
+                                    dr[j] = cell.BooleanCellValue;
+                                    break;
+
+                                default:
+                                    dr[j] = null;
+                                    break;
                             }
+                        }
                     }
                     table.Rows.Add(dr);
                     i++;

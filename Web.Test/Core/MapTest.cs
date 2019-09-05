@@ -1,7 +1,7 @@
 ﻿using QMapper;
 using Xunit;
 
-namespace Web.Test.Common
+namespace Web.Test.Core
 {
     public class MapTest
     {

@@ -46,12 +46,7 @@ namespace Core
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
             this.executingTask = this.StartAsync(this.stoppingCts.Token);
-            if (this.executingTask.IsCompleted)
-            {
-                return this.executingTask;
-            }
-
-            return Task.CompletedTask;
+            return this.executingTask.IsCompleted ? this.executingTask : Task.CompletedTask;
         }
 
         /// <summary>

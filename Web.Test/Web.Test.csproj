@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Web.Host\Web.Host.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="001.apk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

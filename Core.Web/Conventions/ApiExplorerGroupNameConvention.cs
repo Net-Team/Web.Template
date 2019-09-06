@@ -40,12 +40,8 @@ namespace Core.Web.Conventions
         private static string GetGroupName(Type controllerType, string defaultGroupName)
         {
             var names = controllerType.Namespace.Split("Controllers.");
-            if (names.Length > 1)
-            {
-                var groupName = names.Last().ToLower();
-                return string.Join("_", groupName.Split('.').Select(item => FixIfVersion(item)));
-            }
-            return defaultGroupName;
+            var groupName = names.Length > 1 ? names.Last().ToLower() : defaultGroupName;
+            return string.Join("_", groupName.Split('.').Select(item => FixIfVersion(item)));
         }
 
         /// <summary>

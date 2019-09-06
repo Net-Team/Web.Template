@@ -47,9 +47,37 @@ namespace Core.Xls
         /// <exception cref="FileNotFoundException"></exception>
         public XlsDoc(string xls)
         {
-            using var dataset = XlsReader.ReadAsDataSet(xls);
+            if (xls.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(xls));
+            }
+
+            if (File.Exists(xls) == false)
+            {
+                throw new FileNotFoundException($"找不到文件：{xls}");
+            }
+
+            using var xlsStream = new FileStream(xls, FileMode.Open, FileAccess.Read);
+            using var dataset = XlsReader.ReadAsDataSet(xlsStream);
             this.sheets = this.Parse(dataset).ToList();
         }
+
+        /// <summary>
+        /// xls文档
+        /// </summary>
+        /// <param name="xlsStream">xls流</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public XlsDoc(Stream xlsStream)
+        {
+            if (xlsStream == null)
+            {
+                throw new ArgumentNullException(nameof(xlsStream));
+            }
+
+            using var dataset = XlsReader.ReadAsDataSet(xlsStream);
+            this.sheets = this.Parse(dataset).ToList();
+        }
+
 
         /// <summary>
         /// 解析文档
@@ -91,22 +119,11 @@ namespace Core.Xls
             /// <summary>
             /// 读取xls为dataSet
             /// </summary>
-            /// <param name="xls"></param>
-            /// <exception cref="ArgumentNullException"></exception>
-            /// <exception cref="FileNotFoundException"></exception>
+            /// <param name="xlsStream"></param>
             /// <returns></returns>
-            public static DataSet ReadAsDataSet(string xls)
+            public static DataSet ReadAsDataSet(Stream xlsStream)
             {
-                if (xls.IsNullOrEmpty())
-                {
-                    throw new ArgumentNullException(nameof(xls));
-                }
-                if (File.Exists(xls) == false)
-                {
-                    throw new FileNotFoundException(xls);
-                }
-
-                var sheets = ReadAsSheets(xls);
+                var sheets = ReadAsSheets(xlsStream);
                 var dataSet = new DataSet();
                 foreach (var sh in sheets)
                 {
@@ -119,20 +136,20 @@ namespace Core.Xls
             /// <summary>
             /// 读取xls为ISheet
             /// </summary>
-            /// <param name="xls"></param>
+            /// <param name="xlsStream"></param> 
             /// <returns></returns>
-            private static ISheet[] ReadAsSheets(string xls)
+            private static ISheet[] ReadAsSheets(Stream xlsStream)
             {
+                var isXls = xlsStream.ReadByte() != 0x50;
+                xlsStream.Position -= 1;
+
+                var wb = isXls ? (IWorkbook)new HSSFWorkbook(xlsStream) : new XSSFWorkbook(xlsStream);
                 var sheets = new List<ISheet>();
-                var isXls = Path.GetExtension(xls).EqualsIgnoreCase(".xls");
-                using (var fs = new FileStream(xls, FileMode.Open, FileAccess.Read))
+                for (var i = 0; i < wb.NumberOfSheets; i++)
                 {
-                    var wb = isXls ? (IWorkbook)new HSSFWorkbook(fs) : new XSSFWorkbook(fs);
-                    for (var i = 0; i < wb.NumberOfSheets; i++)
-                    {
-                        sheets.Add(wb.GetSheetAt(i));
-                    }
+                    sheets.Add(wb.GetSheetAt(i));
                 }
+
                 return sheets.ToArray();
             }
 

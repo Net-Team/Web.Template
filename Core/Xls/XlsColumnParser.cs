@@ -15,6 +15,10 @@ namespace Core.Xls
         /// <returns></returns>
         public virtual object Parse(object value, Type targetType)
         {
+            if (value == null || value == DBNull.Value)
+            {
+                return targetType.DefaultValue();
+            }
             return Converter.ConvertToType(value, targetType);
         }
     }

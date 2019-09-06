@@ -49,11 +49,14 @@ namespace Core.Xls
         private void CheckDataTable(DataTable dataTable)
         {
             var names = dataTable.Columns.Cast<DataColumn>().Select(item => item.ColumnName).ToHashSet();
-            foreach (var field in fieldDescriptors)
+            if (names.Count > 0)
             {
-                if (names.Contains(field.Name) == false)
+                foreach (var field in fieldDescriptors)
                 {
-                    throw new ArgumentException($"表格{dataTable.TableName}未声明列{field.Name}");
+                    if (names.Contains(field.Name) == false)
+                    {
+                        throw new ArgumentException($"表格{dataTable.TableName}未声明列{field.Name}");
+                    }
                 }
             }
         }

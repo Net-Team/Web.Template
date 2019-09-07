@@ -7,7 +7,7 @@ namespace Core.Web
     /// <summary>
     /// Api版本控制扩展
     /// </summary>
-    public static class ApiVersioningExtenstions
+    public static class ApiVersioningExtensions
     {
         /// <summary>
         /// 添加以namespace来查找Api版本信息 

@@ -12,7 +12,7 @@ namespace Domain
     /// <summary>
     /// Dbset扩展
     /// </summary>
-    public static class DbSetExtenstions
+    public static class DbSetExtensions
     {
         /// <summary>
         /// 将Value更新到数据库

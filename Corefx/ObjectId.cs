@@ -214,7 +214,7 @@ namespace System
         /// <returns>The string value of the new generated ObjectId.</returns>
         public static string NewStringId()
         {
-            return GenerateNewId().ToString();
+            return NewObjectId().ToString();
         }
 
         // public static methods
@@ -222,9 +222,9 @@ namespace System
         /// Generates a new ObjectId with a unique value.
         /// </summary>
         /// <returns>An ObjectId.</returns>
-        public static ObjectId GenerateNewId()
+        public static ObjectId NewObjectId()
         {
-            return GenerateNewId(GetTimestampFromDateTime(DateTime.UtcNow));
+            return NewObjectId(GetTimestampFromDateTime(DateTime.UtcNow));
         }
 
         /// <summary>
@@ -232,9 +232,9 @@ namespace System
         /// </summary>
         /// <param name="timestamp">The timestamp component (expressed as a DateTime).</param>
         /// <returns>An ObjectId.</returns>
-        public static ObjectId GenerateNewId(DateTime timestamp)
+        public static ObjectId NewObjectId(DateTime timestamp)
         {
-            return GenerateNewId(GetTimestampFromDateTime(timestamp));
+            return NewObjectId(GetTimestampFromDateTime(timestamp));
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace System
         /// </summary>
         /// <param name="timestamp">The timestamp component.</param>
         /// <returns>An ObjectId.</returns>
-        public static ObjectId GenerateNewId(int timestamp)
+        public static ObjectId NewObjectId(int timestamp)
         {
             int increment = Interlocked.Increment(ref __staticIncrement) & 0x00ffffff; // only use low order 3 bytes
             return new ObjectId(timestamp, __staticMachine, __staticPid, increment);

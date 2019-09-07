@@ -7,7 +7,7 @@ namespace Core.Web
     /// <summary>
     /// swagger不可空值类型参数或模型属性标记为Required
     /// </summary>
-    public static class SwaggerGenOptionsExtenstions
+    public static class SwaggerGenOptionsExtensions
     {
         /// <summary>
         /// 添加Required标记相关的Filters

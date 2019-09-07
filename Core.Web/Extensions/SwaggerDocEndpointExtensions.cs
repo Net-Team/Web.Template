@@ -10,7 +10,7 @@ namespace Core.Web
     /// <summary>
     /// json文档路径和ui路径扩展
     /// </summary>
-    public static class SwaggerDocEndpointExtenstions
+    public static class SwaggerDocEndpointExtensions
     {
         /// <summary>
         /// 添加json文档路径和ui路径

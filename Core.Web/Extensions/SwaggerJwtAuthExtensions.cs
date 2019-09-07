@@ -8,7 +8,7 @@ namespace Core.Web
     /// <summary>
     /// swagger的授权信息扩展
     /// </summary>
-    public static class SwaggerJwtAuthExtenstions
+    public static class SwaggerJwtAuthExtensions
     {
         /// <summary>
         /// 添加swagger的Bearer token

@@ -10,7 +10,7 @@ namespace Core.Web
     /// <summary>
     /// 模型验证熔岩
     /// </summary>
-    public static class InvalidModelStateExtenstions
+    public static class InvalidModelStateExtensions
     {
         /// <summary>
         /// 添加模型验证转换为ApiResult输出

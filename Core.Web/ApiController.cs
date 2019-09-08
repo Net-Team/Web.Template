@@ -46,10 +46,25 @@ namespace Core.Web
         {
             foreach (var property in ConditionItem<T>.TypeProperties)
             {
-                if (Request.Query.TryGetValue(property.Name, out var values) == true)
+                if (this.Request.Query.TryGetValue(property.Name, out var values) == true)
                 {
                     var value = values[0];
                     yield return new ConditionItem<T>(property, value, null);
+                }
+
+                if (property.PropertyType.IsValueType == true)
+                {
+                    if (this.Request.Query.TryGetValue("min" + property.Name, out var minValues) == true)
+                    {
+                        var value = minValues[0];
+                        yield return new ConditionItem<T>(property, value, Operator.GreaterThanOrEqual);
+                    }
+
+                    if (this.Request.Query.TryGetValue("max" + property.Name, out var maxValues) == true)
+                    {
+                        var value = maxValues[0];
+                        yield return new ConditionItem<T>(property, value, Operator.LessThanOrEqual);
+                    }
                 }
             }
         }

@@ -31,9 +31,9 @@ namespace Core.Web
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        protected Condition<T> GetQueryCondition<T>()
+        protected virtual Condition<T> GetQueryCondition<T>()
         {
-            var items = this.GetConditionItems<T>();
+            var items = this.GetQueryConditionItems<T>();
             return new Condition<T>(items);
         }
 
@@ -42,7 +42,7 @@ namespace Core.Web
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        private IEnumerable<ConditionItem<T>> GetConditionItems<T>()
+        private IEnumerable<ConditionItem<T>> GetQueryConditionItems<T>()
         {
             foreach (var property in ConditionItem<T>.TypeProperties)
             {

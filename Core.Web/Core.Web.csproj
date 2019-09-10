@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>19.9.9</Version>
+    <Version>19.9.10</Version>
     <NoWarn>NU5104</NoWarn>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -11,12 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview8.19405.7" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview9.19424.4" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Exceptionless.Signed" Version="4.3.2027" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview8.19405.7" />    
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview9.19424.4" />    
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0-preview8.19405.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc2" />

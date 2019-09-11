@@ -12,7 +12,7 @@ namespace Core.Web
     /// 将异常转换为IApiResult返回值
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
-    public class ApiExceptionFilterAttribute : Attribute, IExceptionFilter
+    public class ApiExceptionFilterAttribute : Attribute, IExceptionFilter, IOrderedFilter
     {
         /// <summary>
         /// 获取或设置是否启用
@@ -21,10 +21,15 @@ namespace Core.Web
         public bool Enbale { get; set; } = true;
 
         /// <summary>
+        /// 获取或设置排序顺序
+        /// </summary>
+        public int Order { get; set; } = 0;
+
+        /// <summary>
         /// 异常时
         /// </summary>
         /// <param name="context"></param>
-        public void OnException(ExceptionContext context)
+        public virtual void OnException(ExceptionContext context)
         {
             if (this.Enbale == false)
             {
@@ -44,11 +49,17 @@ namespace Core.Web
 
             var apiResult = Activator.CreateInstance(apiResultType) as IApiResult;
             apiResult.Code = Code.ServiceError;
-            apiResult.Message = context.Exception.Message;
-
             if (context.Exception is ArgumentException)
             {
                 apiResult.Code = Code.ParameterError;
+            }
+
+            var inner = context.Exception;
+            var exceptionTypeName = inner.GetType().Name;
+            while (inner != null)
+            {
+                apiResult.Message = $"{exceptionTypeName}：{inner.Message}";
+                inner = inner.InnerException;
             }
 
             context.HttpContext
@@ -56,6 +67,7 @@ namespace Core.Web
                 .GetService<ILogger<ApiExceptionFilterAttribute>>()
                 .LogError(context.Exception, context.Exception.Message);
 
+            context.ExceptionHandled = true;
             context.Result = new ObjectResult(apiResult);
         }
     }

@@ -12,13 +12,18 @@ namespace Core.Web
     /// 使用IApiEventPublisher发布将请求Api的内容
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
-    public class ApiEventFilterAttribute : Attribute, IAsyncActionFilter
+    public class ApiEventFilterAttribute : Attribute, IAsyncActionFilter, IOrderedFilter
     {
         /// <summary>
         /// 获取或设置是否启用
         /// 默认为true
         /// </summary>
         public bool Enbale { get; set; } = true;
+
+        /// <summary>
+        /// 获取或设置排序顺序
+        /// </summary>
+        public int Order { get; set; } = 0;
 
         /// <summary>
         /// Action执行

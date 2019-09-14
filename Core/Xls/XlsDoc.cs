@@ -174,7 +174,9 @@ namespace Core.Xls
                 int colCount = headerRow.LastCellNum;
                 for (var c = 0; c < colCount; c++)
                 {
-                    table.Columns.Add(headerRow.GetCell(c).ToString());
+                    var cell = headerRow.GetCell(c);
+                    var columnName = cell?.ToString() ?? $"__cell{c}__";
+                    table.Columns.Add(columnName);
                 }
 
                 var i = 1;

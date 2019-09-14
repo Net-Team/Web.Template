@@ -12,7 +12,7 @@ namespace Web.Test.Core
         [Fact]
         public void Test()
         {
-            var items = new XlsDoc<Model>("1.xlsx")[0].ToArray();
+            var items = new XlsDoc<Model>("1.xls")[0].ToArray();
         }
 
         class Model

@@ -49,18 +49,7 @@ namespace Core.Web
 
             var apiResult = Activator.CreateInstance(apiResultType) as IApiResult;
             apiResult.Code = Code.ServiceError;
-            if (context.Exception is ArgumentException)
-            {
-                apiResult.Code = Code.ParameterError;
-            }
-
-            var inner = context.Exception;
-            var exceptionTypeName = inner.GetType().Name;
-            while (inner != null)
-            {
-                apiResult.Message = $"{exceptionTypeName}：{inner.Message}";
-                inner = inner.InnerException;
-            }
+            apiResult.Message = $"{context.Exception.GetType().Name}：{context.Exception.Message}";
 
             context.HttpContext
                 .RequestServices

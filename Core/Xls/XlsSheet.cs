@@ -109,7 +109,7 @@ namespace Core.Xls
             /// <summary>
             /// 属性设置器
             /// </summary>
-            private Action<object, object> setter;
+            private readonly Action<object, object> setter;
 
             /// <summary>
             /// 字段名称

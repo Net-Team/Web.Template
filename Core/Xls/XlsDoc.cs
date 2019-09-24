@@ -160,8 +160,10 @@ namespace Core.Xls
             /// <returns></returns>
             private static DataTable ReadAsTable(ISheet sheet)
             {
-                var table = new DataTable();
-                table.TableName = sheet.SheetName;
+                var table = new DataTable
+                {
+                    TableName = sheet.SheetName
+                };
                 table.Rows.Clear();
                 table.Columns.Clear();
 

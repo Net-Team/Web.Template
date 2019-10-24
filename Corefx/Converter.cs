@@ -30,7 +30,7 @@
                 targetType = underlyingType;
             }
 
-            if (targetType.GetTypeInfo().IsEnum == true)
+            if (targetType.IsEnum == true)
             {
                 return Enum.Parse(targetType, value.ToString(), true);
             }

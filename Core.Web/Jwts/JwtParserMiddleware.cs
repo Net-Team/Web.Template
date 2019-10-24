@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -57,8 +58,12 @@ namespace Core.Web.Jwts
         {
             if (httpContext.Request.Headers.TryGetValue("Authorization", out var bearerToken))
             {
-                var token = bearerToken.ToString().Split(' ').LastOrDefault();
-                return new JwtSecurityToken(token);
+                var values = bearerToken.ToString().Split(' ');
+                if (values.First().EqualsIgnoreCase("Bearer") == true)
+                {
+                    var token = values.Last();
+                    return new JwtSecurityToken(token);
+                }
             }
 
             if (string.IsNullOrEmpty(this.options.JwtCookieName) == false)

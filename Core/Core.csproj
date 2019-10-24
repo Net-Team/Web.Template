@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>19.9.24</Version>
+    <Version>19.10.24</Version>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <NoWarn>WA2001,NU5104</NoWarn>   
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>

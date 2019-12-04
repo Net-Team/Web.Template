@@ -25,11 +25,8 @@ namespace System.Linq
                 throw new ArgumentNullException(nameof(orderByKey));
             }
 
-            var sourceType = typeof(T);
-            var keyProperty = Property
-                .GetProperties(sourceType)
-                .FirstOrDefault(p => p.Name.EqualsIgnoreCase(orderByKey));
-
+            var sourceType = typeof(T);           
+            var keyProperty = Property<T>.Properties.FirstOrDefault(p => p.Name.EqualsIgnoreCase(orderByKey));
             if (keyProperty == null)
             {
                 throw new ArgumentException($"{nameof(orderByKey)}不存在...");

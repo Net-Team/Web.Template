@@ -6,72 +6,21 @@ namespace System.Reflection
     /// <summary>
     /// 表示属性
     /// </summary>
-    public class Property
+    public class Property : Property<object, object>
     {
         /// <summary>
-        /// 获取器
+        /// 类型的属性缓存
         /// </summary>
-        private readonly Func<object, object> geter;
-
-        /// <summary>
-        /// 设置器
-        /// </summary>
-        private readonly Action<object, object> seter;
-
-        /// <summary>
-        /// 获取属性名称
-        /// </summary>
-        public string Name { get; protected set; }
-
-        /// <summary>
-        /// 获取属性信息
-        /// </summary>
-        public PropertyInfo Info { get; private set; }
+        private static readonly ConcurrentDictionary<Type, Property[]> cache = new ConcurrentDictionary<Type, Property[]>();
 
         /// <summary>
         /// 属性
         /// </summary>
         /// <param name="property">属性信息</param>
         public Property(PropertyInfo property)
+            : base(property)
         {
-            this.Name = property.Name;
-            this.Info = property;
-
-            if (property.CanRead == true)
-            {
-                this.geter = Lambda.CreateGetFunc<object, object>(property);
-            }
-
-            if (property.CanWrite == true)
-            {
-                this.seter = Lambda.CreateSetAction<object, object>(property);
-            }
         }
-
-        /// <summary>
-        /// 获取属性的值
-        /// </summary>
-        /// <param name="instance">实例</param>
-        /// <returns></returns>
-        public object GetValue(object instance)
-        {
-            return this.geter.Invoke(instance);
-        }
-
-        /// <summary>
-        /// 设置属性的值
-        /// </summary>
-        /// <param name="instance">实例</param>
-        /// <param name="value">值</param>
-        public void SetValue(object instance, object value)
-        {
-            this.seter.Invoke(instance, value);
-        }
-
-        /// <summary>
-        /// 类型属性的Setter缓存
-        /// </summary>
-        private static readonly ConcurrentDictionary<Type, Property[]> cached = new ConcurrentDictionary<Type, Property[]>();
 
         /// <summary>
         /// 从类型的属性获取属性
@@ -80,7 +29,7 @@ namespace System.Reflection
         /// <returns></returns>
         public static Property[] GetProperties(Type type)
         {
-            return cached.GetOrAdd(type, t => t.GetProperties().Select(p => new Property(p)).ToArray());
+            return cache.GetOrAdd(type, t => t.GetProperties().Select(p => new Property(p)).ToArray());
         }
     }
 
@@ -88,18 +37,42 @@ namespace System.Reflection
     /// <summary>
     /// 表示属性
     /// </summary>
-    /// <typeparam name="TDeclaringType"></typeparam>
-    public class Property<TDeclaringType>
+    /// <typeparam name="TDeclaring">定义属性的类型</typeparam>
+    public class Property<TDeclaring> : Property<TDeclaring, object>
+    {
+        /// <summary>
+        /// 从类型的属性获取属性
+        /// </summary>       
+        public static Property<TDeclaring>[] Properties { get; } = typeof(TDeclaring).GetProperties().Select(p => new Property<TDeclaring>(p)).ToArray();
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        /// <param name="property">属性信息</param>
+        public Property(PropertyInfo property)
+            : base(property)
+        {
+        }
+    }
+
+
+
+    /// <summary>
+    /// 表示属性
+    /// </summary>
+    /// <typeparam name="TDeclaring">定义属性的类型</typeparam>
+    /// <typeparam name="TProperty">属性类型</typeparam>
+    public class Property<TDeclaring, TProperty>
     {
         /// <summary>
         /// 获取器
         /// </summary>
-        private readonly Func<TDeclaringType, object> geter;
+        private readonly Func<TDeclaring, TProperty> geter;
 
         /// <summary>
         /// 设置器
         /// </summary>
-        private readonly Action<TDeclaringType, object> seter;
+        private readonly Action<TDeclaring, TProperty> seter;
 
         /// <summary>
         /// 获取属性名称
@@ -109,12 +82,7 @@ namespace System.Reflection
         /// <summary>
         /// 获取属性信息
         /// </summary>
-        public PropertyInfo Info { get; private set; }
-
-        /// <summary>
-        /// 从类型的属性获取属性
-        /// </summary>       
-        public static Property<TDeclaringType>[] Properties { get; } = typeof(TDeclaringType).GetProperties().Select(p => new Property<TDeclaringType>(p)).ToArray();
+        public PropertyInfo Info { get; }
 
         /// <summary>
         /// 属性
@@ -127,12 +95,12 @@ namespace System.Reflection
 
             if (property.CanRead == true)
             {
-                this.geter = Lambda.CreateGetFunc<TDeclaringType, object>(property);
+                this.geter = Lambda.CreateGetFunc<TDeclaring, TProperty>(property);
             }
 
             if (property.CanWrite == true)
             {
-                this.seter = Lambda.CreateSetAction<TDeclaringType, object>(property);
+                this.seter = Lambda.CreateSetAction<TDeclaring, TProperty>(property);
             }
         }
 
@@ -141,7 +109,7 @@ namespace System.Reflection
         /// </summary>
         /// <param name="instance">实例</param>
         /// <returns></returns>
-        public object GetValue(TDeclaringType instance)
+        public TProperty GetValue(TDeclaring instance)
         {
             return this.geter.Invoke(instance);
         }
@@ -151,9 +119,9 @@ namespace System.Reflection
         /// </summary>
         /// <param name="instance">实例</param>
         /// <param name="value">值</param>
-        public void SetValue(TDeclaringType instance, object value)
+        public void SetValue(TDeclaring instance, TProperty value)
         {
-            this.seter.Invoke(instance, value);
+            this.seter?.Invoke(instance, value);
         }
     }
 }

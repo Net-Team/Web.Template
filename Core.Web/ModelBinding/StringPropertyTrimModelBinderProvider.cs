@@ -130,20 +130,15 @@ namespace Core.Web.ModelBinding
         /// <summary>
         /// 表示String类型的属性
         /// </summary>
-        private class StringProperty
+        private class StringProperty : Property<object, string>
         {
-            private readonly Func<object, string> geter;
-
-            private readonly Action<object, string> seter;
-
             /// <summary>
-            /// 属性
+            /// String类型的属性
             /// </summary>
             /// <param name="property">属性信息</param>
             public StringProperty(PropertyInfo property)
+                : base(property)
             {
-                this.geter = Lambda.CreateGetFunc<object, string>(property);
-                this.seter = Lambda.CreateSetAction<object, string>(property);
             }
 
             /// <summary>
@@ -158,11 +153,11 @@ namespace Core.Web.ModelBinding
                     return;
                 }
 
-                var value = this.geter.Invoke(instance);
+                var value = base.GetValue(instance);
                 var trimVal = value?.Trim();
                 if (value != trimVal)
                 {
-                    this.seter.Invoke(instance, trimVal);
+                    base.SetValue(instance, trimVal);
                 }
             }
         }

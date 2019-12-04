@@ -19,18 +19,18 @@ namespace Core.Web.ModelBinding
     {
         private readonly MvcOptions mvcOptions;
 
-        private readonly Type trimAttributeType;
+        private readonly Func<PropertyInfo, bool> propertyFilter;
 
         /// <summary>
         /// String属性trim处理的模型绑定提供者
         /// </summary>
         /// <param name="mvcOptions">mvc配置项</param>
-        /// <param name="trimAttributeType">属性声明的trim标记特性类型</param>
+        /// <param name="propertyFilter">属性过滤器</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public StringPropertyTrimModelBinderProvider(MvcOptions mvcOptions, Type trimAttributeType)
+        public StringPropertyTrimModelBinderProvider(MvcOptions mvcOptions, Func<PropertyInfo, bool> propertyFilter)
         {
             this.mvcOptions = mvcOptions ?? throw new ArgumentNullException(nameof(mvcOptions));
-            this.trimAttributeType = trimAttributeType ?? throw new ArgumentNullException(nameof(trimAttributeType));
+            this.propertyFilter = propertyFilter ?? throw new ArgumentNullException(nameof(propertyFilter));
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Core.Web.ModelBinding
                 var readerFactory = context.Services.GetService<IHttpRequestStreamReaderFactory>();
                 var loggerFactory = context.Services.GetService<ILoggerFactory>();
                 var bodyModelBinder = new BodyModelBinder(this.mvcOptions.InputFormatters, readerFactory, loggerFactory, this.mvcOptions);
-                return new StringPropertyTrimModelBinder(bodyModelBinder, this.trimAttributeType);
+                return new StringPropertyTrimModelBinder(bodyModelBinder, this.propertyFilter);
             }
 
             return null;
@@ -65,11 +65,11 @@ namespace Core.Web.ModelBinding
             /// String属性trim处理的模型绑定者
             /// </summary>
             /// <param name="bodyModelBinder"></param>
-            /// <param name="trimAttributeType"></param>           
-            public StringPropertyTrimModelBinder(BodyModelBinder bodyModelBinder, Type trimAttributeType)
+            /// <param name="propertyFilter"></param>           
+            public StringPropertyTrimModelBinder(BodyModelBinder bodyModelBinder, Func<PropertyInfo, bool> propertyFilter)
             {
                 this.bodyModelBinder = bodyModelBinder;
-                this.stringPropertyCache = new StringPropertyCache(trimAttributeType);
+                this.stringPropertyCache = new StringPropertyCache(propertyFilter);
             }
 
             /// <summary>
@@ -99,17 +99,17 @@ namespace Core.Web.ModelBinding
         /// </summary>
         private class StringPropertyCache
         {
-            private readonly Type trimAttributeType;
+            private readonly Func<PropertyInfo, bool> propertyFilter;
 
             private readonly ConcurrentDictionary<Type, StringProperty[]> trimPropertyCache = new ConcurrentDictionary<Type, StringProperty[]>();
 
             /// <summary>
             /// 类型的StringProperty缓存
             /// </summary>
-            /// <param name="trimAttributeType"></param>
-            public StringPropertyCache(Type trimAttributeType)
+            /// <param name="propertyFilter"></param>
+            public StringPropertyCache(Func<PropertyInfo, bool> propertyFilter)
             {
-                this.trimAttributeType = trimAttributeType;
+                this.propertyFilter = propertyFilter;
             }
 
             /// <summary>
@@ -121,7 +121,7 @@ namespace Core.Web.ModelBinding
             {
                 return this.trimPropertyCache.GetOrAdd(modelType, type =>
                     type.GetProperties()
-                    .Where(item => item.PropertyType == typeof(string) && item.CanWrite && item.CanRead && item.IsDefined(this.trimAttributeType))
+                    .Where(item => item.PropertyType == typeof(string) && item.CanWrite && item.CanRead && this.propertyFilter(item))
                     .Select(p => new StringProperty(p))
                     .ToArray());
             }

@@ -23,7 +23,7 @@ namespace System.Reflection
         }
 
         /// <summary>
-        /// 从类型的属性获取属性
+        /// 从类型获取其所有属性
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns></returns>
@@ -33,7 +33,6 @@ namespace System.Reflection
         }
     }
 
-
     /// <summary>
     /// 表示属性
     /// </summary>
@@ -41,7 +40,12 @@ namespace System.Reflection
     public class Property<TDeclaring> : Property<TDeclaring, object>
     {
         /// <summary>
-        /// 从类型的属性获取属性
+        /// 属性名称与属性缓存
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, Property<TDeclaring>> cache = new ConcurrentDictionary<string, Property<TDeclaring>>();
+
+        /// <summary>
+        /// 获取类型的所有属性
         /// </summary>       
         public static Property<TDeclaring>[] Properties { get; } = typeof(TDeclaring).GetProperties().Select(p => new Property<TDeclaring>(p)).ToArray();
 
@@ -53,8 +57,18 @@ namespace System.Reflection
             : base(property)
         {
         }
-    }
 
+        /// <summary>
+        /// 获取属性
+        /// </summary>
+        /// <param name="name">属性名称</param>
+        /// <param name="comparison">文本比较器</param>
+        /// <returns></returns>
+        public static Property<TDeclaring> GetProperty(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            return cache.GetOrAdd(name, n => Properties.FirstOrDefault(item => string.Equals(item.Name, n, comparison)));
+        }
+    }
 
 
     /// <summary>

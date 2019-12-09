@@ -25,11 +25,11 @@ namespace System.Linq
                 throw new ArgumentNullException(nameof(orderByKey));
             }
 
-            var sourceType = typeof(T);           
-            var keyProperty = Property<T>.Properties.FirstOrDefault(p => p.Name.EqualsIgnoreCase(orderByKey));
+            var sourceType = typeof(T);
+            var keyProperty = Property<T>.GetProperty(orderByKey);
             if (keyProperty == null)
             {
-                throw new ArgumentException($"{nameof(orderByKey)}不存在...");
+                throw new ArgumentException($"属性{nameof(orderByKey)}不存在...");
             }
 
             var param = Expression.Parameter(sourceType, "item");

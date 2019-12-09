@@ -57,7 +57,7 @@ namespace Core.Web.JsonPatchs
             }
 
             var name = this.Path.NullThenEmpty().TrimStart('/');
-            var property = Property<T>.Properties.FirstOrDefault(item => item.Name.EqualsIgnoreCase(name));
+            var property = Property<T>.GetProperty(name);
             if (property != null)
             {
                 var value = this.GetValue(property.Info.PropertyType);

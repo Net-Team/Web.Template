@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Core.Web.JsonPatchs
 {
@@ -13,17 +14,20 @@ namespace Core.Web.JsonPatchs
         /// <summary>
         /// replace
         /// </summary>      
-        public string op { get; set; }
+        [JsonPropertyName("op")]
+        public string Op { get; set; }
 
         /// <summary>
         /// /{propertyName}
         /// </summary>
-        public string path { get; set; }
+        [JsonPropertyName("path")]
+        public string Path { get; set; }
 
         /// <summary>
         /// 属性值
         /// </summary>        
-        public JsonElement value { get; set; }
+        [JsonPropertyName("value")]
+        public JsonElement Value { get; set; }
 
         /// <summary>
         /// 是否为Replace的op
@@ -31,7 +35,7 @@ namespace Core.Web.JsonPatchs
         /// <returns></returns>
         public bool IsReplace()
         {
-            return string.Equals(this.op, "replace");
+            return string.Equals(this.Op, "replace");
         }
 
         /// <summary>
@@ -44,7 +48,7 @@ namespace Core.Web.JsonPatchs
         {
             if (this.IsReplace() == false)
             {
-                throw new NotSupportedException($"not supported op: {this.op}");
+                throw new NotSupportedException($"not supported op: {this.Op}");
             }
 
             if (target == null)
@@ -52,12 +56,12 @@ namespace Core.Web.JsonPatchs
                 return;
             }
 
-            var name = this.path.NullThenEmpty().TrimStart('/');
+            var name = this.Path.NullThenEmpty().TrimStart('/');
             var property = Property<T>.Properties.FirstOrDefault(item => item.Name.EqualsIgnoreCase(name));
             if (property != null)
             {
-                var objValue = this.GetValue(property.Info.PropertyType);
-                property.SetValue(target, objValue);
+                var value = this.GetValue(property.Info.PropertyType);
+                property.SetValue(target, value);
             }
         }
 
@@ -69,7 +73,7 @@ namespace Core.Web.JsonPatchs
         /// <returns></returns>
         private object GetValue(Type type)
         {
-            switch (this.value.ValueKind)
+            switch (this.Value.ValueKind)
             {
                 case JsonValueKind.False:
                     return false;
@@ -81,11 +85,11 @@ namespace Core.Web.JsonPatchs
                     return null;
 
                 case JsonValueKind.Number:
-                    var number = this.value.GetRawText();
+                    var number = this.Value.GetRawText();
                     return Converter.ConvertToType(number, type);
 
                 case JsonValueKind.String:
-                    var str = this.value.GetString();
+                    var str = this.Value.GetString();
                     return Converter.ConvertToType(str, type);
 
                 default:

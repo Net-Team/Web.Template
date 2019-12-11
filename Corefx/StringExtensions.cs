@@ -22,6 +22,22 @@ namespace System
         }
 
         /// <summary>
+        /// 格式化字符串
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args">参数</param>
+        /// <exception cref="FormatException"></exception>
+        /// <returns></returns>
+        public static string Format(this string source, params object[] args)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+            return string.Format(source, args);
+        }
+
+        /// <summary>
         /// 如果为null则返回String.Empty
         /// </summary>
         /// <param name="source">源</param>

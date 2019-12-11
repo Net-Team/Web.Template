@@ -3,6 +3,7 @@ using PredicateLib;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Core.Web
 {
@@ -44,26 +45,34 @@ namespace Core.Web
         /// <returns></returns>
         private IEnumerable<ConditionItem<T>> GetQueryConditionItems<T>()
         {
+            bool TryGetTrimValue(PropertyInfo property, string prefx, out string value)
+            {
+                if (this.Request.Query.TryGetValue($"{prefx}{property.Name}", out var stringValues))
+                {
+                    value = stringValues.Count == 0 ? null : stringValues[0].NullThenEmpty().Trim();
+                    return value.IsNullOrEmpty() == false;
+                }
+
+                value = null;
+                return false;
+            }
+
             foreach (var property in ConditionItem<T>.TypeProperties)
             {
-                if (this.Request.Query.TryGetValue(property.Name, out var values) == true)
+                if (TryGetTrimValue(property, null, out var value))
                 {
-                    var value = values[0];
                     yield return new ConditionItem<T>(property, value, null);
                 }
 
-                if (property.PropertyType.IsValueType == true)
+                if (property.PropertyType.IsValueType)
                 {
-                    if (this.Request.Query.TryGetValue("min" + property.Name, out var minValues) == true)
+                    if (TryGetTrimValue(property, "min", out var minValue))
                     {
-                        var value = minValues[0];
-                        yield return new ConditionItem<T>(property, value, Operator.GreaterThanOrEqual);
+                        yield return new ConditionItem<T>(property, minValue, Operator.GreaterThanOrEqual);
                     }
-
-                    if (this.Request.Query.TryGetValue("max" + property.Name, out var maxValues) == true)
+                    if (TryGetTrimValue(property, "max", out var maxValue))
                     {
-                        var value = maxValues[0];
-                        yield return new ConditionItem<T>(property, value, Operator.LessThanOrEqual);
+                        yield return new ConditionItem<T>(property, maxValue, Operator.LessThanOrEqual);
                     }
                 }
             }

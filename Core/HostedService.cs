@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,6 @@ namespace Core
             this.services = services;
         }
 
-
         /// <summary>
         /// 启动服务
         /// </summary>
@@ -45,8 +45,26 @@ namespace Core
         /// <returns></returns>
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            this.executingTask = this.StartAsync(this.stoppingCts.Token);
+            this.executingTask = this.TryStartAsync(this.stoppingCts.Token);
             return this.executingTask.IsCompleted ? this.executingTask : Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 尝试启动服务
+        /// </summary>
+        /// <param name="stoppingToken">停止令牌</param>
+        /// <returns></returns>
+        private async Task TryStartAsync(CancellationToken stoppingToken)
+        {
+            try
+            {
+                await this.StartAsync(stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                var logger = this.services.GetService<ILogger<HostedService>>();
+                logger?.LogError(ex, ex.Message);
+            }
         }
 
         /// <summary>

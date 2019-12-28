@@ -53,11 +53,7 @@ namespace System.Linq
         /// <returns></returns>
         public static IEnumerable<T> NullThenEmpty<T>(this IEnumerable<T> source)
         {
-            if (source != null)
-            {
-                return source;
-            }
-            return Enumerable.Empty<T>();
+            return source ?? Enumerable.Empty<T>();
         }
 
         /// <summary>

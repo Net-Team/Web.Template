@@ -30,11 +30,7 @@ namespace System
         /// <returns></returns>
         public static string Format(this string source, params object[] args)
         {
-            if (source == null)
-            {
-                return null;
-            }
-            return string.Format(source, args);
+            return source == null ? null : string.Format(source, args);
         }
 
         /// <summary>
@@ -54,7 +50,7 @@ namespace System
         /// <returns></returns>
         public static string NullThenEmpty(this string source)
         {
-            return source == null ? string.Empty : source;
+            return source ?? string.Empty;
         }
 
         /// <summary>
@@ -244,11 +240,7 @@ namespace System
         {
             source = source.NullThenEmpty().SubstringGB2312(lengthGB2312);
             int count = lengthGB2312 - source.LengthGB2312();
-            if (count == 0)
-            {
-                return source;
-            }
-            return string.Concat(source, padChar.Repeat(count));
+            return count == 0 ? source : string.Concat(source, padChar.Repeat(count));
         }
 
         /// <summary>
@@ -283,11 +275,7 @@ namespace System
         /// <returns></returns>
         public static string EllipsisGB2312(this string source, int lengthGB2312)
         {
-            if (source.LengthGB2312() > lengthGB2312)
-            {
-                return source.SubstringGB2312(lengthGB2312) + " ..";
-            }
-            return source;
+            return source.LengthGB2312() > lengthGB2312 ? source.SubstringGB2312(lengthGB2312) + " .." : source;
         }
 
         /// <summary>

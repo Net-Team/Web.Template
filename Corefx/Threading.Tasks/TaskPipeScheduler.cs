@@ -102,7 +102,7 @@ namespace System.Threading.Tasks
             /// <summary>
             /// 表示排队的IO队列
             /// </summary>
-            private class InlineWorkItemQueue : IThreadPoolWorkItem
+            private class InlineWorkItemQueue
             {
                 private int doingWork;
                 private readonly ConcurrentQueue<Func<Task>> workItems = new ConcurrentQueue<Func<Task>>();
@@ -116,31 +116,33 @@ namespace System.Threading.Tasks
                     this.workItems.Enqueue(workItem);
                     if (Interlocked.CompareExchange(ref this.doingWork, 1, 0) == 0)
                     {
-                       ThreadPool.UnsafeQueueUserWorkItem(this, preferLocal: false);
+                        ThreadPool.UnsafeQueueUserWorkItem(Execute, this);
                     }
                 }
 
                 /// <summary>
                 /// 执行
                 /// </summary>
-                async void IThreadPoolWorkItem.Execute()
-                { 
+                /// <param name="state"></param>
+                private static async void Execute(object state)
+                {
+                    var _this = (InlineWorkItemQueue)state;
                     while (true)
                     {
-                        while (this.workItems.TryDequeue(out var item))
+                        while (_this.workItems.TryDequeue(out var item))
                         {
                             await item();
                         }
 
-                        this.doingWork = 0;
+                        _this.doingWork = 0;
                         Thread.MemoryBarrier();
 
-                        if (this.workItems.IsEmpty == true)
+                        if (_this.workItems.IsEmpty == true)
                         {
                             break;
                         }
 
-                        if (Interlocked.Exchange(ref this.doingWork, 1) == 1)
+                        if (Interlocked.Exchange(ref _this.doingWork, 1) == 1)
                         {
                             break;
                         }

@@ -36,45 +36,15 @@ namespace Core.HttpApis
         /// <summary>
         /// 添加HttpApi
         /// </summary>
-        /// <typeparam name="TInterface"></typeparam>
+        /// <typeparam name="THttpApi"></typeparam>
         /// <param name="services"></param>
-        private static void AddHttpApi<TInterface>(IServiceCollection services) where TInterface : class, IHttpApi
+        private static void AddHttpApi<THttpApi>(IServiceCollection services) where THttpApi : class, IHttpApi
         {
-            var apiType = typeof(TInterface);
-            var key = $"HttpApi:{apiType.Name}";
-
-            services.AddHttpApiTypedClient<TInterface>((c, p) =>
+            var key = $"HttpApi:{typeof(THttpApi).Name}";
+            services.AddHttpApi<THttpApi>((o, s) =>
             {
-                p.GetService<IConfiguration>().GetSection(key).Bind(c);
+                s.GetService<IConfiguration>().GetSection(key).Bind(o);
             });
-        }
-
-        /// <summary>
-        /// 添加HttpApiClient的别名HttpClient
-        /// </summary>
-        /// <typeparam name="TInterface">接口类型</typeparam>
-        /// <param name="services"></param>
-        /// <param name="configOptions">配置选项</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        private static IHttpClientBuilder AddHttpApiTypedClient<TInterface>(this IServiceCollection services, Action<HttpApiConfig, IServiceProvider> configOptions)
-            where TInterface : class, IHttpApi
-        {
-            if (configOptions == null)
-            {
-                throw new ArgumentNullException(nameof(configOptions));
-            }
-            return services
-                .AddHttpClient(typeof(TInterface).FullName)
-                .AddTypedClient((httpClient, provider) =>
-                {
-                    var httpApiConfig = new HttpApiConfig(httpClient)
-                    {
-                        ServiceProvider = provider
-                    };
-                    configOptions.Invoke(httpApiConfig, provider);
-                    return HttpApi.Create<TInterface>(httpApiConfig);
-                });
         }
     }
 }

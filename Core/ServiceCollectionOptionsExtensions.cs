@@ -21,8 +21,9 @@ namespace Core
         /// <param name="configuration"></param>
         public static IServiceCollection AddConfigureOptions(this IServiceCollection services, [NotNull] IConfiguration configuration, [NotNull] params Assembly[] assemblies)
         {
+            const string name = nameof(OptionsConfigurationServiceCollectionExtensions.Configure);
             var method = typeof(OptionsConfigurationServiceCollectionExtensions)
-                .GetMethod("Configure", 1, new[] { typeof(IServiceCollection), typeof(IConfiguration) });
+                .GetMethod(name, 1, new[] { typeof(IServiceCollection), typeof(IConfiguration) });
 
             foreach (var assembly in assemblies)
             {

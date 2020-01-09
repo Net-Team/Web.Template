@@ -15,7 +15,7 @@ namespace System.Data
         /// <summary>
         /// 字段
         /// </summary>
-        private List<IField> fields = new List<IField>();
+        private readonly List<IField> fields = new List<IField>();
 
         /// <summary>
         /// 获取数据模型
@@ -28,7 +28,7 @@ namespace System.Data
         /// <param name="models">数据</param>
         public Csv(IEnumerable<T> models)
         {
-            this.Models = models;
+            this.Models = models ?? throw new ArgumentNullException(nameof(models));
         }
 
         /// <summary>
@@ -44,11 +44,13 @@ namespace System.Data
             return this;
         }
 
+
         /// <summary>
         /// 保存为csv格式
         /// </summary>
         /// <param name="filePath"></param>
-        public async Task SaveAsCsvAsync(string filePath)
+        /// <param name="encoding"></param>
+        public async Task SaveAsCsvAsync(string filePath, Encoding encoding = default)
         {
             var path = Path.GetDirectoryName(filePath);
             if (string.IsNullOrEmpty(path) == false)
@@ -56,34 +58,32 @@ namespace System.Data
                 Directory.CreateDirectory(path);
             }
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await this.SaveAsCsvAsync(stream);
-            }
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await this.SaveAsCsvAsync(stream, encoding);
         }
 
         /// <summary>
         /// 保存为csv格式
         /// </summary>
         /// <param name="stream">流</param>
-        public async Task SaveAsCsvAsync(Stream stream)
+        /// <param name="encoding">编码</param>
+        public async Task SaveAsCsvAsync(Stream stream, Encoding encoding = default)
         {
-            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            if (encoding == default)
             {
-                var fieldItem = this.fields.Select(item => item.Name);
-                var head = string.Join(",", fieldItem);
-                await writer.WriteLineAsync(head);
+                encoding = Encoding.UTF8;
+            }
 
-                foreach (var item in this.Models)
-                {
-                    var lineItems = this.fields.Select(f =>
-                    {
-                        var v = f.GetValue(item);
-                        return v == null ? null : v.ToString();
-                    });
-                    var line = string.Join(",", lineItems);
-                    await writer.WriteLineAsync(line);
-                }
+            using var writer = new StreamWriter(stream, encoding, leaveOpen: true);
+            var fieldItem = this.fields.Select(item => item.Name);
+            var head = string.Join(",", fieldItem);
+            await writer.WriteLineAsync(head);
+
+            foreach (var item in this.Models)
+            {
+                var lineItems = this.fields.Select(f => f.GetValue(item)?.ToString());
+                var line = string.Join(",", lineItems);
+                await writer.WriteLineAsync(line);
             }
         }
 

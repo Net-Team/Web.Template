@@ -1,4 +1,6 @@
 ﻿#if NETCOREAPP3_0
+using System.Diagnostics;
+
 namespace System.Buffers
 {
     /// <summary>
@@ -21,6 +23,8 @@ namespace System.Buffers
         /// 表示数组持有者
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        [DebuggerDisplay("Count = {Count}")]
+        [DebuggerTypeProxy(typeof(ArrayOwnerDebugView<>))]
         private class ArrayOwner<T> : Disposable, IArrayOwner<T>
         {
             /// <summary>
@@ -29,12 +33,18 @@ namespace System.Buffers
             public T[] Array { get; }
 
             /// <summary>
+            /// 获取数组的有效长度
+            /// </summary>
+            public int Count { get; }
+
+            /// <summary>
             /// 数组持有者
             /// </summary>
             /// <param name="minLength"></param> 
             public ArrayOwner(int minLength)
             {
                 this.Array = ArrayPool<T>.Shared.Rent(minLength);
+                this.Count = minLength;
             }
 
             /// <summary>
@@ -44,6 +54,25 @@ namespace System.Buffers
             protected override void Dispose(bool disposing)
             {
                 ArrayPool<T>.Shared.Return(this.Array);
+            }
+        }
+
+        /// <summary>
+        /// 调试视图
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        private class ArrayOwnerDebugView<T>
+        {
+            [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+            public T[] Items { get; }
+
+            /// <summary>
+            /// 调试视图
+            /// </summary>
+            /// <param name="owner"></param>
+            public ArrayOwnerDebugView(IArrayOwner<T> owner)
+            {
+                this.Items = owner.Array.AsSpan(0, owner.Count).ToArray();
             }
         }
     }

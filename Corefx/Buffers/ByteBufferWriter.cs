@@ -6,9 +6,38 @@ namespace System.Buffers
     /// </summary>
     public sealed class ByteBufferWriter : Disposable, IBufferWriter<byte>
     {
-        private int index = 0;
-        private byte[] rentedBuffer;
         private const int MinimumBufferSize = 256;
+        private IArrayOwner<byte> byteArrayOwner;      
+
+        /// <summary>
+        /// 获取已写入的字节数
+        /// </summary>
+        public int WrittenCount { get; private set; }
+
+        /// <summary>
+        /// 获取已数入的数据
+        /// </summary>
+        public ReadOnlyMemory<byte> WrittenMemory
+        {
+            get => this.byteArrayOwner.Array.AsMemory(0, this.WrittenCount);
+        }
+
+        /// <summary>
+        /// 获取容量
+        /// </summary>
+        public int Capacity
+        {
+            get => this.byteArrayOwner.Array.Length;
+        }
+
+        /// <summary>
+        /// 获取空余容量
+        /// </summary>
+        public int FreeCapacity
+        {
+            get => this.Capacity - this.WrittenCount;
+        }
+
 
         /// <summary>
         /// 字节缓冲区写入对象
@@ -21,40 +50,7 @@ namespace System.Buffers
             {
                 throw new ArgumentOutOfRangeException(nameof(initialCapacity));
             }
-
-            this.rentedBuffer = ArrayPool<byte>.Shared.Rent(initialCapacity);
-        }
-
-        /// <summary>
-        /// 获取已数入的数据
-        /// </summary>
-        public ReadOnlyMemory<byte> WrittenMemory
-        {
-            get => this.rentedBuffer.AsMemory(0, this.index);
-        }
-
-        /// <summary>
-        /// 获取已写入的字节数
-        /// </summary>
-        public int WrittenCount
-        {
-            get => this.index;
-        }
-
-        /// <summary>
-        /// 获取容量
-        /// </summary>
-        public int Capacity
-        {
-            get => this.rentedBuffer.Length;
-        }
-
-        /// <summary>
-        /// 获取空余容量
-        /// </summary>
-        public int FreeCapacity
-        {
-            get => this.rentedBuffer.Length - this.index;
+            this.byteArrayOwner = ArrayPool.Rent<byte>(initialCapacity);
         }
 
         /// <summary>
@@ -62,20 +58,8 @@ namespace System.Buffers
         /// </summary>
         public void Clear()
         {
-            this.rentedBuffer.AsSpan(0, this.index).Clear();
-            this.index = 0;
-        }
-
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
-        {
-            if (this.rentedBuffer != null)
-            {
-                ArrayPool<byte>.Shared.Return(this.rentedBuffer);
-            }
+            this.byteArrayOwner.Array.AsSpan(0, this.WrittenCount).Clear();
+            this.WrittenCount = 0;
         }
 
         /// <summary>
@@ -85,11 +69,11 @@ namespace System.Buffers
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void Advance(int count)
         {
-            if (count < 0 || this.index + count > this.rentedBuffer.Length)
+            if (count < 0 || this.WrittenCount + count > this.Capacity)
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
-            this.index += count;
+            this.WrittenCount += count;
         }
 
         /// <summary>
@@ -101,7 +85,7 @@ namespace System.Buffers
         public Memory<byte> GetMemory(int sizeHint = 0)
         {
             this.CheckAndResizeBuffer(sizeHint);
-            return this.rentedBuffer.AsMemory(this.index);
+            return this.byteArrayOwner.Array.AsMemory(this.WrittenCount);
         }
 
         /// <summary>
@@ -113,7 +97,16 @@ namespace System.Buffers
         public Span<byte> GetSpan(int sizeHint = 0)
         {
             this.CheckAndResizeBuffer(sizeHint);
-            return rentedBuffer.AsSpan(this.index);
+            return byteArrayOwner.Array.AsSpan(this.WrittenCount);
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
+        {
+            this.byteArrayOwner?.Dispose();
         }
 
         /// <summary>
@@ -133,19 +126,16 @@ namespace System.Buffers
                 sizeHint = MinimumBufferSize;
             }
 
-            int availableSpace = this.rentedBuffer.Length - this.index;
-            if (sizeHint > availableSpace)
+            if (sizeHint > this.FreeCapacity)
             {
-                var growBy = Math.Max(sizeHint, this.rentedBuffer.Length);
-                var newSize = checked(this.rentedBuffer.Length + growBy);
+                var growBy = Math.Max(sizeHint, this.Capacity);
+                var newSize = checked(this.Capacity + growBy);
 
-                var oldBuffer = this.rentedBuffer;
-                this.rentedBuffer = ArrayPool<byte>.Shared.Rent(newSize);
+                var oldByteArrayOwner = this.byteArrayOwner;
+                this.byteArrayOwner = ArrayPool.Rent<byte>(newSize);
 
-                var oldSpan = oldBuffer.AsSpan(0, this.index);
-                oldSpan.CopyTo(this.rentedBuffer);
-
-                ArrayPool<byte>.Shared.Return(oldBuffer);
+                oldByteArrayOwner.Array.AsSpan(0, this.WrittenCount).CopyTo(this.byteArrayOwner.Array);
+                oldByteArrayOwner.Dispose();
             }
         }
     }

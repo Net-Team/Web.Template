@@ -11,6 +11,11 @@ namespace System.Buffers
         /// 获取持有的数组
         /// </summary>
         T[] Array { get; }
+
+        /// <summary>
+        /// 获取数组的有效长度
+        /// </summary>
+        int Count { get; }
     }
 }
 #endif

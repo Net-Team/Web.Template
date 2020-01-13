@@ -69,7 +69,7 @@ namespace Application
         public Task<TNew> FindAsync<TNew>(string id, [NotNull]Expression<Func<T, TNew>> selector)
         {
             return this.Db.Set<T>().Where(item => item.Id == id).Select(selector).FirstOrDefaultAsync();
-        }      
+        }
 
         /// <summary>
         /// 根据Id获取记录
@@ -78,7 +78,7 @@ namespace Application
         /// <returns></returns>
         public Task<T[]> FindManyAsync(IEnumerable<string> id)
         {
-            var where = PredicateLib.Predicate.CreateContains<T, string>(item => item.Id, id);
+            var where = Predicate.CreateOrEqual<T, string>(item => item.Id, id);
             return this.FindManyAsync(where);
         }
 

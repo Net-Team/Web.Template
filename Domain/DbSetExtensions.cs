@@ -129,7 +129,7 @@ namespace Domain
         /// <returns></returns>
         public static Task<T[]> RemoveRangeAsync<T>(this DbSet<T> set, IEnumerable<string> id) where T : class, IStringIdable
         {
-            var where = PredicateLib.Predicate.CreateContains<T, string>(item => item.Id, id);
+            var where = System.Linq.Expressions.Predicate.CreateOrEqual<T, string>(item => item.Id, id);
             return set.RemoveRangeAsync(where);
         }
 

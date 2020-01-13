@@ -3,6 +3,7 @@ using Core.Web;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Web.Host.Controllers
@@ -18,7 +19,7 @@ namespace Web.Host.Controllers
         /// <returns></returns>
         [HttpGet]
         public ApiResult<string[]> Get()
-        {
+        { 
             return new string[] { "ok" };
         }
 

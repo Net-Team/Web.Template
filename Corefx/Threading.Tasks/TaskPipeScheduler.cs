@@ -103,6 +103,9 @@ namespace System.Threading.Tasks
             /// 表示排队的IO队列
             /// </summary>
             private class InlineWorkItemQueue
+#if NETCOREAPP3_0
+                : IThreadPoolWorkItem
+#endif
             {
                 private int doingWork;
                 private readonly ConcurrentQueue<Func<Task>> workItems = new ConcurrentQueue<Func<Task>>();
@@ -116,9 +119,24 @@ namespace System.Threading.Tasks
                     this.workItems.Enqueue(workItem);
                     if (Interlocked.CompareExchange(ref this.doingWork, 1, 0) == 0)
                     {
+#if NETCOREAPP3_0
+                        ThreadPool.UnsafeQueueUserWorkItem(this, preferLocal: false);
+#else
                         ThreadPool.UnsafeQueueUserWorkItem(Execute, this);
+#endif
                     }
                 }
+
+#if NETCOREAPP3_0
+                /// <summary>
+                /// 执行
+                /// </summary>
+                void IThreadPoolWorkItem.Execute()
+                {
+                    Execute(this);
+                }
+#endif
+
 
                 /// <summary>
                 /// 执行

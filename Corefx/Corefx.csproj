@@ -8,6 +8,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>corefx项目的补充，提供诸多基础类型和类型扩展功能</Description>
     <PackageId>Taichuan.Corefx</PackageId>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

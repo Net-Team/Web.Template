@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace System
@@ -183,67 +182,6 @@ namespace System
         }
 
         /// <summary>
-        /// 以GB2312编码获取字符串的长度
-        /// 一个中文占两个长度 英文一个长度
-        /// </summary>
-        /// <param name="source">源</param>
-        /// <returns></returns>
-        public static int LengthGB2312(this string source)
-        {
-            return Encoding.GetEncoding("gb2312").GetByteCount(source.NullThenEmpty());
-        }
-
-        /// <summary>
-        /// 以GB2312编码切割字符串
-        /// </summary>
-        /// <param name="source">源</param>
-        /// <param name="lengthGB2312">保留的长度</param>
-        /// <returns></returns>
-        public static string SubstringGB2312(this string source, int lengthGB2312)
-        {
-            var encoding = Encoding.GetEncoding("gb2312");
-            source = source.NullThenEmpty();
-
-            if (lengthGB2312 >= source.LengthGB2312())
-            {
-                return source;
-            }
-
-            int index = 0;
-            int length = 0;
-            var chars = source.ToCharArray();
-
-            while (length < lengthGB2312)
-            {
-                length += encoding.GetByteCount(chars, index, 1);
-                if (length == lengthGB2312)
-                {
-                    return new string(chars, 0, index + 1);
-                }
-                else if (length > lengthGB2312)
-                {
-                    return new string(chars, 0, index);
-                }
-                index++;
-            }
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// 以GB2312编码切割字符串
-        /// </summary>
-        /// <param name="source">源</param>
-        /// <param name="lengthGB2312">保留的长度</param>
-        /// <param name="padChar">填充字符</param>
-        /// <returns></returns>
-        public static string SubstringGB2312(this string source, int lengthGB2312, char padChar)
-        {
-            source = source.NullThenEmpty().SubstringGB2312(lengthGB2312);
-            int count = lengthGB2312 - source.LengthGB2312();
-            return count == 0 ? source : string.Concat(source, padChar.Repeat(count));
-        }
-
-        /// <summary>
         /// 掩码字符串
         /// </summary>
         /// <param name="sourceValue">原始值</param>
@@ -254,7 +192,12 @@ namespace System
         {
             if (sourceValue?.Length > skipLeft + skipRight)
             {
-                var span = sourceValue.ToCharArray();
+                var span = sourceValue
+                    .ToCharArray()
+#if NETCOREAPP3_0
+                    .AsSpan()
+#endif
+                    ;
                 for (var i = skipLeft; i < span.Length - skipRight; i++)
                 {
                     span[i] = mask;
@@ -268,17 +211,6 @@ namespace System
         }
 
         /// <summary>
-        /// 省略
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="lengthGB2312"></param>
-        /// <returns></returns>
-        public static string EllipsisGB2312(this string source, int lengthGB2312)
-        {
-            return source.LengthGB2312() > lengthGB2312 ? source.SubstringGB2312(lengthGB2312) + " .." : source;
-        }
-
-        /// <summary>
         /// 获取和目标字符串的相似度
         /// </summary>
         /// <param name="source">源</param>
@@ -286,9 +218,9 @@ namespace System
         /// <returns></returns>
         public static decimal GetSimilarityWith(this string source, string target)
         {
-            var Kq = 2m;
-            var Kr = 1m;
-            var Ks = 1m;
+            const decimal Kq = 2m;
+            const decimal Kr = 1m;
+            const decimal Ks = 1m;
 
             var sourceArray = source.ToCharArray();
             var destArray = target.ToCharArray();
@@ -312,7 +244,12 @@ namespace System
                 return source;
             }
 
-            var charArray = source.ToCharArray();
+            var charArray = source
+                .ToCharArray()
+#if NETCOREAPP3_0
+                .AsSpan()
+#endif
+                ;
             for (int i = 0; i < charArray.Length; i++)
             {
                 if (i == 1 && char.IsUpper(charArray[i]) == false)

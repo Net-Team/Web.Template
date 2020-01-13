@@ -13,11 +13,7 @@
         /// <returns></returns>
         public static T NullThenDefault<T>(this T? source) where T : struct
         {
-            if (source.HasValue)
-            {
-                return source.Value;
-            }
-            return default(T);
+            return source ?? default;
         }
 
         /// <summary>
@@ -29,11 +25,7 @@
         /// <returns></returns>
         public static T NullThen<T>(this T? source, T value) where T : struct
         {
-            if (source.HasValue)
-            {
-                return source.Value;
-            }
-            return value;
+            return source ?? value;
         }
     }
 }

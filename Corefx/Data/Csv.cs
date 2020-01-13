@@ -74,7 +74,8 @@ namespace System.Data
                 encoding = Encoding.UTF8;
             }
 
-            using var writer = new StreamWriter(stream, encoding, leaveOpen: true);
+            const int bufferSize = 4 * 1024;
+            using var writer = new StreamWriter(stream, encoding, bufferSize, leaveOpen: true);
             var fieldItem = this.fields.Select(item => item.Name);
             var head = string.Join(",", fieldItem);
             await writer.WriteLineAsync(head);

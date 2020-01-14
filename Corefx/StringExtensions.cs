@@ -37,16 +37,6 @@ namespace System
         /// </summary>
         /// <param name="source">源</param>
         /// <returns></returns>
-        public static string NullToEmpty(this string source)
-        {
-            return source.NullThenEmpty();
-        }
-
-        /// <summary>
-        /// 如果为null则返回String.Empty
-        /// </summary>
-        /// <param name="source">源</param>
-        /// <returns></returns>
         public static string NullThenEmpty(this string source)
         {
             return source ?? string.Empty;
@@ -71,38 +61,6 @@ namespace System
         public static bool IsNullOrEmpty(this string source)
         {
             return string.IsNullOrEmpty(source);
-        }
-
-        /// <summary>
-        /// 当值与when条件相同则返回then值
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="when"></param>
-        /// <param name="then"></param>
-        /// <returns></returns>
-        public static string WhenThen(this string source, string when, string then)
-        {
-            return source == when ? then : source;
-        }
-
-        /// <summary>
-        /// 转换为小写
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string ToLowerIfNoNull(this string source)
-        {
-            return string.IsNullOrEmpty(source) ? source : source.ToLower();
-        }
-
-        /// <summary>
-        /// 转换为大写
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string ToUpperIfNoNull(this string source)
-        {
-            return string.IsNullOrEmpty(source) ? source : source.ToUpper();
         }
 
         /// <summary>
@@ -137,9 +95,7 @@ namespace System
         /// <returns></returns>
         public static bool IsMatch(this string source, string pattert)
         {
-            source = source.NullThenEmpty();
-            pattert = pattert.NullThenEmpty();
-            return Regex.IsMatch(source, pattert);
+            return Regex.IsMatch(source.NullThenEmpty(), pattert.NullThenEmpty());
         }
 
         /// <summary>
@@ -150,9 +106,7 @@ namespace System
         /// <returns></returns>
         public static string Match(this string source, string pattert)
         {
-            source = source.NullThenEmpty();
-            pattert = pattert.NullThenEmpty();
-            return Regex.Match(source, pattert).Value;
+            return Regex.Match(source.NullThenEmpty(), pattert.NullThenEmpty()).Value;
         }
 
         /// <summary>
@@ -218,9 +172,9 @@ namespace System
         /// <returns></returns>
         public static decimal GetSimilarityWith(this string source, string target)
         {
-            const decimal Kq = 2m;
-            const decimal Kr = 1m;
-            const decimal Ks = 1m;
+            const decimal kq = 2m;
+            const decimal kr = 1m;
+            const decimal ks = 1m;
 
             var sourceArray = source.ToCharArray();
             var destArray = target.ToCharArray();
@@ -229,7 +183,7 @@ namespace System
             var q = sourceArray.Intersect(destArray).Count();
             var s = sourceArray.Length - q;
             var r = destArray.Length - q;
-            return Kq * q / (Kq * q + Kr * r + Ks * s);
+            return kq * q / (kq * q + kr * r + ks * s);
         }
 
         /// <summary>

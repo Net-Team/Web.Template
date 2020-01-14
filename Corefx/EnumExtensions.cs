@@ -86,11 +86,7 @@ namespace System
         /// <returns></returns>
         public static IEnumerable<Enum> GetFlagEnums(this Enum e)
         {
-            if (e.GetHashCode() == 0)
-            {
-                return new Enum[0];
-            }
-            return e.GetValues().Where(item => e.HasFlag(item));
+            return e.GetHashCode() == 0 ? (new Enum[0]) : e.GetValues().Where(item => e.HasFlag(item));
         }
 
         /// <summary>

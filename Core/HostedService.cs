@@ -9,28 +9,20 @@ namespace Core
 {
     /// <summary>
     /// 表示托管服务抽象类
+    /// 该对象只适合在应用启动时做等待执行的短时间任务
+    /// 任务并不会在后台运行
     /// </summary>
     public abstract class HostedService : Disposable, IHostedService
     {
-        /// <summary>
-        /// 执行任务
-        /// </summary>
-        private Task executingTask;
-
         /// <summary>
         /// 服务提供者
         /// </summary>
         private readonly IServiceProvider services;
 
         /// <summary>
-        /// 停止取消
-        /// </summary>
-        private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
-
-
-
-        /// <summary>
         /// 托管服务抽象类
+        /// 该对象只适合在应用启动时做等待执行的短时间任务
+        /// 任务并不会在后台运行
         /// </summary>
         /// <param name="services">服务提供者</param>
         public HostedService(IServiceProvider services)
@@ -39,45 +31,35 @@ namespace Core
         }
 
         /// <summary>
+        /// 服务启动入口
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        async Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await this.StartAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                this.services
+                    .GetService<ILoggerFactory>()?
+                    .CreateLogger(this.GetType().FullName)?
+                    .LogError(ex, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// 启动服务
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
-        {
-            this.executingTask = this.TryStartAsync(this.stoppingCts.Token);
-            return this.executingTask.IsCompleted ? this.executingTask : Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 尝试启动服务
-        /// </summary>
-        /// <param name="stoppingToken">停止令牌</param>
-        /// <returns></returns>
-        private async Task TryStartAsync(CancellationToken stoppingToken)
-        {
-            try
-            {
-                await this.StartAsync(stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                var logger = this.services.GetService<ILogger<HostedService>>();
-                logger?.LogError(ex, ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// 启动服务
-        /// </summary>
-        /// <param name="stoppingToken">停止令牌</param>
-        /// <returns></returns>
-        protected abstract Task StartAsync(CancellationToken stoppingToken);
+        protected abstract Task StartAsync(CancellationToken cancellationToken);
 
 
         /// <summary>
-        /// 服务停止时
-        /// 如果应用意外关闭（例如，应用的进程失败），则可能不会调用 StopAsync
+        /// 服务停止入口
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -92,23 +74,10 @@ namespace Core
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected virtual async Task StopAsync(CancellationToken cancellationToken)
+        protected virtual Task StopAsync(CancellationToken cancellationToken)
         {
-            if (this.executingTask == null)
-            {
-                return;
-            }
-
-            try
-            {
-                this.stoppingCts.Cancel();
-            }
-            finally
-            {
-                await Task.WhenAny(this.executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
-            }
+            return Task.CompletedTask;
         }
-
 
         /// <summary>
         /// 创建具有指定生命周期范围的服务提供者
@@ -126,31 +95,6 @@ namespace Core
         /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
-            this.stoppingCts.Cancel();
-        }
-
-
-        /// <summary>
-        /// 具有指定生命周期范围的服务提供者
-        /// </summary>
-        private class ScopeServiceProvider : Disposable, IScopeServiceProvider
-        {
-            private readonly IServiceScope serviceScope;
-
-            public ScopeServiceProvider(IServiceScope serviceScope)
-            {
-                this.serviceScope = serviceScope;
-            }
-
-            public object GetService(Type serviceType)
-            {
-                return this.serviceScope.ServiceProvider.GetService(serviceType);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                this.serviceScope.Dispose();
-            }
         }
     }
 }

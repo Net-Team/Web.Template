@@ -20,31 +20,16 @@ namespace Core.HttpApis
         /// <param name="assembly"></param>
         public static IServiceCollection AddHttpApis(this IServiceCollection services, [NotNull] Assembly assembly)
         {
-            var httpApis = assembly.GetTypes().Where(item => item.IsInheritFrom<IHttpApi>());
-            var method = typeof(ServiceCollectionHttpApiExtensions).GetMethod(nameof(AddHttpApi), BindingFlags.Static | BindingFlags.NonPublic);
-
-            foreach (var item in httpApis)
+            var httpApis = assembly.GetTypes().Where(item => item.IsInterface && item.IsInheritFrom<IHttpApi>());
+            foreach (var httpApi in httpApis)
             {
-                if (item.IsDefined(typeof(ApiManualRegisterAttribute)) == false)
+                if (httpApi.IsDefined(typeof(ApiManualRegisterAttribute)) == false)
                 {
-                    method.MakeGenericMethod(item).Invoke(null, new object[] { services });
+                    var key = $"HttpApi:{httpApi.Name}";
+                    services.AddHttpApi(httpApi, (o, s) => s.GetService<IConfiguration>().GetSection(key).Bind(o));
                 }
             }
             return services;
-        }
-
-        /// <summary>
-        /// 添加HttpApi
-        /// </summary>
-        /// <typeparam name="THttpApi"></typeparam>
-        /// <param name="services"></param>
-        private static void AddHttpApi<THttpApi>(IServiceCollection services) where THttpApi : class, IHttpApi
-        {
-            var key = $"HttpApi:{typeof(THttpApi).Name}";
-            services.AddHttpApi<THttpApi>((o, s) =>
-            {
-                s.GetService<IConfiguration>().GetSection(key).Bind(o);
-            });
         }
     }
 }

@@ -117,6 +117,11 @@ namespace Core.Xls
             public string Name { get; }
 
             /// <summary>
+            /// 获取或设置是否忽略这个列
+            /// </summary>
+            public bool Ignore { get; set; }
+
+            /// <summary>
             /// 获取属性名称
             /// </summary>
             public Type PropertyType { get; }
@@ -136,11 +141,13 @@ namespace Core.Xls
                 if (xlsColumn == null)
                 {
                     this.Name = property.Name;
+                    this.Ignore = false;
                     this.ColumnParser = new XlsColumnParser();
                 }
                 else
                 {
                     this.Name = xlsColumn.Name ?? property.Name;
+                    this.Ignore = xlsColumn.Ignore;
                     this.ColumnParser = Activator.CreateInstance(xlsColumn.ParserType) as XlsColumnParser;
                 }
 
@@ -165,7 +172,11 @@ namespace Core.Xls
             /// <returns></returns>
             public static PropertyDescriptor[] CreateDescriptors<T>() where T : class
             {
-                return typeof(T).GetProperties().Select(p => new PropertyDescriptor(p)).ToArray();
+                return typeof(T)
+                    .GetProperties()
+                    .Select(p => new PropertyDescriptor(p))
+                    .Where(item => item.Ignore == false)
+                    .ToArray();
             }
         }
     }

@@ -19,6 +19,11 @@ namespace Core.Xls
         public Type ParserType { get; set; }
 
         /// <summary>
+        /// 获取或设置是否忽略这个列
+        /// </summary>
+        public bool Ignore { get; set; }
+
+        /// <summary>
         /// xls的列
         /// </summary>
         public XlsColumnAttribute()

@@ -43,10 +43,7 @@ namespace Core
             }
             catch (Exception ex)
             {
-                this.services
-                    .GetService<ILoggerFactory>()?
-                    .CreateLogger(this.GetType().FullName)?
-                    .LogError(ex, ex.Message);
+                await this.HandleExceptionAsync(ex);
             }
         }
 
@@ -63,9 +60,16 @@ namespace Core
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        async Task IHostedService.StopAsync(CancellationToken cancellationToken)
         {
-            return this.StopAsync(cancellationToken);
+            try
+            {
+                await this.StopAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                await this.HandleExceptionAsync(ex);
+            }
         }
 
         /// <summary>
@@ -87,6 +91,22 @@ namespace Core
         {
             var serviceScope = this.services.CreateScope();
             return new ScopeServiceProvider(serviceScope);
+        }
+
+        /// <summary>
+        /// 处理异常
+        /// 默认是输出异常日志
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        protected virtual Task HandleExceptionAsync(Exception ex)
+        {
+            this.services
+                .GetService<ILoggerFactory>()?
+                .CreateLogger(this.GetType().FullName)?
+                .LogError(ex, ex.Message);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

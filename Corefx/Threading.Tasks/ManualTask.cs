@@ -53,10 +53,10 @@ namespace System.Threading.Tasks
         private Action continuation;
 
         /// <summary>
-        /// 延时异常定时器
+        /// 延时设置结果的定时器
         /// </summary>
 
-        private Timer delayExceptionTimer;
+        private Timer delayTimer;
 
         /// <summary>
         /// 是否已完成
@@ -159,19 +159,40 @@ namespace System.Threading.Tasks
 
             if (this.IsCompleted == false)
             {
-                this.delayExceptionTimer?.Dispose();
-                this.delayExceptionTimer = new Timer(this.ExceptionTimerCallback, exception, delay, Timeout.InfiniteTimeSpan);
+                this.delayTimer?.Dispose();
+                this.delayTimer = new Timer(this.DelayTimerCallback, new TimerState(exception), delay, Timeout.InfiniteTimeSpan);
             }
         }
 
         /// <summary>
-        /// 设置异常timer回调
+        /// 延时自动设置任务结果
         /// </summary>
-        /// <param name="exception"></param>
-        private void ExceptionTimerCallback(object exception)
+        /// <param name="result">结果值</param>
+        /// <param name="delay">延时时长</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public void SetResultAfter(TResult result, TimeSpan delay)
         {
-            this.delayExceptionTimer.Dispose();
-            this.SetException((Exception)exception);
+            if (delay <= TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(delay));
+            }
+
+            if (this.IsCompleted == false)
+            {
+                this.delayTimer?.Dispose();
+                this.delayTimer = new Timer(this.DelayTimerCallback, new TimerState(result), delay, Timeout.InfiniteTimeSpan);
+            }
+        }
+
+        /// <summary>
+        /// 延时timer回调
+        /// </summary>
+        /// <param name="state"></param>
+        private void DelayTimerCallback(object state)
+        {
+            this.delayTimer.Dispose();
+            var timerState = state as TimerState;
+            this.SetCompleted(timerState.Result, timerState.Exception);
         }
 
         /// <summary>
@@ -190,7 +211,7 @@ namespace System.Threading.Tasks
 
             this.result = result;
             this.exception = exception;
-            this.delayExceptionTimer?.Dispose();
+            this.delayTimer?.Dispose();
 
             if (this.continuation != null)
             {
@@ -216,6 +237,40 @@ namespace System.Threading.Tasks
         void ICriticalNotifyCompletion.UnsafeOnCompleted(Action continuation)
         {
             this.continuation = continuation;
+        }
+
+        /// <summary>
+        /// timer的状态数据
+        /// </summary>
+        private class TimerState
+        {
+            /// <summary>
+            /// 结果值
+            /// </summary>
+            public TResult Result { get; }
+
+            /// <summary>
+            /// 异常值
+            /// </summary>
+            public Exception Exception { get; }
+
+            /// <summary>
+            /// 状态数据
+            /// </summary>
+            /// <param name="exception"></param>
+            public TimerState(Exception exception)
+            {
+                this.Exception = exception;
+            }
+
+            /// <summary>
+            /// 状态数据
+            /// </summary>
+            /// <param name="result"></param>
+            public TimerState(TResult result)
+            {
+                this.Result = result;
+            }
         }
     }
 }

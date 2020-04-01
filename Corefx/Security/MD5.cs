@@ -23,12 +23,10 @@ namespace System.Security
                 return null;
             }
 
-            using (var md5 = new MD5CryptoServiceProvider())
-            {
-                var format = upperCase ? "X2" : "x2";
-                var data = md5.ComputeHash(Encoding.UTF8.GetBytes(str)).Select(item => item.ToString(format)).ToArray();
-                return string.Join(string.Empty, data);
-            }
+            using var md5 = new MD5CryptoServiceProvider();
+            var format = upperCase ? "X2" : "x2";
+            var data = md5.ComputeHash(Encoding.UTF8.GetBytes(str)).Select(item => item.ToString(format)).ToArray();
+            return string.Join(string.Empty, data);
         }
 
 
@@ -45,12 +43,10 @@ namespace System.Security
                 return null;
             }
 
-            using (var md5 = new MD5CryptoServiceProvider())
-            {
-                var format = upperCase ? "X2" : "x2";
-                var data = md5.ComputeHash(stream).Select(item => item.ToString(format)).ToArray();
-                return string.Join(string.Empty, data);
-            }
+            using var md5 = new MD5CryptoServiceProvider();
+            var format = upperCase ? "X2" : "x2";
+            var data = md5.ComputeHash(stream).Select(item => item.ToString(format)).ToArray();
+            return string.Join(string.Empty, data);
         }
 
         /// <summary>
@@ -68,12 +64,10 @@ namespace System.Security
                 return null;
             }
 
-            using (var md5 = new MD5CryptoServiceProvider())
-            {
-                var format = upperCase ? "X2" : "x2";
-                var data = md5.ComputeHash(byteArray, offset, count).Select(item => item.ToString(format)).ToArray();
-                return string.Join(string.Empty, data);
-            }
+            using var md5 = new MD5CryptoServiceProvider();
+            var format = upperCase ? "X2" : "x2";
+            var data = md5.ComputeHash(byteArray, offset, count).Select(item => item.ToString(format)).ToArray();
+            return string.Join(string.Empty, data);
         }
     }
 }

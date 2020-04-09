@@ -62,7 +62,6 @@ namespace Web.Host.Controllers.v2
         public ApiResult<bool> Delete(int id)
         {
             throw new Exception();
-            return true;
         }
     }
 }

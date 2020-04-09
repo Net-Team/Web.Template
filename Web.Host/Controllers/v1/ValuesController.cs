@@ -1,12 +1,12 @@
 ﻿using Core;
 using Core.Web;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Web.Host.Controllers
+namespace Web.Host.Controllers.v1
 {
     /// <summary>
     /// 演示控制器
@@ -19,7 +19,7 @@ namespace Web.Host.Controllers
         /// <returns></returns>
         [HttpGet]
         public ApiResult<string[]> Get()
-        { 
+        {
             return new string[] { "ok" };
         }
 
@@ -62,8 +62,7 @@ namespace Web.Host.Controllers
         [HttpDelete("{id}")]
         public ApiResult<bool> Delete(int id)
         {
-            throw new Exception();
-            return true;
+            throw new Exception();           
         }
     }
 }

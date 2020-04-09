@@ -1,6 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc.Versioning;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Core.Web
 {
@@ -17,7 +25,7 @@ namespace Core.Web
         /// <returns></returns>
         public static IServiceCollection AddNamespaceApiVersioning(this IServiceCollection services, string apiVersionHeaderName = "x-api-version")
         {
-            return services.PostConfigure<ApiVersioningOptions>(o =>
+            return services.AddApiVersioning(o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.Conventions.Add(new VersionByNamespaceConvention());

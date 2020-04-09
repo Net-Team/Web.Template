@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "Web.Host",
+      "script": "dotnet Web.Host.dll",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://10.0.1.83:6001"
+      }
+    }
+  ]
+}

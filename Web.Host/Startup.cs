@@ -111,7 +111,14 @@ namespace Web.Host
             {
                 c.Conventions.Add(new ApiExplorerGroupNameConvention());
                 c.Conventions.Add(new ServiceTemplateConvention(thisService.Name));
-            });
+                c.ModelBinderProviders.Insert(0, new StringPropertyTrimModelBinderProvider(c, p => p.IsDefined(typeof(StringTrimFlagAttribute))));
+            })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(JsonStringEnumConverter.Default);
+                    options.JsonSerializerOptions.Converters.Add(JsonStringNumberConverter.Default);
+                    options.JsonSerializerOptions.Converters.Add(JsonLocalDateTimeConverter.Default);
+                });
 
             // Ìí¼ÓÐÄÌø¼ì²â
             services.AddHealthChecks();

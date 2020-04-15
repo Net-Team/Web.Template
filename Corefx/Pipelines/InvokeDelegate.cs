@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace System.Middlewares
+namespace System.Pipelines
 {
     /// <summary>
     /// 表示所有中间件执行委托

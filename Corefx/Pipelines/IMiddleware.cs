@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace System.Middlewares
+namespace System.Pipelines
 {
     /// <summary>
     /// 定义中间件的接口

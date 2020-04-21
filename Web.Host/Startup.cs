@@ -3,6 +3,7 @@ using Core;
 using Core.HttpApis;
 using Core.Web;
 using Core.Web.Conventions;
+using Core.Web.ModelBinding;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +16,8 @@ using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 using System;
 using System.IO;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace Web.Host
 {
@@ -113,12 +116,12 @@ namespace Web.Host
                 c.Conventions.Add(new ServiceTemplateConvention(thisService.Name));
                 c.ModelBinderProviders.Insert(0, new StringPropertyTrimModelBinderProvider(c, p => p.IsDefined(typeof(StringTrimFlagAttribute))));
             })
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(JsonStringEnumConverter.Default);
-                    options.JsonSerializerOptions.Converters.Add(JsonStringNumberConverter.Default);
-                    options.JsonSerializerOptions.Converters.Add(JsonLocalDateTimeConverter.Default);
-                });
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(JsonStringToEnumConverter.Default);
+                options.JsonSerializerOptions.Converters.Add(JsonStringToNumberConverter.Default);
+                options.JsonSerializerOptions.Converters.Add(JsonLocalDateTimeConverter.Default);
+            });
 
             // Ìí¼ÓÐÄÌø¼ì²â
             services.AddHealthChecks();

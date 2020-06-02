@@ -17,7 +17,7 @@ namespace Core
         /// <param name="services"></param>
         /// <param name="assembly"></param>
         /// <returns></returns>
-        public static IServiceCollection AddDependencyServices(this IServiceCollection services, [NotNull]Assembly assembly)
+        public static IServiceCollection AddDependencyServices(this IServiceCollection services, Assembly assembly)
         {
             var types = assembly.GetTypes().Where(item => item.IsClass && item.IsAbstract == false).ToArray();
             var singletons = types.Where(item => item.IsInheritFrom<ISingletonDependency>());

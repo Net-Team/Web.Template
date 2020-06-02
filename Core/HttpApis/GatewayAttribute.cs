@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using WebApiClient.Attributes;
-using WebApiClient.Contexts;
+using WebApiClientCore;
+using WebApiClientCore.Attributes;
 
 namespace Core.HttpApis
 {
@@ -17,14 +18,10 @@ namespace Core.HttpApis
         public string Path { get; }
 
         /// <summary>
-        /// 排序顺序
-        /// </summary>
-        public override int OrderIndex => int.MinValue;
-
-        /// <summary>
         /// http接口配置网关的域名
         /// </summary>
         public GatewayAttribute()
+            : this(null)
         {
         }
 
@@ -35,6 +32,7 @@ namespace Core.HttpApis
         public GatewayAttribute(string path)
         {
             this.Path = path;
+            this.OrderIndex = int.MinValue;
         }
 
         /// <summary>
@@ -42,16 +40,16 @@ namespace Core.HttpApis
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task BeforeRequestAsync(ApiActionContext context)
+        public override Task OnRequestAsync(ApiRequestContext context)
         {
-            var options = context.GetService<IOptions<GatewayOptions>>().Value;
+            var options = context.HttpContext.Services.GetService<IOptions<GatewayOptions>>().Value;
             var host = options.HttpHost;
             if (this.Path.IsNullOrEmpty() == false)
             {
                 host = new Uri(host, this.Path);
             }
 
-            context.RequestMessage.RequestUri = host;
+            context.HttpContext.RequestMessage.RequestUri = host;
             return Task.CompletedTask;
         }
     }

@@ -1,13 +1,16 @@
 ﻿#if NETCOREAPP3_0
+
+using System.Runtime.CompilerServices;
+
 namespace System.Buffers
 {
     /// <summary>
     /// 表示字节缓冲区写入对象
     /// </summary>
-    public sealed class ByteBufferWriter : Disposable, IBufferWriter<byte>
+    sealed class BufferWriter<T> : Disposable, IBufferWriter<T>
     {
-        private const int MinimumBufferSize = 256;
-        private IArrayOwner<byte> byteArrayOwner;      
+        private const int defaultSizeHint = 256;
+        private IArrayOwner<T> byteArrayOwner;
 
         /// <summary>
         /// 获取已写入的字节数
@@ -15,28 +18,9 @@ namespace System.Buffers
         public int WrittenCount { get; private set; }
 
         /// <summary>
-        /// 获取已数入的数据
-        /// </summary>
-        public ReadOnlyMemory<byte> WrittenMemory
-        {
-            get => this.byteArrayOwner.Array.AsMemory(0, this.WrittenCount);
-        }
-
-        /// <summary>
         /// 获取容量
         /// </summary>
-        public int Capacity
-        {
-            get => this.byteArrayOwner.Array.Length;
-        }
-
-        /// <summary>
-        /// 获取空余容量
-        /// </summary>
-        public int FreeCapacity
-        {
-            get => this.Capacity - this.WrittenCount;
-        }
+        public int Capacity => this.byteArrayOwner.Array.Length;
 
 
         /// <summary>
@@ -44,13 +28,13 @@ namespace System.Buffers
         /// </summary>
         /// <param name="initialCapacity">初始容量</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public ByteBufferWriter(int initialCapacity)
+        public BufferWriter(int initialCapacity = 1024)
         {
             if (initialCapacity <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(initialCapacity));
             }
-            this.byteArrayOwner = ArrayPool.Rent<byte>(initialCapacity);
+            this.byteArrayOwner = ArrayPool.Rent<T>(initialCapacity);
         }
 
         /// <summary>
@@ -79,10 +63,10 @@ namespace System.Buffers
         /// <summary>
         /// 返回用于写入数据的Memory
         /// </summary>
-        /// <param name="sizeHint"></param>
+        /// <param name="sizeHint">意图大小</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <returns></returns>
-        public Memory<byte> GetMemory(int sizeHint = 0)
+        public Memory<T> GetMemory(int sizeHint = 0)
         {
             this.CheckAndResizeBuffer(sizeHint);
             return this.byteArrayOwner.Array.AsMemory(this.WrittenCount);
@@ -91,20 +75,59 @@ namespace System.Buffers
         /// <summary>
         /// 返回用于写入数据的Span
         /// </summary>
-        /// <param name="sizeHint"></param>
+        /// <param name="sizeHint">意图大小</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <returns></returns>
-        public Span<byte> GetSpan(int sizeHint = 0)
+        public Span<T> GetSpan(int sizeHint = 0)
         {
             this.CheckAndResizeBuffer(sizeHint);
             return byteArrayOwner.Array.AsSpan(this.WrittenCount);
         }
 
         /// <summary>
+        /// 写入数据
+        /// </summary>
+        /// <param name="value"></param>
+        public void Write(T value)
+        {
+            this.GetSpan(1)[0] = value;
+            this.WrittenCount += 1;
+        }
+
+        /// <summary>
+        /// 写入数据
+        /// </summary>
+        /// <param name="value">值</param> 
+        public void Write(ReadOnlySpan<T> value)
+        {
+            if (value.IsEmpty == false)
+            {
+                value.CopyTo(this.GetSpan(value.Length));
+                this.WrittenCount += value.Length;
+            }
+        }
+
+        /// <summary>
+        /// 获取已数入的数据
+        /// </summary>
+        public ReadOnlySpan<T> GetWrittenSpan()
+        {
+            return this.byteArrayOwner.Array.AsSpan(0, this.WrittenCount);
+        }
+
+        /// <summary>
+        /// 获取已数入的数据
+        /// </summary>
+        public ReadOnlyMemory<T> GetWrittenMemory()
+        {
+            return this.byteArrayOwner.Array.AsMemory(0, this.WrittenCount);
+        }
+
+        /// <summary>
         /// 释放资源
         /// </summary>
         /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        protected sealed override void Dispose(bool disposing)
         {
             this.byteArrayOwner?.Dispose();
         }
@@ -114,6 +137,7 @@ namespace System.Buffers
         /// </summary>
         /// <param name="sizeHint"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void CheckAndResizeBuffer(int sizeHint)
         {
             if (sizeHint < 0)
@@ -123,19 +147,19 @@ namespace System.Buffers
 
             if (sizeHint == 0)
             {
-                sizeHint = MinimumBufferSize;
+                sizeHint = defaultSizeHint;
             }
 
-            if (sizeHint > this.FreeCapacity)
+            var freeCapacity = this.Capacity - this.WrittenCount;
+            if (sizeHint > freeCapacity)
             {
                 var growBy = Math.Max(sizeHint, this.Capacity);
                 var newSize = checked(this.Capacity + growBy);
 
-                var oldByteArrayOwner = this.byteArrayOwner;
-                this.byteArrayOwner = ArrayPool.Rent<byte>(newSize);
-
-                oldByteArrayOwner.Array.AsSpan(0, this.WrittenCount).CopyTo(this.byteArrayOwner.Array);
-                oldByteArrayOwner.Dispose();
+                var newOwer = ArrayPool.Rent<T>(newSize);
+                this.GetWrittenSpan().CopyTo(newOwer.Array);
+                this.byteArrayOwner.Dispose();
+                this.byteArrayOwner = newOwer;
             }
         }
     }

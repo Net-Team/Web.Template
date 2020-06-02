@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using WebApiClient;
+using WebApiClientCore;
 
 namespace Core.HttpApis
 {
@@ -18,7 +17,7 @@ namespace Core.HttpApis
         /// </summary>
         /// <param name="services"></param>
         /// <param name="assembly"></param>
-        public static IServiceCollection AddHttpApis(this IServiceCollection services, [NotNull] Assembly assembly)
+        public static IServiceCollection AddHttpApis(this IServiceCollection services, Assembly assembly)
         {
             var httpApis = assembly.GetTypes().Where(item => item.IsInterface && item.IsInheritFrom<IHttpApi>());
             foreach (var httpApi in httpApis)

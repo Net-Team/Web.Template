@@ -34,7 +34,7 @@ namespace Core.Xls
         /// </summary>
         /// <param name="dataTable">数据源</param>
         /// <exception cref="ArgumentException"></exception>
-        public XlsSheet([NotNull]DataTable dataTable)
+        public XlsSheet(DataTable dataTable)
         {
             this.CheckDataTable(dataTable);
             this.datas = this.Parse(dataTable).ToList();

@@ -19,7 +19,7 @@ namespace Core
         /// <param name="services"></param>
         /// <param name="assemblies"></param> 
         /// <param name="configuration"></param>
-        public static IServiceCollection AddConfigureOptions(this IServiceCollection services, [NotNull] IConfiguration configuration, [NotNull] params Assembly[] assemblies)
+        public static IServiceCollection AddConfigureOptions(this IServiceCollection services, IConfiguration configuration, params Assembly[] assemblies)
         {
             const string name = nameof(OptionsConfigurationServiceCollectionExtensions.Configure);
             var method = typeof(OptionsConfigurationServiceCollectionExtensions)

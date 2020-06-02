@@ -7,7 +7,7 @@ namespace System.Buffers
     /// <summary>
     /// 表示字节缓冲区写入对象
     /// </summary>
-    sealed class BufferWriter<T> : Disposable, IBufferWriter<T>
+    public sealed class BufferWriter<T> : Disposable, IBufferWriter<T>
     {
         private const int defaultSizeHint = 256;
         private IArrayOwner<T> byteArrayOwner;

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using WebApiClientCore;
@@ -42,7 +41,7 @@ namespace Core.HttpApis
         /// <returns></returns>
         public override Task OnRequestAsync(ApiRequestContext context)
         {
-            var options = context.HttpContext.Services.GetService<IOptions<GatewayOptions>>().Value;
+            var options = context.HttpContext.ServiceProvider.GetService<IOptions<GatewayOptions>>().Value;
             var host = options.HttpHost;
             if (this.Path.IsNullOrEmpty() == false)
             {

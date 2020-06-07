@@ -7,7 +7,7 @@ namespace System.Buffers
     /// <summary>
     /// 表示字节缓冲区写入对象
     /// </summary>
-    public sealed class BufferWriter<T> : Disposable, IBufferWriter<T>
+    public  class BufferWriter<T> : Disposable, IBufferWriter<T>
     {
         private const int defaultSizeHint = 256;
         private IArrayOwner<T> byteArrayOwner;
@@ -58,6 +58,15 @@ namespace System.Buffers
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
             this.WrittenCount += count;
+        }
+
+        /// <summary>
+        /// 获取已数入的数据
+        /// </summary>
+        /// <returns></returns>
+        public ArraySegment<T> GetWrittenSegment()
+        {
+            return new ArraySegment<T>(this.byteArrayOwner.Array, 0, this.WrittenCount);
         }
 
         /// <summary>

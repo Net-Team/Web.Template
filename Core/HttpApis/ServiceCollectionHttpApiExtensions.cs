@@ -25,7 +25,7 @@ namespace Core.HttpApis
                 if (httpApi.IsDefined(typeof(ApiManualRegisterAttribute)) == false)
                 {
                     var key = $"HttpApi:{httpApi.Name}";
-                    services.AddHttpApi(httpApi, (o, s) => s.GetService<IConfiguration>().GetSection(key).Bind(o));
+                    services.AddHttpApi(httpApi, (o, s) => s.GetRequiredService<IConfiguration>().GetSection(key).Bind(o));
                 }
             }
             return services;

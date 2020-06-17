@@ -2,8 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using WebApiClientCore;
+using WebApiClientCore.Serialization.JsonConverters;
 
 namespace Core.HttpApis
 {
@@ -25,7 +27,16 @@ namespace Core.HttpApis
                 if (httpApi.IsDefined(typeof(ApiManualRegisterAttribute)) == false)
                 {
                     var key = $"HttpApi:{httpApi.Name}";
-                    services.AddHttpApi(httpApi, (o, s) => s.GetRequiredService<IConfiguration>().GetSection(key).Bind(o));
+                    services.AddHttpApi(httpApi, (o, s) =>
+                    {
+                        o.JsonDeserializeOptions.Converters.Add(JsonLocalDateTimeConverter.Default);
+                        s.GetRequiredService<IConfiguration>().GetSection(key).Bind(o);
+                    })
+                    .ConfigurePrimaryHttpMessageHandler(() =>
+                    {
+                        var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (a, b, c, d) => true };
+                        return handler;
+                    });
                 }
             }
             return services;

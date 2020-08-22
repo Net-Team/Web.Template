@@ -8,6 +8,7 @@
     <PackageId>Taichuan.Core.Web</PackageId>
     <Description>asp.net的Api控制器基类、异常过滤器和Startup扩展等</Description>
     <OutputType>Library</OutputType>
+    <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
   </PropertyGroup> 
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">

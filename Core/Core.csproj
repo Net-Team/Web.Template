@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>20.7.28</Version>
+    <Version>20.8.22</Version>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <NoWarn>WA2001,NU5104</NoWarn>
 

@@ -1,4 +1,3 @@
-using Application;
 using Core;
 using Core.HttpApis;
 using Core.Web;
@@ -7,8 +6,6 @@ using Core.Web.ModelBinding;
 using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +14,7 @@ using StackExchange.Redis;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text.Json.Serialization;
 
 namespace Web.Host
@@ -62,6 +60,16 @@ namespace Web.Host
         /// <param name="services"></param>  
         public void ConfigureServices(IServiceCollection services)
         {
+            foreach (var item in AssemblyLoadContext.Default.Assemblies)
+            {
+                if (item.FullName?.StartsWith("System") == false && item.FullName?.StartsWith("Microsoft") == false)
+                {
+                    services.AddHttpApis(item);
+                    services.AddDependencyServices(item);
+                    services.AddConfigureOptions(this.Configuration.GetSection("Options"), item);
+                }
+            }
+
             // 数据库相关
             services
                 .AddDbContext<SqlDbContext>(options => // 关系数据库
@@ -89,9 +97,6 @@ namespace Web.Host
             services
                 .AddMemoryCache()
                 .AddHttpContextAccessor()
-                .AddHttpApis(typeof(ApplicationService).Assembly) // 添加httpApi
-                .AddDependencyServices(typeof(ApplicationService).Assembly) // ApplicationService服务
-                .AddConfigureOptions(this.Configuration.GetSection("Options"), typeof(ApiResult).Assembly, typeof(ApplicationService).Assembly, typeof(ApiController).Assembly, this.GetType().Assembly)
                 .AddJwtParser()                  // 添加认证配置                
                 .AddApiResultInvalidModelState() // 模型验证转换为ApiResult输出
                 .AddNamespaceApiVersioning()     // 添加版本控制

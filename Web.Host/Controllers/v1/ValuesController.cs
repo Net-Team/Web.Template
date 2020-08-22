@@ -2,12 +2,19 @@
 using Core.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Web.Host.Controllers.v1
 {
+
+    [Register(ServiceLifetime.Scoped)]
+    public class AService
+    {
+    }
+
     /// <summary>
     /// 演示控制器
     /// </summary>
@@ -18,7 +25,7 @@ namespace Web.Host.Controllers.v1
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ApiResult<string[]> Get()
+        public ApiResult<string[]> Get([FromServices] AService a)
         {
             return new string[] { "ok" };
         }
@@ -62,7 +69,7 @@ namespace Web.Host.Controllers.v1
         [HttpDelete("{id}")]
         public ApiResult<bool> Delete(int id)
         {
-            throw new Exception();           
+            throw new Exception();
         }
     }
 }

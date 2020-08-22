@@ -1,10 +1,10 @@
 ﻿using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Core.Web.Swaggers
 {
@@ -13,7 +13,7 @@ namespace Core.Web.Swaggers
     /// </summary>
     public class SwaggerRequiredSchemaFilter : ISchemaFilter
     {
-        private readonly CamelCasePropertyNamesContractResolver camelCaseContractResolver;
+        private readonly JsonNamingPolicy camelCaseContractResolver;
 
         /// <summary>
         /// swagger的值类型自动Required标记过滤器
@@ -21,7 +21,10 @@ namespace Core.Web.Swaggers
         /// <param name="camelCasePropertyNames"></param>
         public SwaggerRequiredSchemaFilter(bool camelCasePropertyNames)
         {
-            this.camelCaseContractResolver = camelCasePropertyNames ? new CamelCasePropertyNamesContractResolver() : null;
+            if (camelCasePropertyNames == true)
+            {
+                this.camelCaseContractResolver = JsonNamingPolicy.CamelCase;
+            }
         }
 
         /// <summary>
@@ -31,7 +34,11 @@ namespace Core.Web.Swaggers
         /// <returns></returns>
         private string GetPropertyName(PropertyInfo property)
         {
-            return camelCaseContractResolver?.GetResolvedPropertyName(property.Name) ?? property.Name;
+            if (this.camelCaseContractResolver == null)
+            {
+                return property.Name;
+            }
+            return this.camelCaseContractResolver.ConvertName(property.Name);
         }
 
         /// <summary>
@@ -61,6 +68,6 @@ namespace Core.Web.Swaggers
                     }
                 }
             }
-        } 
+        }
     }
 }

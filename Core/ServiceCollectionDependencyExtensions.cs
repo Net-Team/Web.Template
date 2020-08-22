@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -20,23 +18,23 @@ namespace Core
         public static IServiceCollection AddDependencyServices(this IServiceCollection services, Assembly assembly)
         {
             var types = assembly.GetTypes().Where(item => item.IsClass && item.IsAbstract == false).ToArray();
-            var singletons = types.Where(item => item.IsInheritFrom<ISingletonDependency>());
-            var transients = types.Where(item => item.IsInheritFrom<ITransientDependency>());
-            var scopeds = types.Where(item => item.IsInheritFrom<IScopedDependency>());
-
-            foreach (var item in singletons)
+            foreach (var impType in types)
             {
-                services.AddSingleton(item);
-            }
+                var register = impType.GetCustomAttribute<RegisterAttribute>();
+                if (register == null)
+                {
+                    register = impType
+                        .GetInterfaces()
+                        .Select(item => item.GetCustomAttribute<RegisterAttribute>())
+                        .Where(item => item != null)
+                        .FirstOrDefault();
+                }
 
-            foreach (var item in transients)
-            {
-                services.AddTransient(item);
-            }
-
-            foreach (var item in scopeds)
-            {
-                services.AddScoped(item);
+                if (register != null)
+                {
+                    var serviceType = register.ServiceType ?? impType;
+                    services.Add(ServiceDescriptor.Describe(serviceType, impType, register.Lifetime));
+                }
             }
             return services;
         }

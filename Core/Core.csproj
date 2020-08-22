@@ -1,28 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>20.6.17</Version>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <Version>20.7.28</Version>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <NoWarn>WA2001,NU5104</NoWarn>
 
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Taichuan.Core</PackageId>
     <Description>通用应用需要的依赖注册、选项配置、Http客户端、Http接口返回类型和其它工具类</Description>
-  </PropertyGroup>
+  </PropertyGroup> 
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'"> 
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'"> 
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />   
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-preview.7.20364.11" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="QMapper" Version="0.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
-    <PackageReference Include="WebApiClientCore" Version="1.0.4" />
+    <PackageReference Include="WebApiClientCore" Version="1.0.8" />
     <PackageReference Include="NPOI" Version="2.4.1" />
   </ItemGroup>
 

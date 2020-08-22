@@ -1,4 +1,5 @@
-﻿#if NETCOREAPP3_0
+﻿using System;
+
 namespace System.Buffers
 {
     /// <summary>
@@ -18,4 +19,3 @@ namespace System.Buffers
         int Count { get; }
     }
 }
-#endif

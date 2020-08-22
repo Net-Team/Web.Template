@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP3_0
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace System.Buffers
 {
@@ -56,5 +55,4 @@ namespace System.Buffers
             }
         }
     }
-}
-#endif
+} 

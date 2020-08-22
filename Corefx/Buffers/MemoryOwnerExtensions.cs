@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP3_0
-namespace System.Buffers
+﻿namespace System.Buffers
 {
     /// <summary>
     /// IMemoryOwner扩展
@@ -68,5 +67,4 @@ namespace System.Buffers
             }
         }
     }
-}
-#endif
+} 

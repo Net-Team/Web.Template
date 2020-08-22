@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0
+﻿ 
 
 using System.Runtime.CompilerServices;
 
@@ -172,5 +172,4 @@ namespace System.Buffers
             }
         }
     }
-}
-#endif
+} 

@@ -1,31 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>20.6.17</Version>
     <NoWarn>NU5104</NoWarn>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <Version>20.7.28</Version>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks> 
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Taichuan.Core.Web</PackageId>
     <Description>asp.net的Api控制器基类、异常过滤器和Startup扩展等</Description>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
-  </ItemGroup>
+  </PropertyGroup> 
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="5.0.0-preview.7.20364.11" /> 
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Exceptionless.Signed" Version="4.3.2027" />    
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc2" />
+    <PackageReference Include="Exceptionless.Signed" Version="4.3.2027" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.5.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -146,12 +146,7 @@ namespace System
         {
             if (sourceValue?.Length > skipLeft + skipRight)
             {
-                var span = sourceValue
-                    .ToCharArray()
-#if NETCOREAPP3_0
-                    .AsSpan()
-#endif
-                    ;
+                var span = sourceValue.ToCharArray().AsSpan();
                 for (var i = skipLeft; i < span.Length - skipRight; i++)
                 {
                     span[i] = mask;
@@ -198,12 +193,7 @@ namespace System
                 return source;
             }
 
-            var charArray = source
-                .ToCharArray()
-#if NETCOREAPP3_0
-                .AsSpan()
-#endif
-                ;
+            var charArray = source.ToCharArray().AsSpan();
             for (int i = 0; i < charArray.Length; i++)
             {
                 if (i == 1 && char.IsUpper(charArray[i]) == false)

@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP3_0
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace System.Text.Json.Serialization
 {
@@ -75,4 +74,3 @@ namespace System.Text.Json.Serialization
         }
     }
 }
-#endif

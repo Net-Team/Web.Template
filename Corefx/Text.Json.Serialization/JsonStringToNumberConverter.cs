@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP3_0
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace System.Text.Json.Serialization
@@ -204,4 +203,3 @@ namespace System.Text.Json.Serialization
         }
     }
 }
-#endif

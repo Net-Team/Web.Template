@@ -60,13 +60,13 @@ namespace Web.Host
         /// <param name="services"></param>  
         public void ConfigureServices(IServiceCollection services)
         {
-            foreach (var item in AssemblyLoadContext.Default.Assemblies)
+            foreach (var assembily in AssemblyLoadContext.Default.Assemblies)
             {
-                if (item.FullName?.StartsWith("System") == false && item.FullName?.StartsWith("Microsoft") == false)
+                if (assembily.FullName?.StartsWith("System") == false && assembily.FullName?.StartsWith("Microsoft") == false)
                 {
-                    services.AddHttpApis(item);
-                    services.AddDependencyServices(item);
-                    services.AddConfigureOptions(this.Configuration.GetSection("Options"), item);
+                    services.AddDependencyServices(assembily);
+                    services.AddHttpApis(assembily, Configuration.GetSection("HttpApi"));
+                    services.AddConfigureOptions(assembily, this.Configuration.GetSection("Options"));
                 }
             }
 

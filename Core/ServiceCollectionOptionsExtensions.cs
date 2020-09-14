@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 
 namespace Core
@@ -17,25 +15,35 @@ namespace Core
         /// 并关联到configuration的子项
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="assemblies"></param> 
+        /// <param name="assembly"></param> 
         /// <param name="configuration"></param>
-        public static IServiceCollection AddConfigureOptions(this IServiceCollection services, IConfiguration configuration, params Assembly[] assemblies)
+        public static IServiceCollection AddConfigureOptions(this IServiceCollection services, Assembly assembly, IConfiguration configuration)
         {
-            const string name = nameof(OptionsConfigurationServiceCollectionExtensions.Configure);
-            var method = typeof(OptionsConfigurationServiceCollectionExtensions)
-                .GetMethod(name, 1, new[] { typeof(IServiceCollection), typeof(IConfiguration) });
-
-            foreach (var assembly in assemblies)
+            foreach (var optionsType in assembly.GetTypes())
             {
-                var optionsTypes = assembly.GetTypes().Where(item => item.IsInheritFrom<IConfigureOptions>());
-                foreach (var type in optionsTypes)
+                if (optionsType.IsInheritFrom<IConfigureOptions>() == false)
                 {
-                    var configSection = configuration.GetSection(type.Name);
-                    method.MakeGenericMethod(type).Invoke(null, new object[] { services, configSection });
+                    continue;
                 }
-            }
 
+                var builderType = typeof(BindOptionsBuilder<>).MakeGenericType(optionsType);
+                var builder = (IBindOptionsBuilder)Activator.CreateInstance(builderType);
+                builder.Bind(services, configuration.GetSection(optionsType.Name));
+            }
             return services;
+        }
+
+        private interface IBindOptionsBuilder
+        {
+            void Bind(IServiceCollection services, IConfiguration configuration);
+        }
+
+        private class BindOptionsBuilder<TOptions> : IBindOptionsBuilder where TOptions : class
+        {
+            public void Bind(IServiceCollection services, IConfiguration configuration)
+            {
+                services.AddOptions<TOptions>().Bind(configuration);
+            }
         }
     }
 }

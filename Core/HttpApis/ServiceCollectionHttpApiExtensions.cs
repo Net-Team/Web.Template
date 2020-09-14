@@ -19,50 +19,14 @@ namespace Core.HttpApis
         /// <param name="services"></param>
         /// <param name="assembly"></param>
         /// <param name="configuration"></param>
-        public static IServiceCollection AddHttpApis(this IServiceCollection services, Assembly assembly, string configuration = "HttpApi")
-        {
-            var httpApis = assembly.GetTypes().Where(item => item.IsInterface && item.IsInheritFrom<IHttpApi>());
-            foreach (var httpApi in httpApis)
-            {
-                if (httpApi.IsDefined(typeof(ApiManualRegisterAttribute)) == true)
-                {
-                    continue;
-                }
-
-                services
-                    .AddHttpApi(httpApi, (o, s) =>
-                    {
-                        var key = configuration == null ? httpApi.Name : $"{configuration}:{httpApi.Name}";
-                        s.GetService<IConfiguration>().GetSection(key).Bind(o);
-                    })
-                    .ConfigurePrimaryHttpMessageHandler(() =>
-                    {
-                        return new HttpClientHandler { ServerCertificateCustomValidationCallback = (a, b, c, d) => true };
-                    });
-            }
-
-            return services;
-        }
-
-        /// <summary>
-        /// 注册程序集下所有IHttpApi
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="assembly"></param>
-        /// <param name="configuration"></param>
         public static IServiceCollection AddHttpApis(this IServiceCollection services, Assembly assembly, IConfiguration configuration)
         {
-            var httpApis = assembly.GetTypes().Where(item => item.IsInterface && item.IsInheritFrom<IHttpApi>());
-            foreach (var httpApi in httpApis)
+            var httpApiTypes = assembly.GetTypes().Where(item => item.IsInterface && item.IsInheritFrom<IHttpApi>());
+            foreach (var httpApiType in httpApiTypes)
             {
-                if (httpApi.IsDefined(typeof(ApiManualRegisterAttribute)) == true)
-                {
-                    continue;
-                }
-
                 services
-                    .ConfigureHttpApi(httpApi, configuration.GetSection(httpApi.Name))
-                    .AddHttpApi(httpApi)
+                    .ConfigureHttpApi(httpApiType, configuration.GetSection(httpApiType.Name))
+                    .AddHttpApi(httpApiType)
                     .ConfigurePrimaryHttpMessageHandler(() =>
                     {
                         return new HttpClientHandler { ServerCertificateCustomValidationCallback = (a, b, c, d) => true };

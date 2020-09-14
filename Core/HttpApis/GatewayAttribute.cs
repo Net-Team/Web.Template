@@ -42,8 +42,7 @@ namespace Core.HttpApis
         /// <returns></returns>
         public override Task OnRequestAsync(ApiRequestContext context)
         {
-            var options = context.HttpContext.ServiceProvider.GetService<IOptions<GatewayOptions>>().Value;
-            var host = options.HttpHost;
+            var host = context.HttpContext.ServiceProvider.GetService<IOptionsMonitor<GatewayOptions>>().CurrentValue.HttpHost;
             if (this.Path.IsNullOrEmpty() == false)
             {
                 host = new Uri(host, this.Path);

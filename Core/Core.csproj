@@ -22,7 +22,7 @@
 	<ItemGroup>
 		<PackageReference Include="QMapper" Version="0.4.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
-		<PackageReference Include="WebApiClientCore" Version="1.1.0-rc*" />
+		<PackageReference Include="WebApiClientCore" Version="1.1.0" />
 		<PackageReference Include="NPOI" Version="2.4.1" />
 	</ItemGroup>
 

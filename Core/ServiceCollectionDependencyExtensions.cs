@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
 using System.Reflection;
 
@@ -32,8 +33,15 @@ namespace Core
 
                 if (register != null)
                 {
-                    var serviceType = register.ServiceType ?? impType;
-                    services.Add(ServiceDescriptor.Describe(serviceType, impType, register.Lifetime));
+                    var descriptor = ServiceDescriptor.Describe(register.ServiceType ?? impType, impType, register.Lifetime);
+                    if (register.Lifetime != ServiceLifetime.Transient)
+                    {
+                        services.Replace(descriptor);
+                    }
+                    else if (services.Any(item => item.ServiceType == descriptor.ServiceType && item.ImplementationType == descriptor.ImplementationType) == false)
+                    {
+                        services.Add(descriptor);
+                    }
                 }
             }
             return services;

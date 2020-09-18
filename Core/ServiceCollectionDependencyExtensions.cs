@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
 using System.Reflection;
 
@@ -27,18 +26,13 @@ namespace Core
                     register = impType
                         .GetInterfaces()
                         .Select(item => item.GetCustomAttribute<RegisterAttribute>())
-                        .Where(item => item != null)
-                        .FirstOrDefault();
+                        .FirstOrDefault(item => item != null);
                 }
 
                 if (register != null)
                 {
                     var descriptor = ServiceDescriptor.Describe(register.ServiceType ?? impType, impType, register.Lifetime);
-                    if (register.Lifetime != ServiceLifetime.Transient)
-                    {
-                        services.Replace(descriptor);
-                    }
-                    else if (services.Any(item => item.ServiceType == descriptor.ServiceType && item.ImplementationType == descriptor.ImplementationType) == false)
+                    if (services.Any(item => item.ServiceType == descriptor.ServiceType && item.ImplementationType == descriptor.ImplementationType) == false)
                     {
                         services.Add(descriptor);
                     }

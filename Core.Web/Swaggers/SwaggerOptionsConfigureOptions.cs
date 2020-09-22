@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Collections.Generic;
 
 namespace Core.Web.Swaggers
 {
@@ -26,6 +28,10 @@ namespace Core.Web.Swaggers
         public void Configure(SwaggerOptions options)
         {
             options.RouteTemplate = $"/swagger/{thisService.Name}/{{documentName}}/swagger.json";
+            options.PreSerializeFilters.Add((swagger, request) =>
+            {
+                swagger.Servers = new List<OpenApiServer>();
+            });
         }
     }
 }

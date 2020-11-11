@@ -1,18 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>20.9.15</Version>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>20.11.11</Version>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>System</RootNamespace>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>corefx项目的补充，提供诸多基础类型和类型扩展功能</Description>
     <PackageId>Taichuan.Corefx</PackageId>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0" />
-  </ItemGroup>
+  </PropertyGroup> 
 
 </Project>

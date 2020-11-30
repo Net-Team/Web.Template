@@ -78,13 +78,13 @@ namespace System.Data
             using var writer = new StreamWriter(stream, encoding, bufferSize, leaveOpen: true);
             var fieldItem = this.fields.Select(item => item.Name);
             var head = string.Join(",", fieldItem);
-            await writer.WriteLineAsync(head);
+            await writer.WriteLineAsync(head.AsMemory());
 
             foreach (var item in this.Models)
             {
-                var lineItems = this.fields.Select(f => f.GetValue(item)?.ToString());
+                var lineItems = this.fields.Select(f => f.GetValue(item));
                 var line = string.Join(",", lineItems);
-                await writer.WriteLineAsync(line);
+                await writer.WriteLineAsync(line.AsMemory());
             }
         }
 
@@ -94,7 +94,7 @@ namespace System.Data
         private interface IField
         {
             string Name { get; }
-            object GetValue(T model);
+            string GetValue(T model);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace System.Data
         /// <typeparam name="TKey"></typeparam>
         private class Field<TKey> : IField
         {
-            private Func<T, TKey> valueFunc;
+            private readonly Func<T, TKey> valueFunc;
 
             public string Name { get; private set; }
 
@@ -113,9 +113,12 @@ namespace System.Data
                 this.valueFunc = value;
             }
 
-            public object GetValue(T model)
+            public string GetValue(T model)
             {
-                return this.valueFunc(model);
+                var value = this.valueFunc(model)?.ToString();
+                return value != null && value.Contains(',')
+                    ? @$"""{value}"""
+                    : value;
             }
         }
     }

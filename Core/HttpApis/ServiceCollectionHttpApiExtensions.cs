@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using WebApiClientCore;
@@ -21,16 +20,18 @@ namespace Core.HttpApis
         /// <param name="configuration"></param>
         public static IServiceCollection AddHttpApis(this IServiceCollection services, Assembly assembly, IConfiguration configuration)
         {
-            var httpApiTypes = assembly.GetTypes().Where(item => item.IsInterface && item.IsInheritFrom<IHttpApi>());
-            foreach (var httpApiType in httpApiTypes)
+            foreach (var httpApiType in assembly.GetTypes())
             {
-                services
-                    .ConfigureHttpApi(httpApiType, configuration.GetSection(httpApiType.Name))
-                    .AddHttpApi(httpApiType)
-                    .ConfigurePrimaryHttpMessageHandler(() =>
-                    {
-                        return new HttpClientHandler { ServerCertificateCustomValidationCallback = (a, b, c, d) => true };
-                    });
+                if (httpApiType.IsInterface && httpApiType.IsInheritFrom<IHttpApi>())
+                {
+                    services
+                        .AddHttpApi(httpApiType)
+                        .ConfigureHttpApi(configuration.GetSection(httpApiType.Name))
+                        .ConfigurePrimaryHttpMessageHandler(() =>
+                        {
+                            return new HttpClientHandler { ServerCertificateCustomValidationCallback = (a, b, c, d) => true };
+                        });
+                }
             }
 
             return services;

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>20.11.11</Version>
+    <Version>21.1.26</Version>
     <TargetFramework>net5.0</TargetFramework>
     <NoWarn>WA2001,NU5104</NoWarn>
 
@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="QMapper" Version="0.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
-    <PackageReference Include="WebApiClientCore" Version="1.1.2" />
+    <PackageReference Include="WebApiClientCore" Version="2.0.0" />
     <PackageReference Include="NPOI" Version="2.5.1" />
   </ItemGroup>
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System;
 using System.Threading.Tasks;
 using WebApiClientCore;
 using WebApiClientCore.Attributes;
@@ -10,12 +9,12 @@ namespace Core.HttpApis
     /// <summary>
     /// 标记http接口配置网关的域名
     /// </summary>  
-    public class GatewayAttribute : ApiActionAttribute
+    public class GatewayAttribute : HttpHostBaseAttribute
     {
         /// <summary>
         /// 请求路径
         /// </summary>
-        public string Path { get; }
+        public HttpPath Path { get; }
 
         /// <summary>
         /// http接口配置网关的域名
@@ -31,8 +30,7 @@ namespace Core.HttpApis
         /// <param name="path">路径</param>
         public GatewayAttribute(string path)
         {
-            this.Path = path;
-            this.OrderIndex = int.MinValue;
+            this.Path = HttpPath.Create(path);
         }
 
         /// <summary>
@@ -43,12 +41,7 @@ namespace Core.HttpApis
         public override Task OnRequestAsync(ApiRequestContext context)
         {
             var host = context.HttpContext.ServiceProvider.GetService<IOptionsMonitor<GatewayOptions>>().CurrentValue.HttpHost;
-            if (this.Path.IsNullOrEmpty() == false)
-            {
-                host = new Uri(host, this.Path);
-            }
-
-            context.HttpContext.RequestMessage.RequestUri = host;
+            context.HttpContext.RequestMessage.RequestUri = this.Path.MakeUri(host);
             return Task.CompletedTask;
         }
     }

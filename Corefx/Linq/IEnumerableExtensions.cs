@@ -83,18 +83,14 @@ namespace System.Linq
         /// <param name="source"></param>
         /// <param name="nameSelector">名称选择器</param>
         /// <returns></returns>
-        public static IEnumerable<TRoom> OrderByNumericSegments<TRoom>(this IEnumerable<TRoom> source, Func<TRoom, string> nameSelector)
+        public static IOrderedEnumerable<TRoom> OrderByNumericSegments<TRoom>(this IEnumerable<TRoom> source, Func<TRoom, string> nameSelector)
         {
             if (source == null)
             {
                 return null;
             }
 
-            return source
-                .Select(item => new Segment<TRoom>(item, nameSelector(item)))
-                .OrderBy(item => item.SegmentCount)
-                .ThenBy(item => item.SegmentValue)
-                .Select(item => item.Data);
+            return source.OrderBy(nameSelector, NumericSegmentComparer.Instance);
         }
 
         /// <summary>
@@ -124,41 +120,56 @@ namespace System.Linq
             }
         }
 
+
+
         /// <summary>
-        /// 表示结构分段
+        /// 比较器
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        private class Segment<T>
+        private class NumericSegmentComparer : IComparer<string>
         {
-            /// <summary>
-            /// 获取原始数据
-            /// </summary>
-            public T Data { get; private set; }
+            private const string Pattern = "\\d+(?=\\D)";
 
-            /// <summary>
-            /// 获取分段数量
-            /// </summary>
-            public int SegmentCount { get; private set; }
+            public static IComparer<string> Instance { get; } = new NumericSegmentComparer();
 
-            /// <summary>
-            /// 获取分段值
-            /// </summary>
-            public ulong SegmentValue { get; private set; }
-
-            /// <summary>
-            /// 项目的结构分段
-            /// </summary>
-            /// <param name="data">数据</param>
-            /// <param name="name">名称</param>
-            public Segment(T data, string name)
+            public int Compare(string x, string y)
             {
-                this.Data = data;
-                var segments = name.Matches(@"\d+(?=\D)");
-                this.SegmentCount = segments.Length;
-                if (segments.Length > 0)
+                if (x == null && y == null)
                 {
-                    this.SegmentValue = ulong.Parse(string.Join(string.Empty, segments));
+                    return 0;
                 }
+
+                if (x == null)
+                {
+                    return -1;
+                }
+
+                if (y == null)
+                {
+                    return 1;
+                }
+
+                var xSegments = x.Matches(Pattern);
+                var ySegments = y.Matches(Pattern);
+
+                var c = xSegments.Length - ySegments.Length;
+                if (c != 0)
+                {
+                    return c;
+                }
+
+                for (var i = 0; i < xSegments.Length; i++)
+                {
+                    x = xSegments[i];
+                    y = ySegments[i];
+
+                    c = int.Parse(x) - int.Parse(y);
+                    if (c != 0)
+                    {
+                        return c;
+                    }
+                }
+
+                return 0;
             }
         }
     }

@@ -198,9 +198,21 @@ namespace System.Linq.Expressions
                     return Expression.Lambda(body, parameter) as Expression<Func<T, bool>>;
 
                 default:
-                    var valueExp = ConstantExpression(value, member.Type);
-                    var binaryBody = Expression.MakeBinary((ExpressionType)@operator, member, valueExp);
-                    return Expression.Lambda(binaryBody, parameter) as Expression<Func<T, bool>>;
+                    if (member.Type.IsEnum)
+                    {
+                        var enumType = Enum.GetUnderlyingType(member.Type);
+                        var valueConvert = Expression.Constant(Convert.ChangeType(value, enumType));
+                        var memberConvert = Expression.Convert(member, enumType);
+
+                        var binaryBody = Expression.MakeBinary((ExpressionType)@operator, memberConvert, valueConvert);
+                        return (Expression<Func<T, bool>>)Expression.Lambda(binaryBody, parameter);
+                    }
+                    else
+                    {
+                        var valueExp = ConstantExpression(value, member.Type);
+                        var binaryBody = Expression.MakeBinary((ExpressionType)@operator, member, valueExp);
+                        return Expression.Lambda(binaryBody, parameter) as Expression<Func<T, bool>>;
+                    }
             }
         }
 
